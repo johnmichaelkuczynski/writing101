@@ -114,10 +114,9 @@ export default function DocumentContent() {
                 <p>Tarski, A. (1936). Der Wahrheitsbegriff in den formalisierten Sprachen. <em>Studia Philosophica</em>, 1, 261–405.</p>
               </div>
             </section>
-            </article>
-          </div>
-        </ScrollArea>
-      </div>
+          </article>
+        </div>
+      </ScrollArea>
     </div>
   );
 }

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { MessageCircle, Send, Bot, User, Download, Mail, Copy } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -15,7 +17,9 @@ interface ChatInterfaceProps {
 
 export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
   const [message, setMessage] = useState("");
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [emailAddress, setEmailAddress] = useState("");
+  const [contentToEmail, setContentToEmail] = useState("");
   const { toast } = useToast();
 
   const { data: chatHistory = [], refetch } = useQuery({
@@ -69,16 +73,22 @@ export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
     }
   };
 
-  const handleEmail = async (content: string) => {
+  const openEmailDialog = (content: string) => {
+    setContentToEmail(content);
+    setEmailDialogOpen(true);
+  };
+
+  const handleSendEmail = async () => {
     if (!emailAddress) {
       toast({ title: "Please enter an email address", variant: "destructive" });
       return;
     }
 
     try {
-      await emailContent(content, emailAddress, "AI Response from Living Book");
+      await emailContent(contentToEmail, emailAddress, "AI Response from Living Book");
       toast({ title: "Email sent successfully" });
       setEmailAddress("");
+      setEmailDialogOpen(false);
     } catch (error) {
       toast({ title: "Failed to send email", variant: "destructive" });
     }
@@ -100,7 +110,7 @@ export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
         <div className="flex-1 p-4">
           <ScrollArea className="h-full">
             <div className="space-y-4">
-              {chatHistory.map((chat: ChatMessage) => (
+              {(chatHistory as ChatMessage[]).map((chat: ChatMessage) => (
                 <div key={chat.id} className="space-y-2">
                   {/* User Message */}
                   <div className="bg-muted rounded-lg p-3 ml-8">
@@ -134,7 +144,7 @@ export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleEmail(chat.response)}
+                            onClick={() => openEmailDialog(chat.response)}
                             className="text-xs text-blue-600 hover:text-blue-800 p-1 h-auto"
                           >
                             <Mail className="w-3 h-3 mr-1" />
@@ -159,41 +169,69 @@ export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
           </ScrollArea>
         </div>
 
-        {/* Email Input */}
+        {/* Chat Input - Much Bigger */}
         <div className="border-t border-border p-4">
-          <Input
-            type="email"
-            placeholder="Email address for sending responses"
-            value={emailAddress}
-            onChange={(e) => setEmailAddress(e.target.value)}
-            className="mb-2 text-xs"
-          />
-        </div>
-
-        {/* Chat Input */}
-        <div className="border-t border-border p-4">
-          <form onSubmit={handleSubmit} className="flex space-x-2">
-            <Input
-              type="text"
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <Textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Ask about the paper..."
-              className="flex-1 text-sm"
+              className="min-h-[120px] text-sm resize-none"
               disabled={chatMutation.isPending}
             />
-            <Button
-              type="submit"
-              size="sm"
-              disabled={!message.trim() || chatMutation.isPending}
-            >
-              <Send className="w-4 h-4" />
-            </Button>
+            <div className="flex justify-end">
+              <Button
+                type="submit"
+                disabled={!message.trim() || chatMutation.isPending}
+                className="flex items-center space-x-2"
+              >
+                <Send className="w-4 h-4" />
+                <span>
+                  {chatMutation.isPending ? "Asking..." : "Ask Question"}
+                </span>
+              </Button>
+            </div>
           </form>
           <p className="text-xs text-muted-foreground mt-2">
             Supports Markdown + KaTeX. All responses preserve mathematical notation.
           </p>
         </div>
       </div>
+
+      {/* Email Dialog */}
+      <Dialog open={emailDialogOpen} onOpenChange={setEmailDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Email AI Response</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-foreground">Email Address:</label>
+              <Input
+                type="email"
+                placeholder="your-email@example.com"
+                value={emailAddress}
+                onChange={(e) => setEmailAddress(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground">Content Preview:</label>
+              <div className="mt-1 p-3 bg-muted rounded text-xs max-h-32 overflow-y-auto">
+                {contentToEmail.substring(0, 200)}...
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setEmailDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSendEmail} disabled={!emailAddress}>
+                Send Email
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </aside>
   );
 }
