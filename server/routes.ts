@@ -5,9 +5,16 @@ import { generateAIResponse } from "./services/ai-models";
 import { getFullDocumentContent } from "./services/document-processor";
 import { sendEmail } from "./services/email-service";
 import { generatePDF } from "./services/pdf-generator";
+import { transcribeAudio } from "./services/speech-service";
 import { chatRequestSchema, instructionRequestSchema, emailRequestSchema } from "@shared/schema";
+import multer from "multer";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Configure multer for audio file uploads
+  const upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+  });
   // Chat endpoint
   app.post("/api/chat", async (req, res) => {
     try {
@@ -103,6 +110,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("PDF generation error:", error);
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Speech transcription endpoint
+  app.post("/api/transcribe", upload.single("audio"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "Audio file is required" });
+      }
+
+      const audioBuffer = req.file.buffer;
+      const result = await transcribeAudio(audioBuffer);
+      
+      res.json({ 
+        text: result.text,
+        confidence: result.confidence 
+      });
+    } catch (error) {
+      console.error("Speech transcription error:", error);
+      res.status(500).json({ error: "Speech recognition failed" });
     }
   });
 
