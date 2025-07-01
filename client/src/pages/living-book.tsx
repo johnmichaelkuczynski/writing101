@@ -45,7 +45,7 @@ export default function LivingBook() {
         {/* Main Content Area */}
         <main className="flex-1 min-w-0">
           {/* Document Content */}
-          <DocumentContent />
+          <DocumentContent onQuestionFromSelection={setQuestionFromSelection} />
         </main>
 
         {/* Chat Panel - Much Larger */}
@@ -53,7 +53,11 @@ export default function LivingBook() {
       </div>
 
       {/* Instruction Interface - Bottom Bar */}
-      <InstructionInterface selectedModel={selectedModel} />
+      <InstructionInterface 
+        selectedModel={selectedModel} 
+        initialQuestion={questionFromSelection}
+        onQuestionProcessed={() => setQuestionFromSelection("")}
+      />
     </div>
   );
 }

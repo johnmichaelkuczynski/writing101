@@ -119,3 +119,9 @@ Preferred communication style: Simple, everyday language.
   - Added voice recording button to instruction interface
   - Mobile-friendly microphone support with real-time recording feedback
   - Automatic transcription appends to text input for seamless use
+- July 01, 2025: Added text highlighting and selection functionality
+  - Users can highlight passages in the paper with mouse selection
+  - Selection toolbar appears with "Ask" and "Highlight" buttons
+  - Questions about highlighted text auto-populate the input box
+  - Visual highlighting persists on selected passages
+  - Seamless integration with voice dictation and chat interface

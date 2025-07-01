@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send } from "lucide-react";
@@ -10,12 +10,24 @@ import type { AIModel } from "@shared/schema";
 
 interface InstructionInterfaceProps {
   selectedModel: AIModel;
+  initialQuestion?: string;
+  onQuestionProcessed?: () => void;
 }
 
-export default function InstructionInterface({ selectedModel }: InstructionInterfaceProps) {
+export default function InstructionInterface({ selectedModel, initialQuestion, onQuestionProcessed }: InstructionInterfaceProps) {
   const [instruction, setInstruction] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Auto-fill with highlighted text question
+  useEffect(() => {
+    if (initialQuestion) {
+      setInstruction(initialQuestion);
+      if (onQuestionProcessed) {
+        onQuestionProcessed();
+      }
+    }
+  }, [initialQuestion, onQuestionProcessed]);
 
   const instructionMutation = useMutation({
     mutationFn: async (data: { instruction: string; model: AIModel }) => {
