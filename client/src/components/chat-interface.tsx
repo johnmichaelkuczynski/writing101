@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { copyToClipboard, downloadPDF, emailContent } from "@/lib/export-utils";
+import { renderMathInElement } from "@/lib/math-renderer";
 import type { AIModel, ChatMessage } from "@shared/schema";
 
 interface ChatInterfaceProps {
@@ -26,6 +27,37 @@ export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
     queryKey: ["/api/chat/history"],
     refetchInterval: 5000,
   });
+
+  // Render math after chat history updates
+  useEffect(() => {
+    if ((chatHistory as ChatMessage[]).length > 0) {
+      setTimeout(() => renderMathInElement(), 100);
+    }
+  }, [chatHistory]);
+
+  // Function to render markdown-style text
+  const renderMessageContent = (content: string) => {
+    // Convert markdown-style formatting to HTML
+    let formattedContent = content
+      // Bold text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      // Headers
+      .replace(/^### (.*$)/gm, '<h3 class="text-lg font-semibold mt-4 mb-2">$1</h3>')
+      .replace(/^## (.*$)/gm, '<h2 class="text-xl font-semibold mt-4 mb-2">$1</h2>')
+      .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mt-4 mb-2">$1</h1>')
+      // Code blocks (multiline)
+      .replace(/```[\s\S]*?```/g, (match) => {
+        const codeContent = match.replace(/```/g, '');
+        return `<pre class="bg-gray-100 p-2 rounded text-sm my-2 overflow-x-auto"><code>${codeContent}</code></pre>`;
+      })
+      // Inline code
+      .replace(/`(.*?)`/g, '<code class="bg-gray-100 px-1 py-0.5 rounded text-sm">$1</code>')
+      // Line breaks
+      .replace(/\n\n/g, '<br/><br/>')
+      .replace(/\n/g, '<br/>');
+
+    return { __html: formattedContent };
+  };
 
   const chatMutation = useMutation({
     mutationFn: async (data: { message: string; model: AIModel }) => {
@@ -127,9 +159,10 @@ export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
                     <div className="flex items-start space-x-2">
                       <Bot className="text-primary mt-1 w-4 h-4" />
                       <div className="flex-1">
-                        <p className="text-sm text-foreground whitespace-pre-wrap">
-                          {chat.response}
-                        </p>
+                        <div 
+                          className="text-sm text-foreground prose prose-sm max-w-none"
+                          dangerouslySetInnerHTML={renderMessageContent(chat.response)}
+                        />
                         {/* Export Controls */}
                         <div className="flex items-center space-x-2 mt-3 pt-2 border-t border-blue-200">
                           <Button
