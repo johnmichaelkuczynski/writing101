@@ -38,7 +38,8 @@ export default function InstructionInterface({ selectedModel }: InstructionInter
     },
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (!instruction.trim()) return;
     
     instructionMutation.mutate({
@@ -53,16 +54,25 @@ export default function InstructionInterface({ selectedModel }: InstructionInter
         <h2 className="font-inter font-semibold text-lg text-foreground mb-3">
           AI Instruction Interface
         </h2>
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <Textarea
             value={instruction}
             onChange={(e) => setInstruction(e.target.value)}
-            className="w-full h-24 resize-none"
-            placeholder="Ask a question, give a command, or modify the content (e.g., 'rewrite section 3.2 as a dialogue', 'summarize the proofs', or 'explain it like I'm 15')"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (instruction.trim() && !instructionMutation.isPending) {
+                  handleSubmit(e);
+                }
+              }
+            }}
+            className="w-full h-24 resize-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Ask a question, give a command, or modify the content... (Press Enter to send, Shift+Enter for new line)"
+            autoFocus
           />
           <div className="flex justify-end">
             <Button
-              onClick={handleSubmit}
+              type="submit"
               disabled={!instruction.trim() || instructionMutation.isPending}
               className="flex items-center space-x-2"
             >
@@ -72,7 +82,7 @@ export default function InstructionInterface({ selectedModel }: InstructionInter
               </span>
             </Button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

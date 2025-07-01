@@ -207,42 +207,7 @@ export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
           </ScrollArea>
         </div>
 
-        {/* Chat Input - Much Bigger */}
-        <div className="border-t border-border p-4">
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <Textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  if (message.trim() && !chatMutation.isPending) {
-                    handleSubmit(e);
-                  }
-                }
-              }}
-              placeholder="Ask about the paper... (Press Enter to send, Shift+Enter for new line)"
-              className="min-h-[120px] text-sm resize-none focus:ring-2 focus:ring-blue-500"
-              disabled={chatMutation.isPending}
-              autoFocus
-            />
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={!message.trim() || chatMutation.isPending}
-                className="flex items-center space-x-2"
-              >
-                <Send className="w-4 h-4" />
-                <span>
-                  {chatMutation.isPending ? "Asking..." : "Ask Question"}
-                </span>
-              </Button>
-            </div>
-          </form>
-          <p className="text-xs text-muted-foreground mt-2">
-            Supports Markdown + KaTeX. All responses preserve mathematical notation.
-          </p>
-        </div>
+
       </div>
 
       {/* Email Dialog */}
