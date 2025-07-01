@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import type { AIModel } from "@shared/schema";
@@ -14,20 +14,43 @@ interface InstructionInterfaceProps {
 export default function InstructionInterface({ selectedModel }: InstructionInterfaceProps) {
   const [instruction, setInstruction] = useState("");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const instructionMutation = useMutation({
     mutationFn: async (data: { instruction: string; model: AIModel }) => {
       const response = await apiRequest("POST", "/api/instruction", data);
       return response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      // Add the instruction and response to chat history as a fake chat message
+      const fakeMessage = {
+        id: Date.now(),
+        message: instruction,
+        response: data.response,
+        model: selectedModel,
+        timestamp: new Date(),
+        context: null
+      };
+      
+      // Add to chat history by calling the backend
+      try {
+        await apiRequest("POST", "/api/chat", {
+          message: instruction,
+          model: selectedModel
+        });
+      } catch (error) {
+        // If that fails, at least show a toast
+        console.log("AI Response:", data.response);
+      }
+      
       toast({
-        title: "Instruction Processed",
-        description: "AI response generated successfully",
+        title: "Response Ready",
+        description: "Check the chat panel for your answer",
       });
       setInstruction("");
-      // You could display the response in a modal or update state
-      console.log("AI Response:", data.response);
+      
+      // Force refresh chat history
+      queryClient.invalidateQueries({ queryKey: ["/api/chat/history"] });
     },
     onError: (error) => {
       toast({
