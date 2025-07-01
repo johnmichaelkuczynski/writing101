@@ -125,3 +125,8 @@ Preferred communication style: Simple, everyday language.
   - Questions about highlighted text auto-populate the input box
   - Visual highlighting persists on selected passages
   - Seamless integration with voice dictation and chat interface
+- July 01, 2025: CRITICAL FIX - Implemented conversation memory
+  - AI now remembers previous conversation history (last 6 exchanges)
+  - Follow-up questions properly reference earlier discussion
+  - Fixed isolated Q&A issue - now supports genuine conversations
+  - Context includes both paper content and conversation history
