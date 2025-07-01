@@ -175,7 +175,15 @@ export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
             <Textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Ask about the paper..."
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  if (message.trim() && !chatMutation.isPending) {
+                    handleSubmit(e);
+                  }
+                }
+              }}
+              placeholder="Ask about the paper... (Press Enter to send, Shift+Enter for new line)"
               className="min-h-[120px] text-sm resize-none"
               disabled={chatMutation.isPending}
             />
