@@ -37,8 +37,8 @@ When responding, maintain mathematical precision and use proper LaTeX notation f
 export async function generateAIResponse(model: AIModel, prompt: string, isInstruction: boolean = false): Promise<string> {
   const paperContext = getPaperContext();
   const systemPrompt = isInstruction 
-    ? `${paperContext}\n\nYou are helping analyze, modify, or explain the academic paper content. Follow the user's instructions precisely while maintaining mathematical accuracy.`
-    : `${paperContext}\n\nAnswer questions about the paper, explain concepts, and help users understand the mathematical and philosophical content.`;
+    ? `${paperContext}\n\nYou are helping analyze, modify, or explain the academic paper content. Follow the user's instructions precisely while maintaining mathematical accuracy. Keep responses concise unless the user specifically asks for elaboration.`
+    : `${paperContext}\n\nAnswer questions about the paper concisely in 1-2 paragraphs maximum. Be direct and focused. End with "I can provide more details if you'd like" or similar when appropriate. Use proper LaTeX notation for math.`;
 
   try {
     switch (model) {
