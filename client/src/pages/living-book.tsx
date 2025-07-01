@@ -37,7 +37,7 @@ export default function LivingBook() {
         </div>
       </header>
 
-      <div className="flex max-w-7xl mx-auto main-content-with-bottom-bar">
+      <div className="flex w-full main-content-with-bottom-bar">
         {/* Navigation Sidebar */}
         <NavigationSidebar />
 

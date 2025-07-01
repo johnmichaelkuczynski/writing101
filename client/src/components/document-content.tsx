@@ -8,10 +8,10 @@ export default function DocumentContent() {
   }, []);
 
   return (
-    <div className="bg-card">
-      <div className="h-[calc(100vh-280px)]">
-        <ScrollArea className="h-full p-8">
-          <article className="prose prose-lg max-w-none">
+    <div className="bg-card overflow-hidden">
+      <ScrollArea className="h-[calc(100vh-280px)]">
+        <div className="p-8">
+          <article className="prose prose-lg max-w-none text-foreground">
             {/* Document Title */}
             <header className="text-center mb-12">
               <h1 className="text-3xl font-georgia font-bold text-foreground mb-4">
@@ -114,7 +114,8 @@ export default function DocumentContent() {
                 <p>Tarski, A. (1936). Der Wahrheitsbegriff in den formalisierten Sprachen. <em>Studia Philosophica</em>, 1, 261–405.</p>
               </div>
             </section>
-          </article>
+            </article>
+          </div>
         </ScrollArea>
       </div>
     </div>
