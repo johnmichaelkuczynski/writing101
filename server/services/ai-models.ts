@@ -24,25 +24,27 @@ const anthropic = new Anthropic({
 });
 
 function getPaperContext(): string {
-  const fullContent = getFullDocumentContent();
-  return `You are an AI assistant helping users understand and interact with the academic paper "The Incompleteness of Deductive Logic: A Generalization of Gödel's Theorem".
+  return `You are an AI assistant helping users understand the academic paper "The Incompleteness of Deductive Logic: A Generalization of Gödel's Theorem".
 
-Here is the complete paper content:
+KEY PAPER CONCEPTS:
+- Main theorem (§3.3): Class K of recursive definitions is not recursively definable
+- Definition 2.3: Logic L = recursively enumerable set of sentences from axioms S + inference operator Φ
+- Key result: |P(K)| > |K| (Cantor's theorem) proves incompleteness at logic level
+- Generalizes Gödel's incompleteness from PA to all deductive systems
+- §4 discusses philosophical implications for mathematics and formal systems
 
-${fullContent}
-
-When responding, maintain mathematical precision and use proper LaTeX notation for mathematics. Use $...$ for inline math and $$...$$ for display math. Examples: $\\alpha \\in \\Sigma^*$, $|P(K)| > |K|$, $$\\forall x \\in \\Sigma^*, \\text{if } \\exists y \\in k \\text{ such that } \\Phi(y) = x, \\text{ then } x \\in k$$. Be prepared to discuss connections to Gödel's theorems, recursion theory, and the philosophical implications. You have access to the full text of the paper and should reference specific sections, definitions, and theorems when answering questions.`;
+Use LaTeX notation: $...$ for inline math, $$...$$ for display math. Reference specific sections (§1, §2, etc.) and definitions when relevant. Keep responses concise and mathematically precise.`;
 }
 
 export async function generateAIResponse(model: AIModel, prompt: string, isInstruction: boolean = false, chatHistory: ChatMessage[] = []): Promise<string> {
   const paperContext = getPaperContext();
   
-  // Build conversation context from history
+  // Build conversation context from history - keep it concise
   let conversationContext = "";
   if (!isInstruction && chatHistory.length > 0) {
-    const recentHistory = chatHistory.slice(-6); // Last 6 exchanges to keep context manageable
-    conversationContext = "\n\nPrevious conversation:\n" + 
-      recentHistory.map(msg => `Human: ${msg.message}\nAssistant: ${msg.response}`).join("\n\n");
+    const recentHistory = chatHistory.slice(-3); // Reduced to last 3 exchanges for speed
+    conversationContext = "\n\nRecent discussion:\n" + 
+      recentHistory.map(msg => `Q: ${msg.message.substring(0, 100)}...\nA: ${msg.response.substring(0, 150)}...`).join("\n");
   }
   
   const systemPrompt = isInstruction 
@@ -76,8 +78,8 @@ async function generateOpenAIResponse(prompt: string, systemPrompt: string): Pro
       { role: "system", content: systemPrompt },
       { role: "user", content: prompt }
     ],
-    max_tokens: 2000,
-    temperature: 0.7,
+    max_tokens: 300, // Reduced for faster responses
+    temperature: 0.3, // Lower temp for more focused responses
   });
 
   return response.choices[0].message.content || "I apologize, but I couldn't generate a response.";
@@ -89,7 +91,7 @@ async function generateAnthropicResponse(prompt: string, systemPrompt: string): 
     model: DEFAULT_ANTHROPIC_MODEL,
     system: systemPrompt,
     messages: [{ role: "user", content: prompt }],
-    max_tokens: 2000,
+    max_tokens: 300, // Reduced for faster responses
   });
 
   return response.content[0].text || "I apologize, but I couldn't generate a response.";
@@ -135,8 +137,8 @@ async function generateDeepSeekResponse(prompt: string, systemPrompt: string): P
         { role: "system", content: systemPrompt },
         { role: "user", content: prompt }
       ],
-      max_tokens: 2000,
-      temperature: 0.7,
+      max_tokens: 300, // Reduced for faster responses
+      temperature: 0.3, // Lower temp for more focused responses
       stream: false,
     }),
   });
