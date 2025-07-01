@@ -10,6 +10,7 @@ import type { AIModel } from "@shared/schema";
 
 export default function LivingBook() {
   const [selectedModel, setSelectedModel] = useState<AIModel>("deepseek");
+  const [questionFromSelection, setQuestionFromSelection] = useState<string>("");
 
   useEffect(() => {
     initializeMathRenderer();

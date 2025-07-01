@@ -1,17 +1,37 @@
 import { useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { renderMathInElement } from "@/lib/math-renderer";
+import { useTextSelection } from "@/hooks/use-text-selection";
+import SelectionToolbar from "@/components/selection-toolbar";
 
-export default function DocumentContent() {
+interface DocumentContentProps {
+  onQuestionFromSelection?: (question: string) => void;
+}
+
+export default function DocumentContent({ onQuestionFromSelection }: DocumentContentProps) {
+  const { selection, isSelecting, clearSelection, highlightSelection, removeHighlights } = useTextSelection();
+
   useEffect(() => {
     renderMathInElement();
   }, []);
 
+  const handleAskQuestion = (questionText: string) => {
+    if (onQuestionFromSelection) {
+      onQuestionFromSelection(questionText);
+    }
+    clearSelection();
+  };
+
+  const handleHighlight = () => {
+    highlightSelection();
+    clearSelection();
+  };
+
   return (
     <div className="bg-card overflow-hidden">
       <ScrollArea className="h-[calc(100vh-280px)]">
-        <div className="p-8 w-full max-w-5xl mx-auto">
-          <article className="prose prose-xl max-w-none text-foreground w-full leading-relaxed">
+        <div className="p-8 w-full max-w-5xl mx-auto" data-document-content>
+          <article className="prose prose-xl max-w-none text-foreground w-full leading-relaxed select-text">
             {/* Document Title */}
             <header className="text-center mb-12">
               <h1 className="text-3xl font-georgia font-bold text-foreground mb-4">
@@ -117,6 +137,16 @@ export default function DocumentContent() {
           </article>
         </div>
       </ScrollArea>
+      
+      {/* Selection Toolbar */}
+      {selection && isSelecting && (
+        <SelectionToolbar
+          selectedText={selection.text}
+          onAskQuestion={handleAskQuestion}
+          onHighlight={handleHighlight}
+          onClear={clearSelection}
+        />
+      )}
     </div>
   );
 }
