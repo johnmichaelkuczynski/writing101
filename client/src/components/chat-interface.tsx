@@ -95,7 +95,7 @@ export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
   };
 
   return (
-    <aside className="w-[800px] bg-card border-l border-border sticky top-16 h-[calc(100vh-280px)]">
+    <aside className="w-[500px] bg-card border-l border-border sticky top-16 h-[calc(100vh-280px)]">
       <div className="flex flex-col h-full">
         {/* Chat Header */}
         <div className="bg-muted px-4 py-3 border-b border-border">

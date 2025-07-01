@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import Anthropic from '@anthropic-ai/sdk';
 import type { AIModel } from "@shared/schema";
+import { getFullDocumentContent } from "./document-processor";
 
 /*
 <important_code_snippet_instructions>
@@ -22,25 +23,22 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY_ENV_VAR || "",
 });
 
-const PAPER_CONTEXT = `
-You are an AI assistant helping users understand and interact with the academic paper "The Incompleteness of Deductive Logic: A Generalization of Gödel's Theorem". 
+function getPaperContext(): string {
+  const fullContent = getFullDocumentContent();
+  return `You are an AI assistant helping users understand and interact with the academic paper "The Incompleteness of Deductive Logic: A Generalization of Gödel's Theorem".
 
-The paper demonstrates that deductive logic is incomplete by showing there exists no recursive definition of the class of all logical truths. It generalizes Gödel's incompleteness theorem to show that the class of recursively defined logics is not itself recursively definable. The core result uses Cantor's diagonal argument to show a cardinality mismatch between recursive definitions and their power sets.
+Here is the complete paper content:
 
-Key sections include:
-1. Introduction and Framework - Defines logic as recursively enumerable sets of sentences
-2. Definitions - Recursive functions, posterity operators, and recursive logic
-3. Lemmas and Theorems - Cantor's lemma, theorem about recursive definitions
-4. Philosophical Significance - Extends Gödel's insights to logic itself
-5. Conclusion - Shows no formal system can exhaust logical truths
+${fullContent}
 
-When responding, maintain mathematical precision and support LaTeX notation. Be prepared to discuss connections to Gödel's theorems, recursion theory, and the philosophical implications.
-`;
+When responding, maintain mathematical precision and support LaTeX/KaTeX notation. Be prepared to discuss connections to Gödel's theorems, recursion theory, and the philosophical implications. You have access to the full text of the paper and should reference specific sections, definitions, and theorems when answering questions.`;
+}
 
 export async function generateAIResponse(model: AIModel, prompt: string, isInstruction: boolean = false): Promise<string> {
+  const paperContext = getPaperContext();
   const systemPrompt = isInstruction 
-    ? `${PAPER_CONTEXT}\n\nYou are helping analyze, modify, or explain the academic paper content. Follow the user's instructions precisely while maintaining mathematical accuracy.`
-    : `${PAPER_CONTEXT}\n\nAnswer questions about the paper, explain concepts, and help users understand the mathematical and philosophical content.`;
+    ? `${paperContext}\n\nYou are helping analyze, modify, or explain the academic paper content. Follow the user's instructions precisely while maintaining mathematical accuracy.`
+    : `${paperContext}\n\nAnswer questions about the paper, explain concepts, and help users understand the mathematical and philosophical content.`;
 
   try {
     switch (model) {

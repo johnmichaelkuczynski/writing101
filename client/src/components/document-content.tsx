@@ -10,8 +10,8 @@ export default function DocumentContent() {
   return (
     <div className="bg-card overflow-hidden">
       <ScrollArea className="h-[calc(100vh-280px)]">
-        <div className="p-8">
-          <article className="prose prose-lg max-w-none text-foreground">
+        <div className="p-8 w-full max-w-4xl mx-auto">
+          <article className="prose prose-lg max-w-none text-foreground w-full">
             {/* Document Title */}
             <header className="text-center mb-12">
               <h1 className="text-3xl font-georgia font-bold text-foreground mb-4">
