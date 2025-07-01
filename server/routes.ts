@@ -20,10 +20,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { message, model } = chatRequestSchema.parse(req.body);
       
-      const documentContext = getFullDocumentContent();
-      const fullPrompt = `Context: ${documentContext}\n\nUser Question: ${message}`;
+      // Get conversation history for context
+      const chatHistory = await storage.getChatMessages();
       
-      const response = await generateAIResponse(model, fullPrompt, false);
+      const response = await generateAIResponse(model, message, false, chatHistory);
       
       await storage.createChatMessage({
         message,

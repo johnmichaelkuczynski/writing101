@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import Anthropic from '@anthropic-ai/sdk';
-import type { AIModel } from "@shared/schema";
+import type { AIModel, ChatMessage } from "@shared/schema";
 import { getFullDocumentContent } from "./document-processor";
 
 /*
@@ -34,11 +34,20 @@ ${fullContent}
 When responding, maintain mathematical precision and use proper LaTeX notation for mathematics. Use $...$ for inline math and $$...$$ for display math. Examples: $\\alpha \\in \\Sigma^*$, $|P(K)| > |K|$, $$\\forall x \\in \\Sigma^*, \\text{if } \\exists y \\in k \\text{ such that } \\Phi(y) = x, \\text{ then } x \\in k$$. Be prepared to discuss connections to Gödel's theorems, recursion theory, and the philosophical implications. You have access to the full text of the paper and should reference specific sections, definitions, and theorems when answering questions.`;
 }
 
-export async function generateAIResponse(model: AIModel, prompt: string, isInstruction: boolean = false): Promise<string> {
+export async function generateAIResponse(model: AIModel, prompt: string, isInstruction: boolean = false, chatHistory: ChatMessage[] = []): Promise<string> {
   const paperContext = getPaperContext();
+  
+  // Build conversation context from history
+  let conversationContext = "";
+  if (!isInstruction && chatHistory.length > 0) {
+    const recentHistory = chatHistory.slice(-6); // Last 6 exchanges to keep context manageable
+    conversationContext = "\n\nPrevious conversation:\n" + 
+      recentHistory.map(msg => `Human: ${msg.message}\nAssistant: ${msg.response}`).join("\n\n");
+  }
+  
   const systemPrompt = isInstruction 
     ? `${paperContext}\n\nYou are helping analyze, modify, or explain the academic paper content. Follow the user's instructions precisely while maintaining mathematical accuracy. Keep responses concise unless the user specifically asks for elaboration.`
-    : `${paperContext}\n\nIMPORTANT: Keep answers very short - maximum 3-4 sentences. Be direct and concise. If the user wants more detail, they will ask. Use proper LaTeX notation for math.`;
+    : `${paperContext}${conversationContext}\n\nIMPORTANT: This is a conversation about the paper. Reference our previous discussion when relevant. Keep answers very short - maximum 3-4 sentences. Be direct and concise. If the user wants more detail, they will ask. Use proper LaTeX notation for math.`;
 
   try {
     switch (model) {
