@@ -19,7 +19,7 @@ export default function NavigationSidebar() {
   };
 
   return (
-    <aside className="w-64 bg-card shadow-sm border-r border-border sticky top-16 h-screen">
+    <aside className="w-64 bg-card shadow-sm border-r border-border sticky top-16 h-[calc(100vh-280px)]">
       <div className="p-4">
         <h3 className="font-inter font-semibold text-sm text-foreground mb-3">
           Document Navigation

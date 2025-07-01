@@ -77,7 +77,11 @@
 }
 
 .content-scroll {
-  max-height: calc(100vh - 200px);
+  max-height: calc(100vh - 280px);
+}
+
+.main-content-with-bottom-bar {
+  padding-bottom: 200px;
 }
 
 .font-inter {

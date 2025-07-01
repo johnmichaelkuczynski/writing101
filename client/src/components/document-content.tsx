@@ -8,8 +8,8 @@ export default function DocumentContent() {
   }, []);
 
   return (
-    <div className="bg-card h-screen overflow-hidden">
-      <div className="h-full">
+    <div className="bg-card">
+      <div className="h-[calc(100vh-280px)]">
         <ScrollArea className="h-full p-8">
           <article className="prose prose-lg max-w-none">
             {/* Document Title */}

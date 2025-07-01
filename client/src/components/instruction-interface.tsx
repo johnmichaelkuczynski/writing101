@@ -48,7 +48,7 @@ export default function InstructionInterface({ selectedModel }: InstructionInter
   };
 
   return (
-    <div className="bg-card border-b border-border p-6">
+    <div className="bg-card border-t border-border p-6 fixed bottom-0 left-0 right-0 z-40">
       <div className="max-w-4xl">
         <h2 className="font-inter font-semibold text-lg text-foreground mb-3">
           AI Instruction Interface
