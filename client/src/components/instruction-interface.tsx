@@ -5,6 +5,7 @@ import { Send } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import VoiceRecorder from "@/components/voice-recorder";
 import type { AIModel } from "@shared/schema";
 
 interface InstructionInterfaceProps {
@@ -93,7 +94,11 @@ export default function InstructionInterface({ selectedModel }: InstructionInter
             placeholder="Ask a question, give a command, or modify the content... (Press Enter to send, Shift+Enter for new line)"
             autoFocus
           />
-          <div className="flex justify-end">
+          <div className="flex justify-between items-center">
+            <VoiceRecorder 
+              onTranscription={(text) => setInstruction(prev => prev + (prev ? ' ' : '') + text)}
+              disabled={instructionMutation.isPending}
+            />
             <Button
               type="submit"
               disabled={!instruction.trim() || instructionMutation.isPending}

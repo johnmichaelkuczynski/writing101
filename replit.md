@@ -114,3 +114,8 @@ Preferred communication style: Simple, everyday language.
   - Implemented KaTeX math notation rendering for mathematical formulas
   - Added full paper content to AI context for accurate responses
   - Configured AI models to use proper LaTeX notation ($...$, $$...$$)
+- July 01, 2025: Added voice dictation functionality
+  - Integrated AssemblyAI and Gladia speech-to-text services
+  - Added voice recording button to instruction interface
+  - Mobile-friendly microphone support with real-time recording feedback
+  - Automatic transcription appends to text input for seamless use
