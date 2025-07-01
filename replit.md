@@ -104,5 +104,11 @@ Preferred communication style: Simple, everyday language.
 
 ## Changelog
 
-Changelog:
-- July 01, 2025. Initial setup
+- July 01, 2025: Initial setup
+- July 01, 2025: Fixed chat interface layout and functionality
+  - Made document area much wider (max-w-5xl) for better readability
+  - Added Enter key support for sending messages (Shift+Enter for new lines)
+  - Fixed markdown rendering in chat responses with proper HTML formatting
+  - Implemented KaTeX math notation rendering for mathematical formulas
+  - Added full paper content to AI context for accurate responses
+  - Configured AI models to use proper LaTeX notation ($...$, $$...$$)
