@@ -38,7 +38,7 @@ export async function generateAIResponse(model: AIModel, prompt: string, isInstr
   const paperContext = getPaperContext();
   const systemPrompt = isInstruction 
     ? `${paperContext}\n\nYou are helping analyze, modify, or explain the academic paper content. Follow the user's instructions precisely while maintaining mathematical accuracy. Keep responses concise unless the user specifically asks for elaboration.`
-    : `${paperContext}\n\nAnswer questions about the paper concisely in 1-2 paragraphs maximum. Be direct and focused. End with "I can provide more details if you'd like" or similar when appropriate. Use proper LaTeX notation for math.`;
+    : `${paperContext}\n\nIMPORTANT: Keep answers very short - maximum 3-4 sentences. Be direct and concise. If the user wants more detail, they will ask. Use proper LaTeX notation for math.`;
 
   try {
     switch (model) {

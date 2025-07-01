@@ -98,9 +98,11 @@ This is an interactive AI-augmented interface for exploring the academic paper "
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
-- Chat interface should be much larger (made 800px wide)
+- Chat interface should be much larger (made 420px wide)
 - User input should be a large textarea, not small input field
 - Email functionality should only appear when user clicks on a specific response, not as a persistent input field
+- AI responses should be very short (3-4 sentences maximum) unless user specifically asks for elaboration
+- Enter key should send messages (Shift+Enter for new lines)
 
 ## Changelog
 
