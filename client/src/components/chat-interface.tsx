@@ -31,7 +31,12 @@ export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
   // Render math after chat history updates
   useEffect(() => {
     if ((chatHistory as ChatMessage[]).length > 0) {
-      setTimeout(() => renderMathInElement(), 100);
+      setTimeout(() => {
+        const chatResponses = document.querySelectorAll('.chat-response');
+        chatResponses.forEach(element => {
+          renderMathInElement(element as HTMLElement);
+        });
+      }, 200);
     }
   }, [chatHistory]);
 
@@ -160,7 +165,7 @@ export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
                       <Bot className="text-primary mt-1 w-4 h-4" />
                       <div className="flex-1">
                         <div 
-                          className="text-sm text-foreground prose prose-sm max-w-none"
+                          className="text-sm text-foreground prose prose-sm max-w-none chat-response"
                           dangerouslySetInnerHTML={renderMessageContent(chat.response)}
                         />
                         {/* Export Controls */}

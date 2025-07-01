@@ -31,7 +31,7 @@ Here is the complete paper content:
 
 ${fullContent}
 
-When responding, maintain mathematical precision and support LaTeX/KaTeX notation. Be prepared to discuss connections to Gödel's theorems, recursion theory, and the philosophical implications. You have access to the full text of the paper and should reference specific sections, definitions, and theorems when answering questions.`;
+When responding, maintain mathematical precision and use proper LaTeX notation for mathematics. Use $...$ for inline math and $$...$$ for display math. Examples: $\\alpha \\in \\Sigma^*$, $|P(K)| > |K|$, $$\\forall x \\in \\Sigma^*, \\text{if } \\exists y \\in k \\text{ such that } \\Phi(y) = x, \\text{ then } x \\in k$$. Be prepared to discuss connections to Gödel's theorems, recursion theory, and the philosophical implications. You have access to the full text of the paper and should reference specific sections, definitions, and theorems when answering questions.`;
 }
 
 export async function generateAIResponse(model: AIModel, prompt: string, isInstruction: boolean = false): Promise<string> {
