@@ -43,16 +43,16 @@ export default function LivingBook() {
 
         {/* Main Content Area */}
         <main className="flex-1 min-w-0">
-          {/* Instruction Interface */}
-          <InstructionInterface selectedModel={selectedModel} />
-
           {/* Document Content */}
           <DocumentContent />
         </main>
 
-        {/* Chat Panel */}
+        {/* Chat Panel - Much Larger */}
         <ChatInterface selectedModel={selectedModel} />
       </div>
+
+      {/* Instruction Interface - Bottom Bar */}
+      <InstructionInterface selectedModel={selectedModel} />
     </div>
   );
 }

@@ -85,7 +85,7 @@ export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
   };
 
   return (
-    <aside className="w-80 bg-card border-l border-border sticky top-16 h-screen">
+    <aside className="w-[800px] bg-card border-l border-border sticky top-16 h-screen">
       <div className="flex flex-col h-full">
         {/* Chat Header */}
         <div className="bg-muted px-4 py-3 border-b border-border">
@@ -98,7 +98,7 @@ export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
 
         {/* Chat Messages */}
         <div className="flex-1 p-4">
-          <ScrollArea className="chat-scroll h-full">
+          <ScrollArea className="h-full">
             <div className="space-y-4">
               {chatHistory.map((chat: ChatMessage) => (
                 <div key={chat.id} className="space-y-2">

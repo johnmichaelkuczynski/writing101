@@ -8,9 +8,9 @@ export default function DocumentContent() {
   }, []);
 
   return (
-    <div className="bg-card">
-      <div className="max-w-4xl mx-auto p-8 content-scroll">
-        <ScrollArea className="h-full">
+    <div className="bg-card h-screen overflow-hidden">
+      <div className="h-full">
+        <ScrollArea className="h-full p-8">
           <article className="prose prose-lg max-w-none">
             {/* Document Title */}
             <header className="text-center mb-12">
@@ -65,7 +65,7 @@ export default function DocumentContent() {
               
               <div className="bg-blue-50 border-l-4 border-blue-500 p-6 mb-6">
                 <p className="font-semibold text-foreground mb-2">Lemma 3.1 (Cantor):</p>
-                <p className="text-muted-foreground mb-2"><span className="math-inline">|P(K)| > |K|</span> for any set <span className="math-inline">K</span>.</p>
+                <p className="text-muted-foreground mb-2"><span className="math-inline">|P(K)| {`>`} |K|</span> for any set <span className="math-inline">K</span>.</p>
                 <p className="text-sm text-muted-foreground font-semibold">Proof Sketch:</p>
                 <p className="text-sm text-muted-foreground">Assume <span className="math-inline">|P(K)| = |K|</span>. Then the diagonal subset of <span className="math-inline">K</span> cannot be in the image of any function <span className="math-inline">f: K → P(K)</span>, contradicting surjectivity. □</p>
               </div>
@@ -81,7 +81,7 @@ export default function DocumentContent() {
                 <p className="font-semibold text-foreground mb-2">Theorem 3.3:</p>
                 <p className="text-muted-foreground mb-2">The class of all recursive definitions (<span className="math-inline">K</span>) is not recursively definable.</p>
                 <p className="text-sm text-muted-foreground font-semibold">Proof:</p>
-                <p className="text-sm text-muted-foreground">Assume <span className="math-inline">K</span> is recursively definable. By Lemma 3.1, <span className="math-inline">|P(K)| > |K|</span>, but any recursive definition of <span className="math-inline">K</span> would imply <span className="math-inline">P(K)</span> is also recursively enumerable, yielding <span className="math-inline">|P(K)| ≤ |K|</span>, a contradiction. □</p>
+                <p className="text-sm text-muted-foreground">Assume <span className="math-inline">K</span> is recursively definable. By Lemma 3.1, <span className="math-inline">|P(K)| {`>`} |K|</span>, but any recursive definition of <span className="math-inline">K</span> would imply <span className="math-inline">P(K)</span> is also recursively enumerable, yielding <span className="math-inline">|P(K)| ≤ |K|</span>, a contradiction. □</p>
               </div>
             </section>
 
