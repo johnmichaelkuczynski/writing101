@@ -136,3 +136,8 @@ Preferred communication style: Simple, everyday language.
   - Reduced max_tokens from 2000 to 300 for faster generation
   - Lowered temperature from 0.7 to 0.3 for more focused responses
   - Response time improved from ~8s to ~6.5s
+- July 01, 2025: Balanced response length optimization
+  - Increased max_tokens from 300 to 600 for more informative responses
+  - Relaxed "very short" requirement to allow thorough explanations
+  - AI now provides helpful, complete answers while staying focused
+  - Maintains conversation memory and fast response times

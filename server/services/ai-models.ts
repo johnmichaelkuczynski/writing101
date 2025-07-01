@@ -49,7 +49,7 @@ export async function generateAIResponse(model: AIModel, prompt: string, isInstr
   
   const systemPrompt = isInstruction 
     ? `${paperContext}\n\nYou are helping analyze, modify, or explain the academic paper content. Follow the user's instructions precisely while maintaining mathematical accuracy. Keep responses concise unless the user specifically asks for elaboration.`
-    : `${paperContext}${conversationContext}\n\nIMPORTANT: This is a conversation about the paper. Reference our previous discussion when relevant. Keep answers very short - maximum 3-4 sentences. Be direct and concise. If the user wants more detail, they will ask. Use proper LaTeX notation for math.`;
+    : `${paperContext}${conversationContext}\n\nIMPORTANT: This is a conversation about the paper. Reference our previous discussion when relevant. Provide informative, helpful responses that fully answer the question. Be clear and thorough while staying focused. Use proper LaTeX notation for math.`;
 
   try {
     switch (model) {
@@ -78,7 +78,7 @@ async function generateOpenAIResponse(prompt: string, systemPrompt: string): Pro
       { role: "system", content: systemPrompt },
       { role: "user", content: prompt }
     ],
-    max_tokens: 300, // Reduced for faster responses
+    max_tokens: 600, // Balanced for informative responses
     temperature: 0.3, // Lower temp for more focused responses
   });
 
@@ -91,7 +91,7 @@ async function generateAnthropicResponse(prompt: string, systemPrompt: string): 
     model: DEFAULT_ANTHROPIC_MODEL,
     system: systemPrompt,
     messages: [{ role: "user", content: prompt }],
-    max_tokens: 300, // Reduced for faster responses
+    max_tokens: 600, // Balanced for informative responses
   });
 
   return response.content[0].text || "I apologize, but I couldn't generate a response.";
@@ -137,7 +137,7 @@ async function generateDeepSeekResponse(prompt: string, systemPrompt: string): P
         { role: "system", content: systemPrompt },
         { role: "user", content: prompt }
       ],
-      max_tokens: 300, // Reduced for faster responses
+      max_tokens: 600, // Balanced for informative responses
       temperature: 0.3, // Lower temp for more focused responses
       stream: false,
     }),
