@@ -222,8 +222,9 @@ export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
                 }
               }}
               placeholder="Ask about the paper... (Press Enter to send, Shift+Enter for new line)"
-              className="min-h-[120px] text-sm resize-none"
+              className="min-h-[120px] text-sm resize-none focus:ring-2 focus:ring-blue-500"
               disabled={chatMutation.isPending}
+              autoFocus
             />
             <div className="flex justify-end">
               <Button
