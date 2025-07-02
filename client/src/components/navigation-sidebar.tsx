@@ -1,14 +1,5 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-const navigationItems = [
-  { id: "abstract", title: "Abstract" },
-  { id: "introduction", title: "1. Introduction and Framework" },
-  { id: "definitions", title: "2. Definitions" },
-  { id: "theorems", title: "3. Lemmas and Theorems" },
-  { id: "significance", title: "4. Philosophical Significance" },
-  { id: "conclusion", title: "5. Conclusion" },
-  { id: "references", title: "References" },
-];
+import { paperContent } from "@/data/paper-content";
 
 export default function NavigationSidebar() {
   const handleNavClick = (id: string) => {
@@ -26,13 +17,13 @@ export default function NavigationSidebar() {
         </h3>
         <ScrollArea className="sidebar-scroll">
           <nav className="space-y-1">
-            {navigationItems.map((item) => (
+            {paperContent.sections.map((section) => (
               <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
+                key={section.id}
+                onClick={() => handleNavClick(section.id)}
                 className="block w-full text-left px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-primary rounded-md transition-colors"
               >
-                {item.title}
+                {section.title}
               </button>
             ))}
           </nav>
