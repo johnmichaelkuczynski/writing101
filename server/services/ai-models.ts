@@ -24,16 +24,27 @@ const anthropic = new Anthropic({
 });
 
 function getPaperContext(): string {
-  return `You are an AI assistant helping users understand the academic paper "The Incompleteness of Deductive Logic: A Generalization of Gödel's Theorem".
+  const fullContent = getFullDocumentContent();
+  
+  return `You are an AI assistant helping users understand the philosophical dialogue "Kuczynski & Quine: A Philosophical Dialogue on Empiricism".
 
-KEY PAPER CONCEPTS:
-- Main theorem (§3.3): Class K of recursive definitions is not recursively definable
-- Definition 2.3: Logic L = recursively enumerable set of sentences from axioms S + inference operator Φ
-- Key result: |P(K)| > |K| (Cantor's theorem) proves incompleteness at logic level
-- Generalizes Gödel's incompleteness from PA to all deductive systems
-- §4 discusses philosophical implications for mathematics and formal systems
+This dialogue features a debate between:
+- KUCZYNSKI: A rationalist who argues that some knowledge is acquired through reason alone and that universals exist independently of thought
+- QUINE: An empiricist who argues that all meaningful knowledge claims must ultimately be accountable to experience
 
-Use LaTeX notation: $...$ for inline math, $$...$$ for display math. Reference specific sections (§1, §2, etc.) and definitions when relevant. Keep responses concise and mathematically precise.`;
+KEY THEMES AND SECTIONS:
+1. Properties and Universals - The problem of whether we perceive properties themselves or just property-instances
+2. Language, Meaning, and Explanation - How we understand and explain the world through universals and concepts
+3. Perception and Cognitive Structures - Whether minds supply content or external objects activate pre-existing knowledge
+4. Geometry, Mathematics, and Learning - How we acquire knowledge of abstract concepts like space, time, and shape
+5. The Problem of Induction and Relations - How we know relationships between distinct situations and events
+6. Thoughts, Images, and Abstract Content - Whether thoughts can be reduced to mental images
+7. The Irreconcilable Divide - The fundamental tension between empiricist and rationalist approaches
+
+DOCUMENT CONTENT:
+${fullContent}
+
+Answer questions about this philosophical dialogue, referencing the specific arguments made by Kuczynski and Quine. Be accurate to their positions as presented in the text.`;
 }
 
 export async function generateAIResponse(model: AIModel, prompt: string, isInstruction: boolean = false, chatHistory: ChatMessage[] = []): Promise<string> {
@@ -48,8 +59,8 @@ export async function generateAIResponse(model: AIModel, prompt: string, isInstr
   }
   
   const systemPrompt = isInstruction 
-    ? `${paperContext}\n\nYou are helping analyze, modify, or explain the academic paper content. Follow the user's instructions precisely while maintaining mathematical accuracy. Keep responses concise unless the user specifically asks for elaboration.`
-    : `${paperContext}${conversationContext}\n\nIMPORTANT: This is a conversation about the paper. Reference our previous discussion when relevant. Provide informative, helpful responses that fully answer the question. Be clear and thorough while staying focused. Use proper LaTeX notation for math.`;
+    ? `${paperContext}\n\nYou are helping analyze, modify, or explain the philosophical dialogue content. Follow the user's instructions precisely while staying true to the philosophical positions presented. Keep responses concise unless the user specifically asks for elaboration.`
+    : `${paperContext}${conversationContext}\n\nIMPORTANT: This is a conversation about the Kuczynski-Quine philosophical dialogue on empiricism. Reference our previous discussion when relevant. Provide informative, helpful responses that fully answer the question about the philosophical arguments. Be clear and thorough while staying focused on the dialogue content.`;
 
   try {
     switch (model) {
@@ -66,7 +77,7 @@ export async function generateAIResponse(model: AIModel, prompt: string, isInstr
     }
   } catch (error) {
     console.error(`Error generating AI response with ${model}:`, error);
-    throw new Error(`Failed to generate response using ${model}: ${error.message}`);
+    throw new Error(`Failed to generate response using ${model}: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -94,7 +105,8 @@ async function generateAnthropicResponse(prompt: string, systemPrompt: string): 
     max_tokens: 600, // Balanced for informative responses
   });
 
-  return response.content[0].text || "I apologize, but I couldn't generate a response.";
+  const textContent = response.content[0];
+  return (textContent.type === 'text' ? textContent.text : "I apologize, but I couldn't generate a response.");
 }
 
 async function generatePerplexityResponse(prompt: string, systemPrompt: string): Promise<string> {
