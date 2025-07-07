@@ -1,12 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { generateAIResponse } from "./services/ai-models";
+import { generateAIResponse, generateRewrite } from "./services/ai-models";
 import { getFullDocumentContent } from "./services/document-processor";
 import { sendEmail } from "./services/email-service";
 import { generatePDF } from "./services/pdf-generator";
 import { transcribeAudio } from "./services/speech-service";
-import { chatRequestSchema, instructionRequestSchema, emailRequestSchema } from "@shared/schema";
+import { chatRequestSchema, instructionRequestSchema, emailRequestSchema, rewriteRequestSchema } from "@shared/schema";
 import multer from "multer";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -69,6 +69,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(messages);
     } catch (error) {
       console.error("Chat history error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Rewrite endpoint
+  app.post("/api/rewrite", async (req, res) => {
+    try {
+      const { originalText, instructions, model, chunkIndex, parentRewriteId } = rewriteRequestSchema.parse(req.body);
+      
+      const rewrittenText = await generateRewrite(model, originalText, instructions);
+      
+      const rewrite = await storage.createRewrite({
+        originalText,
+        rewrittenText,
+        instructions,
+        model,
+        chunkIndex,
+        parentRewriteId,
+      });
+      
+      res.json({ rewrite });
+    } catch (error) {
+      console.error("Rewrite error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get rewrites endpoint
+  app.get("/api/rewrites", async (req, res) => {
+    try {
+      const rewrites = await storage.getRewrites();
+      res.json(rewrites);
+    } catch (error) {
+      console.error("Error fetching rewrites:", error);
       res.status(500).json({ error: error.message });
     }
   });

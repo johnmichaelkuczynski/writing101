@@ -48,6 +48,33 @@ ${fullContent}
 Answer questions about this financial regulation document, referencing specific historical events, legislation, and economic arguments presented in the text.`;
 }
 
+export async function generateRewrite(model: AIModel, originalText: string, instructions: string): Promise<string> {
+  const systemPrompt = `You are a professional editor and rewriter. Your task is to rewrite the provided text according to the specific instructions given by the user. 
+
+Key Guidelines:
+- Follow the user's instructions precisely
+- Maintain the original meaning unless instructed otherwise
+- Preserve important factual information
+- Ensure the rewrite flows naturally and is well-structured
+- Keep the same general length unless instructed to expand or condense
+- Use clear, engaging prose appropriate for the subject matter
+
+Original text to rewrite:
+${originalText}
+
+User instructions:
+${instructions}
+
+Provide only the rewritten text without any meta-commentary or explanations.`;
+
+  try {
+    return await generateAnthropicResponse("", systemPrompt);
+  } catch (error) {
+    console.error(`Error generating rewrite with ${model}:`, error);
+    throw new Error(`Failed to generate rewrite: ${error.message}`);
+  }
+}
+
 export async function generateAIResponse(model: AIModel, prompt: string, isInstruction: boolean = false, chatHistory: ChatMessage[] = []): Promise<string> {
   const paperContext = getPaperContext();
   

@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Highlighter, X, MessageSquare } from "lucide-react";
+import { MessageCircle, Highlighter, X, MessageSquare, Edit3 } from "lucide-react";
 import { useState } from "react";
 
 interface SelectionToolbarProps {
   selectedText: string;
   onAskQuestion: (text: string) => void;
   onSendToChat: (text: string) => void;
+  onRewrite: (text: string) => void;
   onHighlight: () => void;
   onClear: () => void;
   position?: { x: number; y: number };
@@ -15,6 +16,7 @@ export default function SelectionToolbar({
   selectedText, 
   onAskQuestion, 
   onSendToChat,
+  onRewrite,
   onHighlight, 
   onClear, 
   position 
@@ -31,6 +33,11 @@ export default function SelectionToolbar({
 
   const handleSendToChat = () => {
     onSendToChat(selectedText);
+    setIsVisible(false);
+  };
+
+  const handleRewrite = () => {
+    onRewrite(selectedText);
     setIsVisible(false);
   };
 
@@ -83,6 +90,16 @@ export default function SelectionToolbar({
       >
         <MessageSquare className="w-3 h-3" />
         <span className="text-xs">Chat</span>
+      </Button>
+
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={handleRewrite}
+        className="flex items-center space-x-1 text-purple-600 border-purple-200 hover:bg-purple-50"
+      >
+        <Edit3 className="w-3 h-3" />
+        <span className="text-xs">Rewrite</span>
       </Button>
       
       <Button

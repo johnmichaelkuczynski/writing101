@@ -1,21 +1,66 @@
 import { useState, useEffect } from "react";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Edit3 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import NavigationSidebar from "@/components/navigation-sidebar";
 import DocumentContent from "@/components/document-content";
 import InstructionInterface from "@/components/instruction-interface";
 import ChatInterface from "@/components/chat-interface";
 import ModelSelector from "@/components/model-selector";
+import RewriteModal from "@/components/rewrite-modal";
 import { initializeMathRenderer } from "@/lib/math-renderer";
+import { paperContent } from "@/data/paper-content";
 import type { AIModel } from "@shared/schema";
 
 export default function LivingBook() {
   const [selectedModel, setSelectedModel] = useState<AIModel>("deepseek");
   const [questionFromSelection, setQuestionFromSelection] = useState<string>("");
   const [selectedTextForChat, setSelectedTextForChat] = useState<string>("");
+  const [rewriteModalOpen, setRewriteModalOpen] = useState(false);
+  const [rewriteMode, setRewriteMode] = useState<"selection" | "chunks">("chunks");
+  const [selectedTextForRewrite, setSelectedTextForRewrite] = useState<string>("");
 
   useEffect(() => {
     initializeMathRenderer();
   }, []);
+
+  const handleQuestionFromSelection = (question: string) => {
+    setQuestionFromSelection(question);
+  };
+
+  const handleTextSelectedForChat = (text: string) => {
+    setSelectedTextForChat(text);
+  };
+
+  const handleSelectedTextUsed = () => {
+    setSelectedTextForChat("");
+  };
+
+  const handleQuestionProcessed = () => {
+    setQuestionFromSelection("");
+  };
+
+  const handleRewriteFromSelection = (text: string) => {
+    setSelectedTextForRewrite(text);
+    setRewriteMode("selection");
+    setRewriteModalOpen(true);
+  };
+
+  const handleChunkRewrite = () => {
+    setSelectedTextForRewrite("");
+    setRewriteMode("chunks");
+    setRewriteModalOpen(true);
+  };
+
+  const handleRewriteModalClose = () => {
+    setRewriteModalOpen(false);
+    setSelectedTextForRewrite("");
+  };
+
+  const getFullDocumentText = () => {
+    return Object.values(paperContent.sections)
+      .map(section => section.content)
+      .join('\n\n');
+  };
 
   return (
     <div className="bg-background text-foreground min-h-screen">
@@ -30,6 +75,15 @@ export default function LivingBook() {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleChunkRewrite}
+                className="flex items-center space-x-2"
+              >
+                <Edit3 className="w-4 h-4" />
+                <span>Rewrite Document</span>
+              </Button>
               <ModelSelector 
                 selectedModel={selectedModel} 
                 onModelChange={setSelectedModel} 
@@ -47,8 +101,9 @@ export default function LivingBook() {
         <main className="flex-1 min-w-0">
           {/* Document Content */}
           <DocumentContent 
-            onQuestionFromSelection={setQuestionFromSelection}
-            onTextSelectedForChat={setSelectedTextForChat}
+            onQuestionFromSelection={handleQuestionFromSelection}
+            onTextSelectedForChat={handleTextSelectedForChat}
+            onRewriteFromSelection={handleRewriteFromSelection}
           />
         </main>
 
@@ -64,7 +119,17 @@ export default function LivingBook() {
       <InstructionInterface 
         selectedModel={selectedModel} 
         initialQuestion={questionFromSelection}
-        onQuestionProcessed={() => setQuestionFromSelection("")}
+        onQuestionProcessed={handleQuestionProcessed}
+      />
+
+      {/* Rewrite Modal */}
+      <RewriteModal
+        isOpen={rewriteModalOpen}
+        onClose={handleRewriteModalClose}
+        selectedModel={selectedModel}
+        mode={rewriteMode}
+        selectedText={selectedTextForRewrite}
+        fullDocumentText={getFullDocumentText()}
       />
     </div>
   );

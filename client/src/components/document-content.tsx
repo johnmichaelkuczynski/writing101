@@ -8,9 +8,10 @@ import { paperContent } from "@/data/paper-content";
 interface DocumentContentProps {
   onQuestionFromSelection?: (question: string) => void;
   onTextSelectedForChat?: (text: string) => void;
+  onRewriteFromSelection?: (text: string) => void;
 }
 
-export default function DocumentContent({ onQuestionFromSelection, onTextSelectedForChat }: DocumentContentProps) {
+export default function DocumentContent({ onQuestionFromSelection, onTextSelectedForChat, onRewriteFromSelection }: DocumentContentProps) {
   const { selection, isSelecting, clearSelection, highlightSelection, removeHighlights } = useTextSelection();
 
   useEffect(() => {
@@ -27,6 +28,13 @@ export default function DocumentContent({ onQuestionFromSelection, onTextSelecte
   const handleSendToChat = (text: string) => {
     if (onTextSelectedForChat) {
       onTextSelectedForChat(text);
+    }
+    clearSelection();
+  };
+
+  const handleRewrite = (text: string) => {
+    if (onRewriteFromSelection) {
+      onRewriteFromSelection(text);
     }
     clearSelection();
   };
@@ -77,6 +85,7 @@ export default function DocumentContent({ onQuestionFromSelection, onTextSelecte
           selectedText={selection.text}
           onAskQuestion={handleAskQuestion}
           onSendToChat={handleSendToChat}
+          onRewrite={handleRewrite}
           onHighlight={handleHighlight}
           onClear={clearSelection}
         />
