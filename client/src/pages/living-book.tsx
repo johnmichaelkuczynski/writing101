@@ -11,6 +11,7 @@ import type { AIModel } from "@shared/schema";
 export default function LivingBook() {
   const [selectedModel, setSelectedModel] = useState<AIModel>("deepseek");
   const [questionFromSelection, setQuestionFromSelection] = useState<string>("");
+  const [selectedTextForChat, setSelectedTextForChat] = useState<string>("");
 
   useEffect(() => {
     initializeMathRenderer();
@@ -45,11 +46,18 @@ export default function LivingBook() {
         {/* Main Content Area */}
         <main className="flex-1 min-w-0">
           {/* Document Content */}
-          <DocumentContent onQuestionFromSelection={setQuestionFromSelection} />
+          <DocumentContent 
+            onQuestionFromSelection={setQuestionFromSelection}
+            onTextSelectedForChat={setSelectedTextForChat}
+          />
         </main>
 
         {/* Chat Panel - Much Larger */}
-        <ChatInterface selectedModel={selectedModel} />
+        <ChatInterface 
+          selectedModel={selectedModel} 
+          selectedText={selectedTextForChat}
+          onSelectedTextUsed={() => setSelectedTextForChat("")}
+        />
       </div>
 
       {/* Instruction Interface - Bottom Bar */}

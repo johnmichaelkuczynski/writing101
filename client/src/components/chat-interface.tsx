@@ -14,9 +14,11 @@ import type { AIModel, ChatMessage } from "@shared/schema";
 
 interface ChatInterfaceProps {
   selectedModel: AIModel;
+  selectedText?: string;
+  onSelectedTextUsed?: () => void;
 }
 
-export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
+export default function ChatInterface({ selectedModel, selectedText, onSelectedTextUsed }: ChatInterfaceProps) {
   const [message, setMessage] = useState("");
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [emailAddress, setEmailAddress] = useState("");
@@ -86,8 +88,16 @@ export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
     e.preventDefault();
     if (!message.trim()) return;
     
+    let finalMessage = message.trim();
+    
+    // If there's selected text, prepend it as context
+    if (selectedText) {
+      finalMessage = `About this highlighted passage: "${selectedText}"\n\n${finalMessage}`;
+      onSelectedTextUsed?.();
+    }
+    
     chatMutation.mutate({
-      message: message.trim(),
+      message: finalMessage,
       model: selectedModel,
     });
   };
@@ -205,7 +215,62 @@ export default function ChatInterface({ selectedModel }: ChatInterfaceProps) {
             </div>
         </div>
 
-
+        {/* Chat Input Form */}
+        <div className="p-4 border-t border-border bg-card">
+          {selectedText && (
+            <div className="mb-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-200 dark:border-blue-800">
+              <div className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-1">
+                Selected text:
+              </div>
+              <div className="text-xs text-muted-foreground truncate">
+                "{selectedText.substring(0, 100)}..."
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onSelectedTextUsed}
+                className="text-xs text-blue-600 hover:text-blue-800 p-0 h-auto mt-1"
+              >
+                Clear selection
+              </Button>
+            </div>
+          )}
+          
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <Textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder={selectedText ? "Ask about the selected text..." : "Ask a question about the document..."}
+              className="min-h-[80px] resize-none text-sm"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+              }}
+            />
+            <div className="flex justify-end">
+              <Button 
+                type="submit" 
+                disabled={!message.trim() || chatMutation.isPending}
+                size="sm"
+                className="flex items-center space-x-2"
+              >
+                {chatMutation.isPending ? (
+                  <>
+                    <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-3 h-3" />
+                    <span>Send</span>
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
 
       {/* Email Dialog */}

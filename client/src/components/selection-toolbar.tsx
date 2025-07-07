@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Highlighter, X } from "lucide-react";
+import { MessageCircle, Highlighter, X, MessageSquare } from "lucide-react";
 import { useState } from "react";
 
 interface SelectionToolbarProps {
   selectedText: string;
   onAskQuestion: (text: string) => void;
+  onSendToChat: (text: string) => void;
   onHighlight: () => void;
   onClear: () => void;
   position?: { x: number; y: number };
@@ -13,6 +14,7 @@ interface SelectionToolbarProps {
 export default function SelectionToolbar({ 
   selectedText, 
   onAskQuestion, 
+  onSendToChat,
   onHighlight, 
   onClear, 
   position 
@@ -24,6 +26,11 @@ export default function SelectionToolbar({
   const handleAskQuestion = () => {
     const questionText = `About this passage: "${selectedText.substring(0, 100)}${selectedText.length > 100 ? '...' : ''}"\n\n`;
     onAskQuestion(questionText);
+    setIsVisible(false);
+  };
+
+  const handleSendToChat = () => {
+    onSendToChat(selectedText);
     setIsVisible(false);
   };
 
@@ -66,6 +73,16 @@ export default function SelectionToolbar({
       >
         <MessageCircle className="w-3 h-3" />
         <span className="text-xs">Ask</span>
+      </Button>
+      
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={handleSendToChat}
+        className="flex items-center space-x-1 text-green-600 border-green-200 hover:bg-green-50"
+      >
+        <MessageSquare className="w-3 h-3" />
+        <span className="text-xs">Chat</span>
       </Button>
       
       <Button
