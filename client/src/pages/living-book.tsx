@@ -6,6 +6,7 @@ import DocumentContent from "@/components/document-content";
 import InstructionInterface from "@/components/instruction-interface";
 import ChatInterface from "@/components/chat-interface";
 import ModelSelector from "@/components/model-selector";
+import MathToggle from "@/components/math-toggle";
 import RewriteModal from "@/components/rewrite-modal";
 import { initializeMathRenderer } from "@/lib/math-renderer";
 import { paperContent } from "@/data/paper-content";
@@ -13,6 +14,7 @@ import type { AIModel } from "@shared/schema";
 
 export default function LivingBook() {
   const [selectedModel, setSelectedModel] = useState<AIModel>("deepseek");
+  const [mathMode, setMathMode] = useState<boolean>(true);
   const [questionFromSelection, setQuestionFromSelection] = useState<string>("");
   const [selectedTextForChat, setSelectedTextForChat] = useState<string>("");
   const [rewriteModalOpen, setRewriteModalOpen] = useState(false);
@@ -75,6 +77,10 @@ export default function LivingBook() {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
+              <MathToggle 
+                mathMode={mathMode} 
+                onToggle={setMathMode} 
+              />
               <Button
                 variant="outline"
                 size="sm"
@@ -101,6 +107,7 @@ export default function LivingBook() {
         <main className="flex-1 min-w-0">
           {/* Document Content */}
           <DocumentContent 
+            mathMode={mathMode}
             onQuestionFromSelection={handleQuestionFromSelection}
             onTextSelectedForChat={handleTextSelectedForChat}
             onRewriteFromSelection={handleRewriteFromSelection}
@@ -110,6 +117,7 @@ export default function LivingBook() {
         {/* Chat Panel - Much Larger */}
         <ChatInterface 
           selectedModel={selectedModel} 
+          mathMode={mathMode}
           selectedText={selectedTextForChat}
           onSelectedTextUsed={() => setSelectedTextForChat("")}
         />
@@ -118,6 +126,7 @@ export default function LivingBook() {
       {/* Instruction Interface - Bottom Bar */}
       <InstructionInterface 
         selectedModel={selectedModel} 
+        mathMode={mathMode}
         initialQuestion={questionFromSelection}
         onQuestionProcessed={handleQuestionProcessed}
       />

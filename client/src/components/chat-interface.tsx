@@ -14,11 +14,12 @@ import type { AIModel, ChatMessage } from "@shared/schema";
 
 interface ChatInterfaceProps {
   selectedModel: AIModel;
+  mathMode?: boolean;
   selectedText?: string;
   onSelectedTextUsed?: () => void;
 }
 
-export default function ChatInterface({ selectedModel, selectedText, onSelectedTextUsed }: ChatInterfaceProps) {
+export default function ChatInterface({ selectedModel, mathMode = true, selectedText, onSelectedTextUsed }: ChatInterfaceProps) {
   const [message, setMessage] = useState("");
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [emailAddress, setEmailAddress] = useState("");
@@ -32,7 +33,7 @@ export default function ChatInterface({ selectedModel, selectedText, onSelectedT
 
   // Render math after chat history updates
   useEffect(() => {
-    if ((chatHistory as ChatMessage[]).length > 0) {
+    if ((chatHistory as ChatMessage[]).length > 0 && mathMode) {
       setTimeout(() => {
         const chatResponses = document.querySelectorAll('.chat-response');
         chatResponses.forEach(element => {
@@ -40,12 +41,34 @@ export default function ChatInterface({ selectedModel, selectedText, onSelectedT
         });
       }, 200);
     }
-  }, [chatHistory]);
+  }, [chatHistory, mathMode]);
+
+  // Function to process math content based on mode
+  const processContentForMathMode = (content: string) => {
+    if (!mathMode) {
+      // Remove LaTeX notation when math mode is off
+      return content
+        .replace(/\$\$([^$]+)\$\$/g, '$1') // Remove display math delimiters
+        .replace(/\$([^$]+)\$/g, '$1') // Remove inline math delimiters
+        .replace(/\\sqrt\{([^}]+)\}/g, 'sqrt($1)') // Convert sqrt notation
+        .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)') // Convert fractions
+        .replace(/\\text\{([^}]+)\}/g, '$1') // Remove text commands
+        .replace(/\\mathbb\{([^}]+)\}/g, '$1') // Remove mathbb
+        .replace(/\\forall/g, 'for all') // Convert universal quantifier
+        .replace(/\\Rightarrow/g, 'implies') // Convert implication
+        .replace(/\\ldots/g, '...') // Convert ellipsis
+        .replace(/\\times/g, '×'); // Convert multiplication
+    }
+    return content;
+  };
 
   // Function to render markdown-style text
   const renderMessageContent = (content: string) => {
+    // Process content based on math mode first
+    const processedContent = processContentForMathMode(content);
+    
     // Convert markdown-style formatting to HTML
-    let formattedContent = content
+    let formattedContent = processedContent
       // Bold text
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       // Headers
@@ -174,7 +197,7 @@ export default function ChatInterface({ selectedModel, selectedText, onSelectedT
                       <Bot className="text-primary mt-1 w-4 h-4" />
                       <div className="flex-1">
                         <div 
-                          className="text-lg text-foreground prose prose-lg max-w-none chat-response"
+                          className={`text-lg text-foreground prose prose-lg max-w-none chat-response ${mathMode ? 'math-enabled' : 'math-disabled'}`}
                           dangerouslySetInnerHTML={renderMessageContent(chat.response)}
                         />
                         {/* Export Controls */}

@@ -6,20 +6,23 @@ import SelectionToolbar from "@/components/selection-toolbar";
 import { paperContent } from "@/data/paper-content";
 
 interface DocumentContentProps {
+  mathMode?: boolean;
   onQuestionFromSelection?: (question: string) => void;
   onTextSelectedForChat?: (text: string) => void;
   onRewriteFromSelection?: (text: string) => void;
 }
 
-export default function DocumentContent({ onQuestionFromSelection, onTextSelectedForChat, onRewriteFromSelection }: DocumentContentProps) {
+export default function DocumentContent({ mathMode = true, onQuestionFromSelection, onTextSelectedForChat, onRewriteFromSelection }: DocumentContentProps) {
   const { selection, isSelecting, clearSelection, highlightSelection, removeHighlights } = useTextSelection();
 
   useEffect(() => {
     // Render math after a short delay to ensure DOM is ready
-    setTimeout(() => {
-      renderMathInElement();
-    }, 100);
-  }, [paperContent]);
+    if (mathMode) {
+      setTimeout(() => {
+        renderMathInElement();
+      }, 100);
+    }
+  }, [paperContent, mathMode]);
 
   const handleAskQuestion = (questionText: string) => {
     if (onQuestionFromSelection) {
@@ -47,6 +50,25 @@ export default function DocumentContent({ onQuestionFromSelection, onTextSelecte
     clearSelection();
   };
 
+  // Function to convert math content based on mode
+  const processContentForMathMode = (content: string) => {
+    if (!mathMode) {
+      // Remove LaTeX notation when math mode is off
+      return content
+        .replace(/\$\$([^$]+)\$\$/g, '$1') // Remove display math delimiters
+        .replace(/\$([^$]+)\$/g, '$1') // Remove inline math delimiters
+        .replace(/\\sqrt\{([^}]+)\}/g, 'sqrt($1)') // Convert sqrt notation
+        .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)') // Convert fractions
+        .replace(/\\text\{([^}]+)\}/g, '$1') // Remove text commands
+        .replace(/\\mathbb\{([^}]+)\}/g, '$1') // Remove mathbb
+        .replace(/\\forall/g, 'for all') // Convert universal quantifier
+        .replace(/\\Rightarrow/g, 'implies') // Convert implication
+        .replace(/\\ldots/g, '...') // Convert ellipsis
+        .replace(/\\times/g, '×'); // Convert multiplication
+    }
+    return content;
+  };
+
   return (
     <div className="bg-card overflow-hidden">
       <ScrollArea className="h-[calc(100vh-280px)]">
@@ -66,9 +88,9 @@ export default function DocumentContent({ onQuestionFromSelection, onTextSelecte
                   {section.title}
                 </h2>
                 <div 
-                  className="text-muted-foreground leading-relaxed prose prose-lg max-w-none document-math-content"
+                  className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
                   dangerouslySetInnerHTML={{ 
-                    __html: section.content
+                    __html: processContentForMathMode(section.content)
                       .replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
                       .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
                       .replace(/\n\n/g, '</p><p class="mb-4">')

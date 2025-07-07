@@ -10,11 +10,12 @@ import type { AIModel } from "@shared/schema";
 
 interface InstructionInterfaceProps {
   selectedModel: AIModel;
+  mathMode?: boolean;
   initialQuestion?: string;
   onQuestionProcessed?: () => void;
 }
 
-export default function InstructionInterface({ selectedModel, initialQuestion, onQuestionProcessed }: InstructionInterfaceProps) {
+export default function InstructionInterface({ selectedModel, mathMode = true, initialQuestion, onQuestionProcessed }: InstructionInterfaceProps) {
   const [instruction, setInstruction] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
