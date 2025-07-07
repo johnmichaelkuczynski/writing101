@@ -44,6 +44,8 @@ export default function RewriteModal({
   const [chunks, setChunks] = useState<TextChunk[]>([]);
   const [rewriteResults, setRewriteResults] = useState<RewriteResult[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [originalText, setOriginalText] = useState("");
+  const [selectedChunk, setSelectedChunk] = useState<TextChunk | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -138,7 +140,7 @@ export default function RewriteModal({
 
   const handleRewriteAgain = (rewriteResult: RewriteResult) => {
     // Set the rewritten text as the new original text and clear instructions for user input
-    setCurrentInstructions("");
+    setInstructions("");
     setOriginalText(rewriteResult.rewrittenText);
     setSelectedChunk(null);
     setRewriteResults([]);
