@@ -169,3 +169,5 @@ Preferred communication style: Simple, everyday language.
   - Added proper text formatting with whitespace preservation for better readability
   - Added inline instruction input for "Rewrite Again" with dedicated text area for new instructions
   - Each rewrite result now has its own instruction field for customized recursive rewrites
+  - Fixed PDF download functionality using browser's print-to-PDF feature
+  - Replaced server-side PDF generation with client-side print dialog for better reliability

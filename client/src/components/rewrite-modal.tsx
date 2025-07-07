@@ -172,25 +172,55 @@ export default function RewriteModal({
 
   const downloadAsPDF = async (content: string, filename: string) => {
     try {
-      const response = await apiRequest("/api/pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content }),
-      });
+      // Create a new window with the content formatted for PDF
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        throw new Error('Popup blocked - please allow popups for PDF generation');
+      }
       
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${filename}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>${filename}</title>
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                line-height: 1.6;
+                max-width: 8.5in;
+                margin: 0 auto;
+                padding: 1in;
+                color: #333;
+              }
+              h1, h2, h3 { color: #2563eb; margin-top: 1.5em; }
+              p { margin-bottom: 1em; }
+              @media print {
+                body { margin: 0; padding: 0.5in; }
+              }
+            </style>
+          </head>
+          <body>
+            <h1>${filename}</h1>
+            <div style="white-space: pre-wrap;">${content}</div>
+          </body>
+        </html>
+      `);
+      
+      printWindow.document.close();
+      
+      // Wait for content to load, then trigger print dialog
+      setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+        // Close the window after a brief delay
+        setTimeout(() => printWindow.close(), 1000);
+      }, 500);
+      
     } catch (error) {
+      console.error("PDF generation error:", error);
       toast({
         title: "PDF Generation Failed",
-        description: error.message,
+        description: "Please allow popups and use your browser's print function to save as PDF.",
         variant: "destructive",
       });
     }
