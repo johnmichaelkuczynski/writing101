@@ -9,7 +9,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { copyToClipboard, downloadPDF, emailContent } from "@/lib/export-utils";
-import { renderMathInElement } from "@/lib/math-renderer";
+import { renderMathInElement, renderMathString } from "@/lib/math-renderer";
 import type { AIModel, ChatMessage } from "@shared/schema";
 
 interface ChatInterfaceProps {
@@ -31,17 +31,7 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
     refetchInterval: 5000,
   });
 
-  // Render math after chat history updates
-  useEffect(() => {
-    if ((chatHistory as ChatMessage[]).length > 0 && mathMode) {
-      setTimeout(() => {
-        const chatResponses = document.querySelectorAll('.chat-response');
-        chatResponses.forEach(element => {
-          renderMathInElement(element as HTMLElement);
-        });
-      }, 200);
-    }
-  }, [chatHistory, mathMode]);
+  // No need for additional math rendering since we process it in renderMessageContent
 
   // Function to process math content based on mode
   const processContentForMathMode = (content: string) => {
@@ -67,8 +57,21 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
     // Process content based on math mode first
     const processedContent = processContentForMathMode(content);
     
+    // If math mode is enabled, process LaTeX notation
+    let mathProcessedContent = processedContent;
+    if (mathMode) {
+      // Replace display math blocks
+      mathProcessedContent = mathProcessedContent.replace(/\$\$([^$]+)\$\$/g, (match, latex) => {
+        return renderMathString(latex, true);
+      });
+      // Replace inline math
+      mathProcessedContent = mathProcessedContent.replace(/\$([^$]+)\$/g, (match, latex) => {
+        return renderMathString(latex, false);
+      });
+    }
+    
     // Convert markdown-style formatting to HTML
-    let formattedContent = processedContent
+    let formattedContent = mathProcessedContent
       // Bold text
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       // Headers

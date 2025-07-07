@@ -1,3 +1,5 @@
+import katex from 'katex';
+
 declare global {
   interface Window {
     renderMathInElement?: (element: HTMLElement, options?: any) => void;
@@ -33,5 +35,17 @@ export function renderMathInElement(element?: HTMLElement) {
       errorColor: '#cc0000',
       strict: false,
     });
+  }
+}
+
+export function renderMathString(latex: string, displayMode: boolean = false): string {
+  try {
+    return katex.renderToString(latex, {
+      throwOnError: false,
+      displayMode: displayMode
+    });
+  } catch (error) {
+    console.warn('KaTeX string rendering failed:', error);
+    return latex;
   }
 }

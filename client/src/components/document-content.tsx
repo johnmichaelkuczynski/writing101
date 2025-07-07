@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { renderMathInElement } from "@/lib/math-renderer";
+import { renderMathInElement, renderMathString } from "@/lib/math-renderer";
 import { useTextSelection } from "@/hooks/use-text-selection";
 import SelectionToolbar from "@/components/selection-toolbar";
 import { paperContent } from "@/data/paper-content";
@@ -15,14 +15,7 @@ interface DocumentContentProps {
 export default function DocumentContent({ mathMode = true, onQuestionFromSelection, onTextSelectedForChat, onRewriteFromSelection }: DocumentContentProps) {
   const { selection, isSelecting, clearSelection, highlightSelection, removeHighlights } = useTextSelection();
 
-  useEffect(() => {
-    // Render math after a short delay to ensure DOM is ready
-    if (mathMode) {
-      setTimeout(() => {
-        renderMathInElement();
-      }, 100);
-    }
-  }, [paperContent, mathMode]);
+  // Math rendering is handled in processContentForMathMode function
 
   const handleAskQuestion = (questionText: string) => {
     if (onQuestionFromSelection) {
@@ -65,8 +58,19 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
         .replace(/\\Rightarrow/g, 'implies') // Convert implication
         .replace(/\\ldots/g, '...') // Convert ellipsis
         .replace(/\\times/g, '×'); // Convert multiplication
+    } else {
+      // Process LaTeX notation for rendering
+      let processed = content;
+      // Replace display math blocks
+      processed = processed.replace(/\$\$([^$]+)\$\$/g, (match, latex) => {
+        return renderMathString(latex, true);
+      });
+      // Replace inline math
+      processed = processed.replace(/\$([^$]+)\$/g, (match, latex) => {
+        return renderMathString(latex, false);
+      });
+      return processed;
     }
-    return content;
   };
 
   return (
