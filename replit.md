@@ -164,3 +164,6 @@ Preferred communication style: Simple, everyday language.
   - Added Enter key support: users can press Enter to start rewrite (Shift+Enter for new lines)
   - Enhanced error handling and user feedback for rewrite operations
   - Database schema expanded with rewrites table for storing rewrite history and relationships
+  - Fixed recursive rewrite to allow new custom instructions for each re-rewrite
+  - Implemented text cleaning to remove markdown formatting and improve paragraph structure
+  - Added proper text formatting with whitespace preservation for better readability

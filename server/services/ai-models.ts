@@ -48,6 +48,23 @@ ${fullContent}
 Answer questions about this financial regulation document, referencing specific historical events, legislation, and economic arguments presented in the text.`;
 }
 
+// Helper function to clean markdown and improve formatting
+function cleanRewriteText(text: string): string {
+  return text
+    // Remove markdown bold/italic formatting
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/__([^_]+)__/g, '$1')
+    .replace(/_([^_]+)_/g, '$1')
+    // Remove markdown headers
+    .replace(/^#{1,6}\s+/gm, '')
+    // Ensure proper paragraph breaks
+    .replace(/\n{3,}/g, '\n\n')
+    // Clean up extra spaces
+    .replace(/[ \t]+/g, ' ')
+    .trim();
+}
+
 export async function generateRewrite(model: AIModel, originalText: string, instructions: string): Promise<string> {
   const systemPrompt = `You are a professional editor and rewriter. Your task is to rewrite the provided text according to the specific instructions given by the user. 
 
@@ -58,8 +75,12 @@ Key Guidelines:
 - Ensure the rewrite flows naturally and is well-structured
 - Keep the same general length unless instructed to expand or condense
 - Use clear, engaging prose appropriate for the subject matter
+- Write in plain text format with proper paragraph breaks
+- Do NOT use any markdown formatting, bold text (**), italics, or special characters
+- Use natural paragraph breaks to separate ideas (double line breaks)
+- Write as if for publication in a book or formal document
 
-Provide only the rewritten text without any meta-commentary or explanations.`;
+Provide only the rewritten text without any meta-commentary, explanations, or formatting markup.`;
 
   const prompt = `Original text to rewrite:
 ${originalText}
@@ -70,18 +91,26 @@ ${instructions}
 Please rewrite the text according to these instructions:`;
 
   try {
+    let result: string;
     switch (model) {
       case "openai":
-        return await generateOpenAIResponse(prompt, systemPrompt);
+        result = await generateOpenAIResponse(prompt, systemPrompt);
+        break;
       case "anthropic":
-        return await generateAnthropicResponse(prompt, systemPrompt);
+        result = await generateAnthropicResponse(prompt, systemPrompt);
+        break;
       case "perplexity":
-        return await generatePerplexityResponse(prompt, systemPrompt);
+        result = await generatePerplexityResponse(prompt, systemPrompt);
+        break;
       case "deepseek":
-        return await generateDeepSeekResponse(prompt, systemPrompt);
+        result = await generateDeepSeekResponse(prompt, systemPrompt);
+        break;
       default:
         throw new Error(`Unsupported model: ${model}`);
     }
+    
+    // Clean the result to remove markdown and improve formatting
+    return cleanRewriteText(result);
   } catch (error) {
     console.error(`Error generating rewrite with ${model}:`, error);
     throw new Error(`Failed to generate rewrite with ${model}: ${error.message}`);

@@ -137,21 +137,19 @@ export default function RewriteModal({
   };
 
   const handleRewriteAgain = (rewriteResult: RewriteResult) => {
-    if (!instructions.trim()) {
-      toast({
-        title: "Instructions Required",
-        description: "Please provide new rewriting instructions.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    rewriteMutation.mutate({
-      originalText: rewriteResult.rewrittenText,
-      instructions: instructions.trim(),
-      model: selectedModel,
-      parentRewriteId: rewriteResult.id,
-    });
+    // Set the rewritten text as the new original text and clear instructions for user input
+    setCurrentInstructions("");
+    setOriginalText(rewriteResult.rewrittenText);
+    setSelectedChunk(null);
+    setRewriteResults([]);
+    
+    // Focus the instructions input after a brief delay
+    setTimeout(() => {
+      const instructionsInput = document.querySelector('textarea[placeholder*="instructions"]') as HTMLTextAreaElement;
+      if (instructionsInput) {
+        instructionsInput.focus();
+      }
+    }, 100);
   };
 
   const downloadAsText = (content: string, filename: string) => {
@@ -364,7 +362,7 @@ export default function RewriteModal({
                           </div>
                           <div>
                             <p className="text-xs text-muted-foreground mb-1">Rewritten Text:</p>
-                            <div className="text-sm bg-background border rounded p-3 max-h-40 overflow-y-auto">
+                            <div className="text-sm bg-background border rounded p-3 max-h-40 overflow-y-auto whitespace-pre-wrap">
                               {result.rewrittenText}
                             </div>
                           </div>
