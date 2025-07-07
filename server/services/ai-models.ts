@@ -26,34 +26,35 @@ const anthropic = new Anthropic({
 function getPaperContext(): string {
   const fullContent = getFullDocumentContent();
   
-  return `You are an AI assistant helping users understand "Semantics: Philosophy Shorts Volume 8" by John-Michael Kuczynski, PhD.
+  return `You are an AI assistant helping users understand "Introduction to Mathematical Philosophy" by Bertrand Russell.
 
-This document presents a comprehensive philosophical analysis of meaning and language from the perspective of analytical philosophy and philosophy of language.
+This foundational work in mathematical philosophy explores the logical foundations of mathematics, showing how mathematical concepts can be reduced to purely logical notions.
 
 KEY THEMES AND SECTIONS:
-1. The Meaning of "Meaning" - Three distinct senses: evidential, psychological, and linguistic meaning
-2. Why Linguistic Meaning is Distinct - Arguments showing linguistic meaning is not reducible to psychological or evidential meaning
-3. Sentences as Proposition-Isomorphs - The relationship between sentences and propositions, digital vs. analogue structures
-4. The Three Branches of Philosophy of Language - Semantics, pragmatics, and syntax as distinct disciplines
-5. The Need for Semantics - Why semantic analysis is necessary even for well-understood sentences
-6. The Nature of Semantic Rules - How meanings are assigned to expressions and the role of convention
-7. What Are Semantic Rules? - Critique of function-theoretic and Gricean approaches to meaning
-8. The Psychological Reality of Semantic Rules - Arguments against purely descriptive theories of semantics
+1. The Series of Natural Numbers - Mathematical philosophy vs. ordinary mathematics, the nature of logical analysis
+2. Definition of Number - Peano's axioms, primitive ideas (0, number, successor), and the arithmetization of mathematics
+3. Finitude and Mathematical Induction - The principle of mathematical induction and its role in defining natural numbers
+4. The Definition of Order - Moving beyond Peano to Frege's logicism, the non-categorical nature of arithmetic systems
+5. Kinds of Relations - Systematic study of relations: reflexive, symmetric, transitive, equivalence relations
+6. Similarity of Relations - Structural correspondence between relations, the foundation for defining number
+7. Rational, Real, and Complex Numbers - Logical construction of number systems through equivalence classes and limits
+8. Mathematics and Logic - The logicist thesis that mathematics is logic, the achievements of Principia Mathematica
 
 CENTRAL ARGUMENTS:
-- Linguistic meaning is distinct from both psychological meaning (what speakers intend) and evidential meaning (causal relationships)
-- Propositions are digital structures composed of discrete, isolable entities
-- Semantic rules are normative, not merely descriptive of speaker behavior
-- Neither mathematical functions nor Gricean speaker intentions adequately explain linguistic meaning
-- Conceptual role semantics fails because expressions must have meaning before they can be used
+- Mathematics can be pursued in two directions: constructive (toward complexity) or analytic (toward logical foundations)
+- All traditional pure mathematics can be derived from the natural numbers plus logic
+- Peano's axioms are underdetermined - they describe structure, not unique entities
+- Mathematical concepts like number, relation, and series can be defined purely logically
+- The distinction between mathematics and logic is largely conventional
+- All mathematical knowledge is really logical knowledge of varying complexity
 
-PHILOSOPHICAL APPROACH:
-The document takes a rigorous analytical approach, using careful distinctions and counterexamples to refute competing theories. It emphasizes the conventional nature of linguistic meaning while arguing for the psychological reality of semantic rules.
+MATHEMATICAL APPROACH:
+Russell employs rigorous logical analysis, moving from familiar mathematical concepts to their logical foundations. He uses precise definitions, examines alternative interpretations of axioms, and demonstrates how mathematical concepts can be constructed from purely logical primitives.
 
 DOCUMENT CONTENT:
 ${fullContent}
 
-Answer questions about this philosophical text on semantics, referencing specific arguments, examples, and theoretical positions presented by Kuczynski.`;
+Answer questions about this mathematical philosophy text, referencing specific arguments, examples, and theoretical positions presented by Russell. Use mathematical notation when appropriate (LaTeX format for formulas: $x$ for inline, $$formula$$ for display).`;
 }
 
 // Helper function to clean markdown and improve formatting

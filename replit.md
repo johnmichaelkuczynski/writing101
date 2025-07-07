@@ -155,13 +155,13 @@ Preferred communication style: Simple, everyday language.
   - Maintains chronological flow from colonial times through post-2008 reforms
   - Content covers Glass-Steagall, deregulation period, and modern financial crises
   - All existing AI functionality preserved with new financial regulation content
-- July 07, 2025: Document content replacement with semantics philosophy text
-  - Replaced financial regulation content with "Semantics: Philosophy Shorts Volume 8" by John-Michael Kuczynski, PhD
-  - Content now features comprehensive philosophical analysis of meaning and language
-  - Structured into 7 sections: The Meaning of "Meaning", Linguistic Meaning Distinctions, Sentences as Proposition-Isomorphs, Three Branches of Philosophy of Language, Need for Semantics, Nature of Semantic Rules, Functions vs. Gricean Approaches, and Psychological Reality of Semantic Rules
-  - Covers evidential vs. psychological vs. linguistic meaning, propositions as digital structures, and critique of various semantic theories
-  - Updated AI context to handle philosophical content with proper terminology and argument structure
-  - All existing functionality (chat, rewrite, voice, text selection) preserved with new philosophical content
+- July 07, 2025: Document content replacement with Russell's mathematical philosophy
+  - Replaced semantics philosophy content with "Introduction to Mathematical Philosophy" by Bertrand Russell
+  - Content now features comprehensive mathematical philosophy covering foundational concepts
+  - Structured into 7 sections: Natural Numbers, Definition of Number, Mathematical Induction, Definition of Order, Kinds of Relations, Similarity of Relations, Rational/Real/Complex Numbers, and Mathematics and Logic
+  - Covers Peano's axioms, mathematical induction, relation theory, number system extensions, and the logicist thesis
+  - Updated AI context to handle mathematical philosophy with proper mathematical notation and logical argument structure
+  - All existing functionality (chat, rewrite, voice, text selection) preserved with new mathematical philosophy content
 - July 07, 2025: UI improvements for better user experience
   - Widened AI chat interface from 420px to 550px (1.3x wider) for improved dialogue experience
   - Increased font size from text-sm to text-base for user messages and text-lg for AI responses
