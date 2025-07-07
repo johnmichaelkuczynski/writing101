@@ -174,7 +174,7 @@ export default function ChatInterface({ selectedModel, selectedText, onSelectedT
                       <Bot className="text-primary mt-1 w-4 h-4" />
                       <div className="flex-1">
                         <div 
-                          className="text-base text-foreground prose prose-base max-w-none chat-response"
+                          className="text-lg text-foreground prose prose-lg max-w-none chat-response"
                           dangerouslySetInnerHTML={renderMessageContent(chat.response)}
                         />
                         {/* Export Controls */}
