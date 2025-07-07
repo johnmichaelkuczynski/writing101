@@ -26,26 +26,34 @@ const anthropic = new Anthropic({
 function getPaperContext(): string {
   const fullContent = getFullDocumentContent();
   
-  return `You are an AI assistant helping users understand "The Case for Financial Regulation: A History of American Financial Regulation and Deregulation".
+  return `You are an AI assistant helping users understand "Semantics: Philosophy Shorts Volume 8" by John-Michael Kuczynski, PhD.
 
-This document presents a comprehensive historical analysis of American financial regulation from colonial times through the post-2008 reforms.
+This document presents a comprehensive philosophical analysis of meaning and language from the perspective of analytical philosophy and philosophy of language.
 
 KEY THEMES AND SECTIONS:
-1. Introduction - Overview of regulatory cycles and their consequences
-2. Early Financial Regulation - Colonial banking through the Great Depression, including the Bank of the United States and Federal Reserve establishment
-3. The 1929 Crash and Response - Market collapse, causes, and the creation of Glass-Steagall, FDIC, and SEC
-4. The Great Wave of Deregulation (1978-2004) - Systematic dismantling of Depression-era regulations
-5. Commercial vs. Investment Banking - The significance of Glass-Steagall's repeal and complex financial instruments
-6. The 2008 Financial Crisis - Consequences of deregulation, housing market collapse, and "too big to fail" institutions
-7. Post-Crisis Regulation - Dodd-Frank Act, Volcker Rule, and modern regulatory challenges
+1. The Meaning of "Meaning" - Three distinct senses: evidential, psychological, and linguistic meaning
+2. Why Linguistic Meaning is Distinct - Arguments showing linguistic meaning is not reducible to psychological or evidential meaning
+3. Sentences as Proposition-Isomorphs - The relationship between sentences and propositions, digital vs. analogue structures
+4. The Three Branches of Philosophy of Language - Semantics, pragmatics, and syntax as distinct disciplines
+5. The Need for Semantics - Why semantic analysis is necessary even for well-understood sentences
+6. The Nature of Semantic Rules - How meanings are assigned to expressions and the role of convention
+7. What Are Semantic Rules? - Critique of function-theoretic and Gricean approaches to meaning
+8. The Psychological Reality of Semantic Rules - Arguments against purely descriptive theories of semantics
 
-CENTRAL ARGUMENT:
-The document argues that financial regulation has historically promoted economic stability and prosperity, while deregulation has consistently led to financial crises. It demonstrates that even by free-market standards, regulation has been beneficial by decentralizing capital access rather than restricting it.
+CENTRAL ARGUMENTS:
+- Linguistic meaning is distinct from both psychological meaning (what speakers intend) and evidential meaning (causal relationships)
+- Propositions are digital structures composed of discrete, isolable entities
+- Semantic rules are normative, not merely descriptive of speaker behavior
+- Neither mathematical functions nor Gricean speaker intentions adequately explain linguistic meaning
+- Conceptual role semantics fails because expressions must have meaning before they can be used
+
+PHILOSOPHICAL APPROACH:
+The document takes a rigorous analytical approach, using careful distinctions and counterexamples to refute competing theories. It emphasizes the conventional nature of linguistic meaning while arguing for the psychological reality of semantic rules.
 
 DOCUMENT CONTENT:
 ${fullContent}
 
-Answer questions about this financial regulation document, referencing specific historical events, legislation, and economic arguments presented in the text.`;
+Answer questions about this philosophical text on semantics, referencing specific arguments, examples, and theoretical positions presented by Kuczynski.`;
 }
 
 // Helper function to clean markdown and improve formatting

@@ -155,6 +155,13 @@ Preferred communication style: Simple, everyday language.
   - Maintains chronological flow from colonial times through post-2008 reforms
   - Content covers Glass-Steagall, deregulation period, and modern financial crises
   - All existing AI functionality preserved with new financial regulation content
+- July 07, 2025: Document content replacement with semantics philosophy text
+  - Replaced financial regulation content with "Semantics: Philosophy Shorts Volume 8" by John-Michael Kuczynski, PhD
+  - Content now features comprehensive philosophical analysis of meaning and language
+  - Structured into 7 sections: The Meaning of "Meaning", Linguistic Meaning Distinctions, Sentences as Proposition-Isomorphs, Three Branches of Philosophy of Language, Need for Semantics, Nature of Semantic Rules, Functions vs. Gricean Approaches, and Psychological Reality of Semantic Rules
+  - Covers evidential vs. psychological vs. linguistic meaning, propositions as digital structures, and critique of various semantic theories
+  - Updated AI context to handle philosophical content with proper terminology and argument structure
+  - All existing functionality (chat, rewrite, voice, text selection) preserved with new philosophical content
 - July 07, 2025: Comprehensive rewrite functionality implementation
   - Added text selection rewrite: users can highlight text and click "Rewrite" from selection toolbar
   - Added chunk-based document rewrite: "Rewrite Document" button allows selecting 1000-word chunks
