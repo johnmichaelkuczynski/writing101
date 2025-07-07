@@ -26,19 +26,18 @@ const anthropic = new Anthropic({
 function getPaperContext(): string {
   const fullContent = getFullDocumentContent();
   
-  return `You are an AI assistant helping users understand "Introduction to Mathematical Philosophy" by Bertrand Russell.
+  return `You are an AI assistant helping users understand "The Incompleteness of Deductive Logic: A Generalization of Gödel's Theorem".
 
-This foundational work in mathematical philosophy explores the logical foundations of mathematics, showing how mathematical concepts can be reduced to purely logical notions.
+This paper demonstrates a fundamental limitation of formal logic by showing that the class of all recursively defined logics cannot itself be recursively characterized, extending Gödel's incompleteness theorem to logic as such.
 
 KEY THEMES AND SECTIONS:
-1. The Series of Natural Numbers - Mathematical philosophy vs. ordinary mathematics, the nature of logical analysis
-2. Definition of Number - Peano's axioms, primitive ideas (0, number, successor), and the arithmetization of mathematics
-3. Finitude and Mathematical Induction - The principle of mathematical induction and its role in defining natural numbers
-4. The Definition of Order - Moving beyond Peano to Frege's logicism, the non-categorical nature of arithmetic systems
-5. Kinds of Relations - Systematic study of relations: reflexive, symmetric, transitive, equivalence relations
-6. Similarity of Relations - Structural correspondence between relations, the foundation for defining number
-7. Rational, Real, and Complex Numbers - Logical construction of number systems through equivalence classes and limits
-8. Mathematics and Logic - The logicist thesis that mathematics is logic, the achievements of Principia Mathematica
+1. Abstract - Main thesis: no recursive definition of all logical truths exists, using Cantor's diagonal argument
+2. Introduction and Framework - Formal setup with classical first-order logic, recursive enumeration, and the central question
+3. Definitions - Recursive functions, posterity relations, recursive logics, and recursively definable classes
+4. Lemmas and Theorems - Cantor's theorem, core impossibility proof via diagonal construction, key corollaries
+5. Philosophical Significance - Implications for AI, cognitive science, philosophy of mind, and the logicist program
+6. Conclusion - Summary of the metatheoretic result and its broader implications for formal reasoning
+7. References - Key works by Gödel, Turing, Church, Tarski, Cantor, Post, and Kleene
 
 CENTRAL ARGUMENTS:
 - Mathematics can be pursued in two directions: constructive (toward complexity) or analytic (toward logical foundations)
