@@ -142,7 +142,7 @@ export default function ChatInterface({ selectedModel, selectedText, onSelectedT
   };
 
   return (
-    <aside className="w-[420px] bg-card border-l border-border sticky top-16 h-[calc(100vh-280px)]">
+    <aside className="w-[550px] bg-card border-l border-border sticky top-16 h-[calc(100vh-280px)]">
       <div className="flex flex-col h-full overflow-hidden">
         {/* Chat Header */}
         <div className="bg-muted px-4 py-3 border-b border-border">
@@ -163,7 +163,7 @@ export default function ChatInterface({ selectedModel, selectedText, onSelectedT
                     <div className="flex items-start space-x-2">
                       <User className="text-muted-foreground mt-1 w-4 h-4" />
                       <div className="flex-1">
-                        <p className="text-sm text-foreground">{chat.message}</p>
+                        <p className="text-base text-foreground">{chat.message}</p>
                       </div>
                     </div>
                   </div>
@@ -174,7 +174,7 @@ export default function ChatInterface({ selectedModel, selectedText, onSelectedT
                       <Bot className="text-primary mt-1 w-4 h-4" />
                       <div className="flex-1">
                         <div 
-                          className="text-sm text-foreground prose prose-sm max-w-none chat-response"
+                          className="text-base text-foreground prose prose-base max-w-none chat-response"
                           dangerouslySetInnerHTML={renderMessageContent(chat.response)}
                         />
                         {/* Export Controls */}

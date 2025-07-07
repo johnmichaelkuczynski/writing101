@@ -162,6 +162,11 @@ Preferred communication style: Simple, everyday language.
   - Covers evidential vs. psychological vs. linguistic meaning, propositions as digital structures, and critique of various semantic theories
   - Updated AI context to handle philosophical content with proper terminology and argument structure
   - All existing functionality (chat, rewrite, voice, text selection) preserved with new philosophical content
+- July 07, 2025: UI improvements for better user experience
+  - Widened AI chat interface from 420px to 550px (1.3x wider) for improved dialogue experience
+  - Increased font size from text-sm to text-base for both user messages and AI responses
+  - Enhanced readability and usability based on user feedback
+  - Maintained all existing functionality while improving visual presentation
 - July 07, 2025: Comprehensive rewrite functionality implementation
   - Added text selection rewrite: users can highlight text and click "Rewrite" from selection toolbar
   - Added chunk-based document rewrite: "Rewrite Document" button allows selecting 1000-word chunks
