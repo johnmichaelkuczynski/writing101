@@ -12,6 +12,7 @@ import { chunkText, getChunkPreview, TextChunk } from "@/lib/text-chunker";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { renderMathInElement } from "@/lib/math-renderer";
 
 interface RewriteModalProps {
   isOpen: boolean;
@@ -56,6 +57,18 @@ export default function RewriteModal({
     }
   }, [mode, isOpen, fullDocumentText]);
 
+  // Render math when results are displayed
+  useEffect(() => {
+    if (showResults && rewriteResults.length > 0) {
+      setTimeout(() => {
+        const rewriteElements = document.querySelectorAll('.rewrite-content');
+        rewriteElements.forEach(element => {
+          renderMathInElement(element as HTMLElement);
+        });
+      }, 200);
+    }
+  }, [showResults, rewriteResults]);
+
   const rewriteMutation = useMutation({
     mutationFn: async (data: {
       originalText: string;
@@ -89,6 +102,13 @@ export default function RewriteModal({
         title: "Rewrite Complete",
         description: "Your text has been successfully rewritten.",
       });
+      // Render math in the new rewrite result
+      setTimeout(() => {
+        const rewriteElements = document.querySelectorAll('.rewrite-content');
+        rewriteElements.forEach(element => {
+          renderMathInElement(element as HTMLElement);
+        });
+      }, 100);
     },
     onError: (error) => {
       console.error("Rewrite mutation error:", error);
@@ -422,7 +442,7 @@ export default function RewriteModal({
                           </div>
                           <div>
                             <p className="text-xs text-muted-foreground mb-1">Rewritten Text:</p>
-                            <div className="text-sm bg-background border rounded p-3 max-h-40 overflow-y-auto whitespace-pre-wrap">
+                            <div className="text-sm bg-background border rounded p-3 max-h-40 overflow-y-auto whitespace-pre-wrap rewrite-content">
                               {result.rewrittenText}
                             </div>
                           </div>

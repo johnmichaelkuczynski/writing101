@@ -15,8 +15,11 @@ export default function DocumentContent({ onQuestionFromSelection, onTextSelecte
   const { selection, isSelecting, clearSelection, highlightSelection, removeHighlights } = useTextSelection();
 
   useEffect(() => {
-    renderMathInElement();
-  }, []);
+    // Render math after a short delay to ensure DOM is ready
+    setTimeout(() => {
+      renderMathInElement();
+    }, 100);
+  }, [paperContent]);
 
   const handleAskQuestion = (questionText: string) => {
     if (onQuestionFromSelection) {
@@ -63,7 +66,7 @@ export default function DocumentContent({ onQuestionFromSelection, onTextSelecte
                   {section.title}
                 </h2>
                 <div 
-                  className="text-muted-foreground leading-relaxed prose prose-lg max-w-none"
+                  className="text-muted-foreground leading-relaxed prose prose-lg max-w-none document-math-content"
                   dangerouslySetInnerHTML={{ 
                     __html: section.content
                       .replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
