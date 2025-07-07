@@ -70,10 +70,21 @@ ${instructions}
 Please rewrite the text according to these instructions:`;
 
   try {
-    return await generateAnthropicResponse(prompt, systemPrompt);
+    switch (model) {
+      case "openai":
+        return await generateOpenAIResponse(prompt, systemPrompt);
+      case "anthropic":
+        return await generateAnthropicResponse(prompt, systemPrompt);
+      case "perplexity":
+        return await generatePerplexityResponse(prompt, systemPrompt);
+      case "deepseek":
+        return await generateDeepSeekResponse(prompt, systemPrompt);
+      default:
+        throw new Error(`Unsupported model: ${model}`);
+    }
   } catch (error) {
     console.error(`Error generating rewrite with ${model}:`, error);
-    throw new Error(`Failed to generate rewrite: ${error.message}`);
+    throw new Error(`Failed to generate rewrite with ${model}: ${error.message}`);
   }
 }
 

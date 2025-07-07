@@ -62,18 +62,18 @@ export default function RewriteModal({
       parentRewriteId?: number;
     }) => {
       try {
-        const response = await apiRequest("/api/rewrite", {
+        const response = await fetch("/api/rewrite", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
         });
         
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `HTTP ${response.status}`);
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
         }
         
-        return response.json();
+        return await response.json();
       } catch (error) {
         console.error("Rewrite API error:", error);
         throw error;
