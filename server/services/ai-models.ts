@@ -26,25 +26,26 @@ const anthropic = new Anthropic({
 function getPaperContext(): string {
   const fullContent = getFullDocumentContent();
   
-  return `You are an AI assistant helping users understand the philosophical dialogue "Kuczynski & Quine: A Philosophical Dialogue on Empiricism".
+  return `You are an AI assistant helping users understand "The Case for Financial Regulation: A History of American Financial Regulation and Deregulation".
 
-This dialogue features a debate between:
-- KUCZYNSKI: A rationalist who argues that some knowledge is acquired through reason alone and that universals exist independently of thought
-- QUINE: An empiricist who argues that all meaningful knowledge claims must ultimately be accountable to experience
+This document presents a comprehensive historical analysis of American financial regulation from colonial times through the post-2008 reforms.
 
 KEY THEMES AND SECTIONS:
-1. Properties and Universals - The problem of whether we perceive properties themselves or just property-instances
-2. Language, Meaning, and Explanation - How we understand and explain the world through universals and concepts
-3. Perception and Cognitive Structures - Whether minds supply content or external objects activate pre-existing knowledge
-4. Geometry, Mathematics, and Learning - How we acquire knowledge of abstract concepts like space, time, and shape
-5. The Problem of Induction and Relations - How we know relationships between distinct situations and events
-6. Thoughts, Images, and Abstract Content - Whether thoughts can be reduced to mental images
-7. The Irreconcilable Divide - The fundamental tension between empiricist and rationalist approaches
+1. Introduction - Overview of regulatory cycles and their consequences
+2. Early Financial Regulation - Colonial banking through the Great Depression, including the Bank of the United States and Federal Reserve establishment
+3. The 1929 Crash and Response - Market collapse, causes, and the creation of Glass-Steagall, FDIC, and SEC
+4. The Great Wave of Deregulation (1978-2004) - Systematic dismantling of Depression-era regulations
+5. Commercial vs. Investment Banking - The significance of Glass-Steagall's repeal and complex financial instruments
+6. The 2008 Financial Crisis - Consequences of deregulation, housing market collapse, and "too big to fail" institutions
+7. Post-Crisis Regulation - Dodd-Frank Act, Volcker Rule, and modern regulatory challenges
+
+CENTRAL ARGUMENT:
+The document argues that financial regulation has historically promoted economic stability and prosperity, while deregulation has consistently led to financial crises. It demonstrates that even by free-market standards, regulation has been beneficial by decentralizing capital access rather than restricting it.
 
 DOCUMENT CONTENT:
 ${fullContent}
 
-Answer questions about this philosophical dialogue, referencing the specific arguments made by Kuczynski and Quine. Be accurate to their positions as presented in the text.`;
+Answer questions about this financial regulation document, referencing specific historical events, legislation, and economic arguments presented in the text.`;
 }
 
 export async function generateAIResponse(model: AIModel, prompt: string, isInstruction: boolean = false, chatHistory: ChatMessage[] = []): Promise<string> {
@@ -59,8 +60,8 @@ export async function generateAIResponse(model: AIModel, prompt: string, isInstr
   }
   
   const systemPrompt = isInstruction 
-    ? `${paperContext}\n\nYou are helping analyze, modify, or explain the philosophical dialogue content. Follow the user's instructions precisely while staying true to the philosophical positions presented. Keep responses concise unless the user specifically asks for elaboration.`
-    : `${paperContext}${conversationContext}\n\nIMPORTANT: This is a conversation about the Kuczynski-Quine philosophical dialogue on empiricism. Reference our previous discussion when relevant. Provide informative, helpful responses that fully answer the question about the philosophical arguments. Be clear and thorough while staying focused on the dialogue content.`;
+    ? `${paperContext}\n\nYou are helping analyze, modify, or explain the financial regulation document content. Follow the user's instructions precisely while staying true to the historical facts and arguments presented. Keep responses concise unless the user specifically asks for elaboration.`
+    : `${paperContext}${conversationContext}\n\nIMPORTANT: This is a conversation about the financial regulation document. Reference our previous discussion when relevant. Provide informative, helpful responses that fully answer questions about financial history, regulations, and economic arguments. Be clear and thorough while staying focused on the document content.`;
 
   try {
     switch (model) {
