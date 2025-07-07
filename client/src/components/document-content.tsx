@@ -80,9 +80,12 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
           <article className="prose prose-xl max-w-none text-foreground w-full leading-relaxed select-text">
             {/* Document Title */}
             <header className="text-center mb-12">
-              <h1 className="text-3xl font-georgia font-bold text-foreground mb-4">
+              <h1 className="text-3xl font-georgia font-bold text-foreground mb-2">
                 {paperContent.title}
               </h1>
+              <p className="text-xl text-muted-foreground font-georgia italic mb-4">
+                Bertrand Russell
+              </p>
             </header>
 
             {/* Dynamic Content Sections */}
