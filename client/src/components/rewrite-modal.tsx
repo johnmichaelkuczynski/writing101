@@ -29,6 +29,7 @@ interface RewriteResult {
   instructions: string;
   chunkIndex?: number;
   parentRewriteId?: number;
+  nextInstructions?: string;
 }
 
 export default function RewriteModal({
@@ -139,19 +140,22 @@ export default function RewriteModal({
   };
 
   const handleRewriteAgain = (rewriteResult: RewriteResult) => {
-    // Set the rewritten text as the new original text and clear instructions for user input
-    setInstructions("");
-    setOriginalText(rewriteResult.rewrittenText);
-    setSelectedChunk(null);
-    setRewriteResults([]);
-    
-    // Focus the instructions input after a brief delay
-    setTimeout(() => {
-      const instructionsInput = document.querySelector('textarea[placeholder*="instructions"]') as HTMLTextAreaElement;
-      if (instructionsInput) {
-        instructionsInput.focus();
-      }
-    }, 100);
+    // Use the nextInstructions for the re-rewrite
+    if (!rewriteResult.nextInstructions?.trim()) {
+      toast({
+        title: "Instructions Required",
+        description: "Please provide instructions for the re-rewrite.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    rewriteMutation.mutate({
+      originalText: rewriteResult.rewrittenText,
+      instructions: rewriteResult.nextInstructions.trim(),
+      model: selectedModel,
+      parentRewriteId: rewriteResult.id,
+    });
   };
 
   const downloadAsText = (content: string, filename: string) => {
@@ -329,14 +333,38 @@ export default function RewriteModal({
                             {result.parentRewriteId && " (Revision)"}
                           </span>
                           <div className="flex items-center space-x-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleRewriteAgain(result)}
-                              disabled={rewriteMutation.isPending}
-                            >
-                              Rewrite Again
-                            </Button>
+                            <div className="flex flex-col gap-1">
+                              <Textarea
+                                placeholder="New instructions for re-rewrite..."
+                                value={result.nextInstructions || ""}
+                                onChange={(e) => {
+                                  setRewriteResults(prev => prev.map(r => 
+                                    r.id === result.id 
+                                      ? { ...r, nextInstructions: e.target.value }
+                                      : r
+                                  ));
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault();
+                                    if (result.nextInstructions?.trim()) {
+                                      handleRewriteAgain(result);
+                                    }
+                                  }
+                                }}
+                                className="min-h-[60px] text-xs w-64"
+                                rows={2}
+                              />
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleRewriteAgain(result)}
+                                disabled={rewriteMutation.isPending || !result.nextInstructions?.trim()}
+                                className="w-full"
+                              >
+                                Rewrite Again
+                              </Button>
+                            </div>
                             <Button
                               size="sm"
                               variant="outline"

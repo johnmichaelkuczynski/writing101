@@ -167,3 +167,5 @@ Preferred communication style: Simple, everyday language.
   - Fixed recursive rewrite to allow new custom instructions for each re-rewrite
   - Implemented text cleaning to remove markdown formatting and improve paragraph structure
   - Added proper text formatting with whitespace preservation for better readability
+  - Added inline instruction input for "Rewrite Again" with dedicated text area for new instructions
+  - Each rewrite result now has its own instruction field for customized recursive rewrites
