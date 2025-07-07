@@ -16,7 +16,7 @@ export function chunkText(text: string, maxWords: number = 1000): TextChunk[] {
     
     // Calculate start and end indices in original text
     const wordsBeforeChunk = words.slice(0, i);
-    const startIndex = wordsBeforeChunk.join(' ').length + (wordsBeforeChunk.length > 0 ? 1 : 0);
+    const startIndex = wordsBeforeChunk.length > 0 ? wordsBeforeChunk.join(' ').length + 1 : 0;
     const endIndex = startIndex + chunkText.length;
     
     chunks.push({

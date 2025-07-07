@@ -155,3 +155,12 @@ Preferred communication style: Simple, everyday language.
   - Maintains chronological flow from colonial times through post-2008 reforms
   - Content covers Glass-Steagall, deregulation period, and modern financial crises
   - All existing AI functionality preserved with new financial regulation content
+- July 07, 2025: Comprehensive rewrite functionality implementation
+  - Added text selection rewrite: users can highlight text and click "Rewrite" from selection toolbar
+  - Added chunk-based document rewrite: "Rewrite Document" button allows selecting 1000-word chunks
+  - Implemented recursive rewriting: users can rewrite the rewritten content multiple times
+  - Added modal interface with chunk selection, custom instructions, and progress tracking
+  - Integrated export functionality: download rewrites as TXT or PDF files
+  - Added Enter key support: users can press Enter to start rewrite (Shift+Enter for new lines)
+  - Enhanced error handling and user feedback for rewrite operations
+  - Database schema expanded with rewrites table for storing rewrite history and relationships

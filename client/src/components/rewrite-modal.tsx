@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -61,12 +61,23 @@ export default function RewriteModal({
       chunkIndex?: number;
       parentRewriteId?: number;
     }) => {
-      const response = await apiRequest("/api/rewrite", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      return response.json();
+      try {
+        const response = await apiRequest("/api/rewrite", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `HTTP ${response.status}`);
+        }
+        
+        return response.json();
+      } catch (error) {
+        console.error("Rewrite API error:", error);
+        throw error;
+      }
     },
     onSuccess: (data) => {
       setRewriteResults(prev => [...prev, data.rewrite]);
@@ -77,9 +88,10 @@ export default function RewriteModal({
       });
     },
     onError: (error) => {
+      console.error("Rewrite mutation error:", error);
       toast({
         title: "Rewrite Failed",
-        description: error.message,
+        description: error?.message || "An unexpected error occurred during rewriting.",
         variant: "destructive",
       });
     },
@@ -195,6 +207,11 @@ export default function RewriteModal({
           <DialogTitle>
             {mode === "selection" ? "Rewrite Selected Text" : "Rewrite Document Chunks"}
           </DialogTitle>
+          <DialogDescription>
+            {mode === "selection" 
+              ? "Provide instructions to rewrite the selected text passage." 
+              : "Select document chunks and provide instructions for rewriting them."}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex-1 overflow-hidden">
@@ -206,7 +223,13 @@ export default function RewriteModal({
                 <Textarea
                   value={instructions}
                   onChange={(e) => setInstructions(e.target.value)}
-                  placeholder="Describe how you want the text to be rewritten (e.g., 'Make it more formal', 'Simplify the language', 'Add more examples')"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleRewrite();
+                    }
+                  }}
+                  placeholder="Describe how you want the text to be rewritten (e.g., 'Make it more formal', 'Simplify the language', 'Add more examples'). Press Enter to start rewrite, Shift+Enter for new line."
                   className="mt-1 min-h-[80px]"
                 />
               </div>

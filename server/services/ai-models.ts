@@ -59,16 +59,18 @@ Key Guidelines:
 - Keep the same general length unless instructed to expand or condense
 - Use clear, engaging prose appropriate for the subject matter
 
-Original text to rewrite:
+Provide only the rewritten text without any meta-commentary or explanations.`;
+
+  const prompt = `Original text to rewrite:
 ${originalText}
 
 User instructions:
 ${instructions}
 
-Provide only the rewritten text without any meta-commentary or explanations.`;
+Please rewrite the text according to these instructions:`;
 
   try {
-    return await generateAnthropicResponse("", systemPrompt);
+    return await generateAnthropicResponse(prompt, systemPrompt);
   } catch (error) {
     console.error(`Error generating rewrite with ${model}:`, error);
     throw new Error(`Failed to generate rewrite: ${error.message}`);
