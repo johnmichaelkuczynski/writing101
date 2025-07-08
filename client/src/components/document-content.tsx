@@ -83,6 +83,9 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
               <h1 className="text-3xl font-georgia font-bold text-foreground mb-2">
                 {paperContent.title}
               </h1>
+              <p className="text-lg font-georgia text-muted-foreground">
+                by {paperContent.author}
+              </p>
             </header>
 
             {/* Dynamic Content Sections */}
