@@ -1,6 +1,6 @@
 export const paperContent = {
   title: "The Incompleteness of Deductive Logic: A Generalization of Gödel's Theorem",
-  author: "Anonymous",
+  author: "",
   sections: [
     {
       id: "abstract",
