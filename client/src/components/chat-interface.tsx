@@ -168,7 +168,7 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
   };
 
   return (
-    <aside className="w-[550px] bg-card border-l border-border sticky top-16 h-[calc(100vh-280px)]">
+    <aside className="w-[550px] bg-card border-l border-border sticky top-16 h-[calc(100vh-200px)]">
       <div className="flex flex-col h-full overflow-hidden">
         {/* Chat Header */}
         <div className="bg-muted px-4 py-3 border-b border-border">
@@ -180,7 +180,7 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
         </div>
 
         {/* Chat Messages */}
-        <div className="flex-1 overflow-y-auto min-h-0">
+        <ScrollArea className="flex-1 overflow-y-auto min-h-0">
           <div className="p-4 space-y-4">
             {(chatHistory as ChatMessage[]).map((chat: ChatMessage) => (
                 <div key={chat.id} className="space-y-2">
@@ -239,7 +239,7 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
                 </div>
               ))}
             </div>
-        </div>
+        </ScrollArea>
 
         {/* Chat Input Form */}
         <div className="p-4 border-t border-border bg-card">
