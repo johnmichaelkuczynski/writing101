@@ -192,12 +192,12 @@ Preferred communication style: Simple, everyday language.
   - Added real-time switching between mathematical and plain text display modes
   - Math rendering automatically updates when toggle is switched
   - Provides accessibility option for users who prefer plain text mathematical expressions
-- July 08, 2025: Document content replacement with "The ABC of Relativity" by Bertrand Russell
-  - Replaced Gödel incompleteness theorem paper with Russell's accessible introduction to Einstein's relativity theories
-  - Content now features 7 chapters covering special and general relativity without advanced mathematics
-  - Structured sections: Touch and Sight, What Happens vs Observed, Velocity of Light, Clocks and Foot-Rules, Space-Time, Special Theory, and Einstein's Law of Gravitation
-  - Covers fundamental concepts like the constancy of light speed, space-time unification, time dilation, length contraction, and gravity as space-time curvature
-  - Updated AI context to handle physics concepts with clear explanations and thought experiments
-  - Emphasizes Russell's approach of "imaginative reconstruction" of our understanding of physical reality
+- July 08, 2025: Document content replacement with "The Art of War" by Sun Tzu
+  - Replaced Russell's relativity content with Sun Tzu's foundational military strategy treatise
+  - Content now features 7 strategic sections covering ancient Chinese military philosophy and tactical principles
+  - Structured sections: Laying Plans, Waging War, Attack by Stratagem, Tactical Dispositions, Energy, Weak Points and Strong, and Maneuvering
+  - Covers fundamental strategic concepts like the five factors of war, winning without fighting, adaptability, timing, and information warfare
+  - Updated AI context to handle strategic thinking, leadership principles, and philosophical insights applicable beyond military contexts
+  - Emphasizes Sun Tzu's approach of intelligence over force and strategic preparation over reactive tactics
   - API keys activated for DeepSeek, OpenAI, Anthropic, and Perplexity models
-  - All existing functionality (chat, rewrite, voice, text selection, math mode) preserved with new physics content
+  - All existing functionality (chat, rewrite, voice, text selection, math mode) preserved with new strategic content
