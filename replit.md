@@ -192,11 +192,12 @@ Preferred communication style: Simple, everyday language.
   - Added real-time switching between mathematical and plain text display modes
   - Math rendering automatically updates when toggle is switched
   - Provides accessibility option for users who prefer plain text mathematical expressions
-- July 07, 2025: Document content replacement with Gödel incompleteness theorem paper
-  - Replaced Russell's mathematical philosophy with "The Incompleteness of Deductive Logic: A Generalization of Gödel's Theorem"
-  - Content now features advanced mathematical logic covering Gödel's theorem generalization to all deductive logic
-  - Structured into 7 sections: Abstract, Introduction/Framework, Definitions, Lemmas/Theorems, Philosophical Significance, Conclusion, and References
-  - Covers recursive functions, diagonal arguments, Cantor's theorem, and meta-logical incompleteness
-  - Updated AI context to handle advanced mathematical logic with proper formal notation and proof structures
-  - Philosophical implications for AI, cognitive science, and foundations of mathematics
-  - All existing functionality (chat, rewrite, voice, text selection, math mode) preserved with new logic content
+- July 08, 2025: Document content replacement with "The ABC of Relativity" by Bertrand Russell
+  - Replaced Gödel incompleteness theorem paper with Russell's accessible introduction to Einstein's relativity theories
+  - Content now features 7 chapters covering special and general relativity without advanced mathematics
+  - Structured sections: Touch and Sight, What Happens vs Observed, Velocity of Light, Clocks and Foot-Rules, Space-Time, Special Theory, and Einstein's Law of Gravitation
+  - Covers fundamental concepts like the constancy of light speed, space-time unification, time dilation, length contraction, and gravity as space-time curvature
+  - Updated AI context to handle physics concepts with clear explanations and thought experiments
+  - Emphasizes Russell's approach of "imaginative reconstruction" of our understanding of physical reality
+  - API keys activated for DeepSeek, OpenAI, Anthropic, and Perplexity models
+  - All existing functionality (chat, rewrite, voice, text selection, math mode) preserved with new physics content
