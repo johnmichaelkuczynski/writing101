@@ -192,12 +192,13 @@ Preferred communication style: Simple, everyday language.
   - Added real-time switching between mathematical and plain text display modes
   - Math rendering automatically updates when toggle is switched
   - Provides accessibility option for users who prefer plain text mathematical expressions
-- July 08, 2025: Document content replacement with "The Art of War" by Sun Tzu
-  - Replaced Russell's relativity content with Sun Tzu's foundational military strategy treatise
-  - Content now features 7 strategic sections covering ancient Chinese military philosophy and tactical principles
-  - Structured sections: Laying Plans, Waging War, Attack by Stratagem, Tactical Dispositions, Energy, Weak Points and Strong, and Maneuvering
-  - Covers fundamental strategic concepts like the five factors of war, winning without fighting, adaptability, timing, and information warfare
-  - Updated AI context to handle strategic thinking, leadership principles, and philosophical insights applicable beyond military contexts
-  - Emphasizes Sun Tzu's approach of intelligence over force and strategic preparation over reactive tactics
-  - API keys activated for DeepSeek, OpenAI, Anthropic, and Perplexity models
-  - All existing functionality (chat, rewrite, voice, text selection, math mode) preserved with new strategic content
+- July 08, 2025: Document content replacement with "Tractatus Logico-Philosophicus" by Ludwig Wittgenstein
+  - Replaced Sun Tzu content with Wittgenstein's foundational work of analytic philosophy
+  - Content now features 7 philosophical sections covering the logical structure of language and reality
+  - Structured sections: The World, Facts and Objects, Pictures and Propositions, Thought and Language, Logic and Truth Functions, Ethics and the Mystical, and The Limits of Language
+  - Covers fundamental philosophical concepts including the picture theory of meaning, logical atomism, truth-functional analysis, and the limits of meaningful language
+  - Updated AI context to handle philosophical analysis, logical reasoning, and the relationship between language and reality
+  - Emphasizes Wittgenstein's approach to dissolving philosophical problems through logical clarification
+  - API keys activated for OpenAI, Anthropic, and Perplexity models (DeepSeek available as fallback)
+  - All existing functionality (chat, rewrite, voice, text selection, math mode) preserved with new philosophical content
+  - Content includes original numbered propositions with explanatory commentary
