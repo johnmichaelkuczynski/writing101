@@ -26,7 +26,10 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 
 export async function downloadPDF(content: string): Promise<void> {
   try {
-    const response = await apiRequest("POST", "/api/pdf", { content });
+    const response = await apiRequest("/api/pdf", {
+      method: "POST",
+      body: JSON.stringify({ content })
+    });
     const blob = await response.blob();
     
     const url = window.URL.createObjectURL(blob);
@@ -45,10 +48,13 @@ export async function downloadPDF(content: string): Promise<void> {
 
 export async function emailContent(content: string, email: string, subject: string): Promise<void> {
   try {
-    await apiRequest("POST", "/api/email", {
-      content,
-      email,
-      subject,
+    await apiRequest("/api/email", {
+      method: "POST",
+      body: JSON.stringify({
+        content,
+        email,
+        subject,
+      })
     });
   } catch (error) {
     console.error('Failed to send email:', error);

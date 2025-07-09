@@ -13,7 +13,10 @@ export function useAIChat() {
 
   const chatMutation = useMutation({
     mutationFn: async (data: { message: string; model: AIModel }) => {
-      const response = await apiRequest("POST", "/api/chat", data);
+      const response = await apiRequest("/api/chat", {
+        method: "POST", 
+        body: JSON.stringify(data)
+      });
       return response.json();
     },
     onSuccess: () => {
@@ -23,7 +26,10 @@ export function useAIChat() {
 
   const instructionMutation = useMutation({
     mutationFn: async (data: { instruction: string; model: AIModel }) => {
-      const response = await apiRequest("POST", "/api/instruction", data);
+      const response = await apiRequest("/api/instruction", {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
       return response.json();
     },
   });

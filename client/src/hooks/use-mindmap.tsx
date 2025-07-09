@@ -16,11 +16,20 @@ export function useMindMap() {
 
   const mutation = useMutation({
     mutationFn: async (params: GenerateMindMapParams) => {
-      const response = await apiRequest('/api/mindmap/generate', {
+      const response = await fetch('/api/mindmap/generate', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(params)
       });
-      return response as MindMap;
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      return data as MindMap;
     },
     onSuccess: (data) => {
       setMindMap(data);

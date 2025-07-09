@@ -94,7 +94,10 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
 
   const chatMutation = useMutation({
     mutationFn: async (data: { message: string; model: AIModel }) => {
-      const response = await apiRequest("POST", "/api/chat", data);
+      const response = await apiRequest("/api/chat", {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
       return response.json();
     },
     onSuccess: () => {

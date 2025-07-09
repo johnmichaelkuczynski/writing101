@@ -32,7 +32,10 @@ export default function InstructionInterface({ selectedModel, mathMode = true, i
 
   const instructionMutation = useMutation({
     mutationFn: async (data: { instruction: string; model: AIModel }) => {
-      const response = await apiRequest("POST", "/api/instruction", data);
+      const response = await apiRequest("/api/instruction", {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
       return response.json();
     },
     onSuccess: async (data) => {
@@ -48,9 +51,12 @@ export default function InstructionInterface({ selectedModel, mathMode = true, i
       
       // Add to chat history by calling the backend
       try {
-        await apiRequest("POST", "/api/chat", {
-          message: instruction,
-          model: selectedModel
+        await apiRequest("/api/chat", {
+          method: "POST",
+          body: JSON.stringify({
+            message: instruction,
+            model: selectedModel
+          })
         });
       } catch (error) {
         // If that fails, at least show a toast
