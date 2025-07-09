@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BookOpen, Edit3 } from "lucide-react";
+import { BookOpen, Edit3, Network } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NavigationSidebar from "@/components/navigation-sidebar";
 import DocumentContent from "@/components/document-content";
@@ -8,6 +8,7 @@ import ChatInterface from "@/components/chat-interface";
 import ModelSelector from "@/components/model-selector";
 import MathToggle from "@/components/math-toggle";
 import RewriteModal from "@/components/rewrite-modal";
+import ConceptLatticeModal from "@/components/concept-lattice-modal";
 import { initializeMathRenderer } from "@/lib/math-renderer";
 import { paperContent } from "@shared/paper-content";
 import type { AIModel } from "@shared/schema";
@@ -20,6 +21,8 @@ export default function LivingBook() {
   const [rewriteModalOpen, setRewriteModalOpen] = useState(false);
   const [rewriteMode, setRewriteMode] = useState<"selection" | "chunks">("chunks");
   const [selectedTextForRewrite, setSelectedTextForRewrite] = useState<string>("");
+  const [conceptLatticeModalOpen, setConceptLatticeModalOpen] = useState(false);
+  const [selectedTextForLattice, setSelectedTextForLattice] = useState<string>("");
 
   useEffect(() => {
     initializeMathRenderer();
@@ -58,6 +61,21 @@ export default function LivingBook() {
     setSelectedTextForRewrite("");
   };
 
+  const handleConceptLatticeFromSelection = (text: string) => {
+    setSelectedTextForLattice(text);
+    setConceptLatticeModalOpen(true);
+  };
+
+  const handleConceptLatticeGenerate = () => {
+    setSelectedTextForLattice(getFullDocumentText());
+    setConceptLatticeModalOpen(true);
+  };
+
+  const handleConceptLatticeModalClose = () => {
+    setConceptLatticeModalOpen(false);
+    setSelectedTextForLattice("");
+  };
+
 
 
   const getFullDocumentText = () => {
@@ -85,7 +103,15 @@ export default function LivingBook() {
                 mathMode={mathMode} 
                 onToggle={setMathMode} 
               />
-
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleConceptLatticeGenerate}
+                className="flex items-center space-x-2"
+              >
+                <Network className="w-4 h-4" />
+                <span>Visualize</span>
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -116,6 +142,7 @@ export default function LivingBook() {
             onQuestionFromSelection={handleQuestionFromSelection}
             onTextSelectedForChat={handleTextSelectedForChat}
             onRewriteFromSelection={handleRewriteFromSelection}
+            onConceptLatticeFromSelection={handleConceptLatticeFromSelection}
           />
         </main>
 
@@ -146,6 +173,15 @@ export default function LivingBook() {
         fullDocumentText={getFullDocumentText()}
       />
 
+      {/* Concept Lattice Modal */}
+      <ConceptLatticeModal
+        isOpen={conceptLatticeModalOpen}
+        onClose={handleConceptLatticeModalClose}
+        selectedModel={selectedModel}
+        selectedText={selectedTextForLattice}
+        onAskQuestion={handleQuestionFromSelection}
+        onRewrite={handleRewriteFromSelection}
+      />
 
     </div>
   );
