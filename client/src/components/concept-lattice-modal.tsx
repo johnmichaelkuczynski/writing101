@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X, Download, Mail, MessageSquare, Edit3, RotateCcw } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { X, Download, Mail, MessageSquare, Edit3, RotateCcw, FileText } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -31,6 +32,9 @@ export default function ConceptLatticeModal({
   const [currentLattice, setCurrentLattice] = useState<ConceptLattice | null>(null);
   const [globalInstructions, setGlobalInstructions] = useState("");
   const [showGlobalChat, setShowGlobalChat] = useState(false);
+  const [selectedChunks, setSelectedChunks] = useState<string[]>([]);
+  const [showChunkSelection, setShowChunkSelection] = useState(false);
+  const [textChunks, setTextChunks] = useState<string[]>([]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -86,22 +90,80 @@ export default function ConceptLatticeModal({
     }
   });
 
-  // Generate lattice when modal opens with selected text
-  const handleGenerate = () => {
+  // Split text into chunks for selection
+  const splitIntoChunks = (text: string): string[] => {
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 20);
+    const chunks: string[] = [];
+    let currentChunk = "";
+    
+    for (const sentence of sentences) {
+      if (currentChunk.length + sentence.length > 1000) {
+        if (currentChunk) {
+          chunks.push(currentChunk.trim() + ".");
+          currentChunk = "";
+        }
+      }
+      currentChunk += sentence + ".";
+    }
+    
+    if (currentChunk.trim()) {
+      chunks.push(currentChunk.trim());
+    }
+    
+    return chunks;
+  };
+
+  // Show chunk selection interface
+  const handleShowChunks = () => {
     if (!selectedText) {
       toast({
-        title: "No text selected",
+        title: "No text available",
         description: "Please select some text to visualize.",
         variant: "destructive"
       });
       return;
     }
 
+    const chunks = splitIntoChunks(selectedText);
+    setTextChunks(chunks);
+    setSelectedChunks([]);
+    setShowChunkSelection(true);
+  };
+
+  // Generate lattice with selected chunks or full text
+  const handleGenerate = () => {
+    let textToAnalyze = "";
+    
+    if (showChunkSelection && selectedChunks.length > 0) {
+      textToAnalyze = selectedChunks.join("\n\n");
+    } else if (selectedText) {
+      textToAnalyze = selectedText;
+    } else {
+      toast({
+        title: "No text selected",
+        description: "Please select some text or chunks to visualize.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     generateMutation.mutate({
-      text: selectedText,
+      text: textToAnalyze,
       model: selectedModel,
       globalInstructions: globalInstructions || undefined
     });
+    
+    setShowChunkSelection(false);
+  };
+
+  // Toggle chunk selection
+  const toggleChunk = (chunkIndex: number) => {
+    const chunk = textChunks[chunkIndex];
+    setSelectedChunks(prev => 
+      prev.includes(chunk) 
+        ? prev.filter(c => c !== chunk)
+        : [...prev, chunk]
+    );
   };
 
   // Apply global refinements
@@ -147,6 +209,9 @@ export default function ConceptLatticeModal({
     setCurrentLattice(null);
     setGlobalInstructions("");
     setShowGlobalChat(false);
+    setShowChunkSelection(false);
+    setSelectedChunks([]);
+    setTextChunks([]);
     onClose();
   };
 
@@ -155,9 +220,14 @@ export default function ConceptLatticeModal({
       <DialogContent className="max-w-7xl w-[95vw] h-[90vh] p-0">
         <DialogHeader className="p-4 border-b">
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-semibold">
-              Concept Lattice 1.0 {currentLattice && `- ${currentLattice.title}`}
-            </DialogTitle>
+            <div>
+              <DialogTitle className="text-xl font-semibold">
+                Concept Lattice 1.0 {currentLattice && `- ${currentLattice.title}`}
+              </DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">
+                Interactive visual analysis with main ideas, arguments, examples, and quotes
+              </DialogDescription>
+            </div>
             <div className="flex items-center space-x-2">
               {currentLattice && (
                 <>
@@ -203,44 +273,139 @@ export default function ConceptLatticeModal({
             {!currentLattice ? (
               /* Initial generation interface */
               <div className="flex-1 flex items-center justify-center p-8">
-                <div className="max-w-lg w-full space-y-6 text-center">
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Generate Concept Lattice</h3>
-                    <p className="text-muted-foreground">
-                      Create an interactive visual analysis of the selected text with main ideas, 
-                      arguments, examples, and supporting quotes.
-                    </p>
+                {!showChunkSelection ? (
+                  /* Initial selection screen */
+                  <div className="max-w-lg w-full space-y-6 text-center">
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2">Generate Concept Lattice</h3>
+                      <p className="text-muted-foreground">
+                        Create an interactive visual analysis of the selected text with main ideas, 
+                        arguments, examples, and supporting quotes.
+                      </p>
+                    </div>
+                    
+                    {selectedText && (
+                      <div className="text-left">
+                        <label className="text-sm font-medium text-muted-foreground">Selected Text Preview:</label>
+                        <div className="mt-1 p-3 bg-muted rounded border text-sm max-h-32 overflow-y-auto">
+                          {selectedText.substring(0, 300)}
+                          {selectedText.length > 300 && "..."}
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <label className="text-sm font-medium">Initial Instructions (Optional)</label>
+                      <Textarea
+                        value={globalInstructions}
+                        onChange={(e) => setGlobalInstructions(e.target.value)}
+                        placeholder="e.g., Focus on philosophical arguments, include examples from modern psychology..."
+                        className="mt-1"
+                        rows={3}
+                      />
+                    </div>
+
+                    <div className="flex space-x-3">
+                      <Button 
+                        onClick={handleGenerate}
+                        disabled={generateMutation.isPending || !selectedText}
+                        className="flex-1"
+                      >
+                        {generateMutation.isPending ? "Generating..." : "Use Full Text"}
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        onClick={handleShowChunks}
+                        disabled={!selectedText}
+                        className="flex-1 flex items-center space-x-2"
+                      >
+                        <FileText className="w-4 h-4" />
+                        <span>Choose Chunks</span>
+                      </Button>
+                    </div>
                   </div>
-                  
-                  {selectedText && (
-                    <div className="text-left">
-                      <label className="text-sm font-medium text-muted-foreground">Selected Text Preview:</label>
-                      <div className="mt-1 p-3 bg-muted rounded border text-sm max-h-32 overflow-y-auto">
-                        {selectedText.substring(0, 300)}
-                        {selectedText.length > 300 && "..."}
+                ) : (
+                  /* Chunk selection screen */
+                  <div className="max-w-4xl w-full h-full flex flex-col">
+                    <div className="text-center mb-6">
+                      <h3 className="text-lg font-semibold mb-2">Select Text Chunks</h3>
+                      <p className="text-muted-foreground">
+                        Choose which parts of the text to include in your concept lattice.
+                      </p>
+                      <div className="mt-2 flex items-center justify-center space-x-4">
+                        <Badge variant="secondary">
+                          {selectedChunks.length} of {textChunks.length} chunks selected
+                        </Badge>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedChunks(textChunks)}
+                        >
+                          Select All
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedChunks([])}
+                        >
+                          Clear All
+                        </Button>
                       </div>
                     </div>
-                  )}
 
-                  <div>
-                    <label className="text-sm font-medium">Initial Instructions (Optional)</label>
-                    <Textarea
-                      value={globalInstructions}
-                      onChange={(e) => setGlobalInstructions(e.target.value)}
-                      placeholder="e.g., Focus on philosophical arguments, include examples from modern psychology..."
-                      className="mt-1"
-                      rows={3}
-                    />
+                    <ScrollArea className="flex-1 pr-4">
+                      <div className="space-y-3">
+                        {textChunks.map((chunk, index) => (
+                          <div
+                            key={index}
+                            className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                              selectedChunks.includes(chunk)
+                                ? 'border-blue-300 bg-blue-50 dark:bg-blue-950/30'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                            onClick={() => toggleChunk(index)}
+                          >
+                            <div className="flex items-start space-x-3">
+                              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center mt-1 ${
+                                selectedChunks.includes(chunk)
+                                  ? 'border-blue-500 bg-blue-500'
+                                  : 'border-gray-300'
+                              }`}>
+                                {selectedChunks.includes(chunk) && (
+                                  <div className="w-2 h-2 bg-white rounded-full" />
+                                )}
+                              </div>
+                              <div className="flex-1">
+                                <div className="text-xs text-muted-foreground mb-1">
+                                  Chunk {index + 1} ({chunk.length} characters)
+                                </div>
+                                <div className="text-sm leading-relaxed">
+                                  {chunk.length > 200 ? `${chunk.substring(0, 200)}...` : chunk}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+
+                    <div className="mt-6 flex space-x-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowChunkSelection(false)}
+                      >
+                        Back
+                      </Button>
+                      <Button 
+                        onClick={handleGenerate}
+                        disabled={generateMutation.isPending || selectedChunks.length === 0}
+                        className="flex-1"
+                      >
+                        {generateMutation.isPending ? "Generating..." : `Generate from ${selectedChunks.length} chunks`}
+                      </Button>
+                    </div>
                   </div>
-
-                  <Button 
-                    onClick={handleGenerate}
-                    disabled={generateMutation.isPending || !selectedText}
-                    className="w-full"
-                  >
-                    {generateMutation.isPending ? "Generating..." : "Generate Concept Lattice"}
-                  </Button>
-                </div>
+                )}
               </div>
             ) : (
               /* Lattice viewer */

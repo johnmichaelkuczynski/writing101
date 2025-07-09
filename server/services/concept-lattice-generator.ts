@@ -65,7 +65,20 @@ Return ONLY the JSON object, no additional text.
   const response = await generateAIResponse(model, prompt, false);
   
   try {
-    const parsed = JSON.parse(response);
+    // Clean the response to remove markdown code blocks if present
+    let cleanedResponse = response.trim();
+    if (cleanedResponse.startsWith('```json')) {
+      cleanedResponse = cleanedResponse.slice(7);
+    }
+    if (cleanedResponse.startsWith('```')) {
+      cleanedResponse = cleanedResponse.slice(3);
+    }
+    if (cleanedResponse.endsWith('```')) {
+      cleanedResponse = cleanedResponse.slice(0, -3);
+    }
+    cleanedResponse = cleanedResponse.trim();
+    
+    const parsed = JSON.parse(cleanedResponse);
     
     const latticeId = `lattice_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
@@ -181,7 +194,20 @@ Return ONLY the JSON object.
   const response = await generateAIResponse(model, prompt, false);
   
   try {
-    const parsed = JSON.parse(response);
+    // Clean the response to remove markdown code blocks if present
+    let cleanedResponse = response.trim();
+    if (cleanedResponse.startsWith('```json')) {
+      cleanedResponse = cleanedResponse.slice(7);
+    }
+    if (cleanedResponse.startsWith('```')) {
+      cleanedResponse = cleanedResponse.slice(3);
+    }
+    if (cleanedResponse.endsWith('```')) {
+      cleanedResponse = cleanedResponse.slice(0, -3);
+    }
+    cleanedResponse = cleanedResponse.trim();
+    
+    const parsed = JSON.parse(cleanedResponse);
     
     return {
       ...lattice,
