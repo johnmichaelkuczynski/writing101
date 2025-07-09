@@ -248,7 +248,7 @@ export default function MetaMindMapViewer({
       </div>
 
       {/* Meta Mind Map */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative" style={{ height: '500px', minHeight: '500px' }}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -258,7 +258,7 @@ export default function MetaMindMapViewer({
           nodeTypes={nodeTypes}
           connectionMode={ConnectionMode.Loose}
           fitView
-          className="react-flow"
+          className="react-flow w-full h-full"
         >
           <Background variant="dots" />
           <Controls />

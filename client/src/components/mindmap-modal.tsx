@@ -63,7 +63,7 @@ export default function MindMapModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl max-h-[90vh] p-0">
+      <DialogContent className="max-w-7xl h-[90vh] p-0">
         <DialogHeader className="p-6 pb-0">
           <DialogTitle className="flex items-center gap-2">
             <Network className="w-5 h-5" />
@@ -74,7 +74,7 @@ export default function MindMapModal({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden h-[calc(90vh-120px)]">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
             <div className="px-6 pb-4">
               <TabsList className="grid w-full grid-cols-2">
@@ -94,7 +94,7 @@ export default function MindMapModal({
               </TabsList>
             </div>
 
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 overflow-hidden h-[calc(100%-80px)]">
               <TabsContent value="meta" className="h-full m-0">
                 {metaLoading ? (
                   <div className="flex items-center justify-center h-full">
@@ -104,11 +104,13 @@ export default function MindMapModal({
                     </div>
                   </div>
                 ) : metaMap ? (
-                  <MetaMindMapViewer
-                    metaMap={metaMap}
-                    onSectionClick={handleSectionClick}
-                    onViewLocalMap={handleViewLocalMap}
-                  />
+                  <div className="w-full h-full">
+                    <MetaMindMapViewer
+                      metaMap={metaMap}
+                      onSectionClick={handleSectionClick}
+                      onViewLocalMap={handleViewLocalMap}
+                    />
+                  </div>
                 ) : (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center">
@@ -157,7 +159,7 @@ export default function MindMapModal({
                         Back to Book Structure
                       </Button>
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 w-full h-full">
                       <MindMapViewer
                         mindMap={localMap}
                         onAskQuestion={onAskQuestion}

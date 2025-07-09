@@ -20,7 +20,42 @@ function parseAIResponse(response: string): any {
     cleanResponse = jsonMatch[0];
   }
   
-  return JSON.parse(cleanResponse);
+  // Clean up common JSON issues
+  cleanResponse = cleanResponse
+    .replace(/,\s*]/g, ']') // Remove trailing commas in arrays
+    .replace(/,\s*}/g, '}') // Remove trailing commas in objects
+    .replace(/'/g, '"') // Replace single quotes with double quotes
+    .replace(/\n/g, ' '); // Replace newlines with spaces
+  
+  try {
+    return JSON.parse(cleanResponse);
+  } catch (error) {
+    // If still fails, try to extract JSON by finding balanced braces
+    const braceStack = [];
+    let start = -1;
+    let end = -1;
+    
+    for (let i = 0; i < cleanResponse.length; i++) {
+      const char = cleanResponse[i];
+      if (char === '{') {
+        if (start === -1) start = i;
+        braceStack.push(char);
+      } else if (char === '}') {
+        braceStack.pop();
+        if (braceStack.length === 0) {
+          end = i;
+          break;
+        }
+      }
+    }
+    
+    if (start !== -1 && end !== -1) {
+      const jsonStr = cleanResponse.substring(start, end + 1);
+      return JSON.parse(jsonStr);
+    }
+    
+    throw new Error('Could not parse JSON response');
+  }
 }
 
 export interface MindMapNode {
@@ -361,12 +396,17 @@ function createFallbackMetaMap(localMaps: LocalMindMap[]): MetaMindMap {
     summary: map.centralClaim
   }));
 
+  // Create edges connecting sequential nodes  
   const edges = localMaps.slice(0, -1).map((map, index) => ({
     id: `meta-edge-${index}`,
     source: map.id,
     target: localMaps[index + 1].id,
     relationship: 'builds_on' as const
   }));
+
+  // Log for debugging
+  console.log('Fallback meta nodes:', nodes.map(n => n.id));
+  console.log('Fallback meta edges:', edges.map(e => ({ source: e.source, target: e.target })));
 
   return {
     id: 'tractatus-meta',
