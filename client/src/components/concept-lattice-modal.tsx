@@ -327,7 +327,7 @@ export default function ConceptLatticeModal({
                 ) : (
                   /* Chunk selection screen */
                   <div className="max-w-4xl w-full h-full flex flex-col">
-                    <div className="text-center mb-6">
+                    <div className="text-center mb-4">
                       <h3 className="text-lg font-semibold mb-2">Select Text Chunks</h3>
                       <p className="text-muted-foreground">
                         Choose which parts of the text to include in your concept lattice.
@@ -353,6 +353,24 @@ export default function ConceptLatticeModal({
                       </div>
                     </div>
 
+                    {/* ACTION BUTTONS AT TOP */}
+                    <div className="mb-4 flex space-x-3 justify-center">
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowChunkSelection(false)}
+                      >
+                        Back
+                      </Button>
+                      <Button 
+                        onClick={handleGenerate}
+                        disabled={generateMutation.isPending || selectedChunks.length === 0}
+                        className="px-8"
+                      >
+                        {generateMutation.isPending ? "Generating..." : `Generate from ${selectedChunks.length} chunks`}
+                      </Button>
+                    </div>
+
+                    {/* SCROLLABLE CHUNK LIST */}
                     <ScrollArea className="flex-1 pr-4">
                       <div className="space-y-3">
                         {textChunks.map((chunk, index) => (
@@ -388,22 +406,6 @@ export default function ConceptLatticeModal({
                         ))}
                       </div>
                     </ScrollArea>
-
-                    <div className="mt-6 flex space-x-3">
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowChunkSelection(false)}
-                      >
-                        Back
-                      </Button>
-                      <Button 
-                        onClick={handleGenerate}
-                        disabled={generateMutation.isPending || selectedChunks.length === 0}
-                        className="flex-1"
-                      >
-                        {generateMutation.isPending ? "Generating..." : `Generate from ${selectedChunks.length} chunks`}
-                      </Button>
-                    </div>
                   </div>
                 )}
               </div>
