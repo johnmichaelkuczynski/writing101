@@ -53,7 +53,7 @@ export default function RewriteModal({
 
   useEffect(() => {
     if (mode === "chunks" && isOpen) {
-      const textChunks = chunkText(fullDocumentText, 1000);
+      const textChunks = chunkText(fullDocumentText, 250);
       setChunks(textChunks);
     }
   }, [mode, isOpen, fullDocumentText]);

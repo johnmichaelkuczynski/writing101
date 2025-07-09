@@ -6,7 +6,7 @@ export interface TextChunk {
   wordCount: number;
 }
 
-export function chunkText(text: string, maxWords: number = 1000): TextChunk[] {
+export function chunkText(text: string, maxWords: number = 250): TextChunk[] {
   const words = text.split(/\s+/);
   const chunks: TextChunk[] = [];
   
