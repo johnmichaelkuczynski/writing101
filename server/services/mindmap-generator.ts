@@ -109,8 +109,89 @@ export async function generateLocalMindMap(
   const module = paperContent.sections.find(s => s.id === moduleId);
   if (!module) throw new Error(`Module ${moduleId} not found`);
 
-  // Use fallback approach for immediate response
-  return createFallbackMindMap(module);
+  const prompt = `Analyze this section of Wittgenstein's Tractatus and create a mind map structure.
+
+Section: ${module.title}
+Content: ${module.content}
+
+Create a mind map with:
+1. Central claim (main philosophical insight)
+2. Supporting points (key propositions)
+3. Examples (specific illustrations)
+4. Potential objections (philosophical challenges)
+5. Implications (consequences for philosophy)
+
+Return JSON with this structure:
+{
+  "centralClaim": "Main insight",
+  "nodes": [
+    {
+      "type": "central|supporting|example|objection|implication",
+      "label": "Brief label",
+      "content": "Detailed explanation",
+      "sourceText": "Relevant quote if any"
+    }
+  ],
+  "relationships": [
+    {
+      "from": "node_index",
+      "to": "node_index", 
+      "type": "supports|objects|exemplifies|implies"
+    }
+  ]
+}`;
+
+  const response = await generateAIResponse(model, prompt, true);
+  
+  try {
+    const aiResult = JSON.parse(response);
+    
+    // Convert AI response to our MindMapNode format
+    const nodes: MindMapNode[] = aiResult.nodes.map((node: any, index: number) => ({
+      id: `${moduleId}-node-${index}`,
+      type: node.type,
+      label: node.label,
+      content: node.content,
+      position: calculateNodePosition(index, aiResult.nodes.length, node.type),
+      metadata: {
+        sourceText: node.sourceText,
+        sectionId: moduleId
+      }
+    }));
+
+    // Add central node
+    const centralNode: MindMapNode = {
+      id: `${moduleId}-central`,
+      type: 'central',
+      label: module.title,
+      content: aiResult.centralClaim,
+      position: { x: 0, y: 0 },
+      metadata: { sectionId: moduleId }
+    };
+
+    const allNodes = [centralNode, ...nodes];
+
+    // Create edges based on relationships
+    const edges = aiResult.relationships?.map((rel: any, index: number) => ({
+      id: `${moduleId}-edge-${index}`,
+      source: rel.from === 'central' ? centralNode.id : allNodes[parseInt(rel.from) + 1]?.id,
+      target: rel.to === 'central' ? centralNode.id : allNodes[parseInt(rel.to) + 1]?.id,
+      type: rel.type
+    })).filter((edge: any) => edge.source && edge.target) || [];
+
+    return {
+      id: moduleId,
+      sectionId: moduleId,
+      title: module.title,
+      centralClaim: aiResult.centralClaim,
+      nodes: allNodes,
+      edges
+    };
+  } catch (error) {
+    console.error('Failed to parse AI response for mind map:', error);
+    // Fallback: create simple mind map from section structure
+    return createFallbackMindMap(module);
+  }
 }
 
 function calculateNodePosition(index: number, total: number, type: string): { x: number; y: number } {
@@ -185,9 +266,66 @@ export async function generateMetaMindMap(
   localMaps: LocalMindMap[],
   model: AIModel = 'anthropic'
 ): Promise<MetaMindMap> {
-  // Use fallback approach for immediate response
-  // TODO: Implement AI enhancement in background
-  return createFallbackMetaMap(localMaps);
+  const sectionsOverview = localMaps.map(map => ({
+    id: map.id,
+    title: map.title,
+    centralClaim: map.centralClaim
+  }));
+
+  const prompt = `Analyze the overall structure of Wittgenstein's Tractatus based on these sections:
+
+${sectionsOverview.map(s => `${s.id}: ${s.title} - ${s.centralClaim}`).join('\n')}
+
+Create a meta-mind map showing how these sections relate to each other in Wittgenstein's philosophical argument. Consider:
+- Logical progression (how each section builds on previous ones)
+- Thematic relationships (shared concepts)
+- Dialectical structure (tensions and resolutions)
+
+Return JSON with:
+{
+  "nodes": [
+    {
+      "id": "section_id",
+      "label": "Brief section label",
+      "summary": "How this fits in overall argument",
+      "position": {"x": number, "y": number}
+    }
+  ],
+  "edges": [
+    {
+      "source": "section_id",
+      "target": "section_id",
+      "relationship": "builds_on|contradicts|exemplifies|concludes"
+    }
+  ]
+}`;
+
+  const response = await generateAIResponse(model, prompt, true);
+  
+  try {
+    const aiResult = JSON.parse(response);
+    
+    return {
+      id: 'tractatus-meta',
+      title: 'Tractatus Logico-Philosophicus: Overall Structure',
+      nodes: aiResult.nodes.map((node: any) => ({
+        id: node.id,
+        label: node.label,
+        sectionId: node.id,
+        position: node.position || { x: 0, y: 0 },
+        summary: node.summary
+      })),
+      edges: aiResult.edges.map((edge: any, index: number) => ({
+        id: `meta-edge-${index}`,
+        source: edge.source,
+        target: edge.target,
+        relationship: edge.relationship
+      }))
+    };
+  } catch (error) {
+    console.error('Failed to parse meta mind map:', error);
+    return createFallbackMetaMap(localMaps);
+  }
 }
 
 function createFallbackMetaMap(localMaps: LocalMindMap[]): MetaMindMap {
@@ -220,15 +358,15 @@ function createFallbackMetaMap(localMaps: LocalMindMap[]): MetaMindMap {
 export async function generateAllMindMaps(model: AIModel = 'anthropic'): Promise<BookStructure> {
   const modules = await segmentBookIntoModules();
   
-  // Generate fallback local mind maps immediately (can be enhanced with AI later)
-  const localMaps: LocalMindMap[] = modules.map(module => 
-    createFallbackMindMap({ id: module.id, title: module.title, content: module.content })
-  );
+  // Generate all local mind maps
+  const localMaps: LocalMindMap[] = [];
+  for (const module of modules) {
+    const localMap = await generateLocalMindMap(module.id, model);
+    localMaps.push(localMap);
+  }
   
-  // Generate fallback meta mind map
-  const metaMap = createFallbackMetaMap(localMaps);
-  
-  // TODO: Add AI enhancement in background processing
+  // Generate meta mind map
+  const metaMap = await generateMetaMindMap(localMaps, model);
   
   return {
     modules,
