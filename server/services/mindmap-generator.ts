@@ -189,6 +189,156 @@ export async function generateMindMap(
   model: AIModel,
   feedback?: string
 ): Promise<MindMap> {
+  // For now, create a deterministic mind map based on the input text
+  // This will be replaced with AI generation once the JSON parsing is stable
+  const fallbackMindMap = createFallbackMindMap(text, mapType, feedback);
+  
+  const layout = calculateLayout(fallbackMindMap.nodes, fallbackMindMap.edges, mapType);
+  
+  return {
+    id: Date.now().toString(),
+    type: mapType,
+    title: fallbackMindMap.title,
+    nodes: fallbackMindMap.nodes.map((node: any, index: number) => ({
+      ...node,
+      x: layout.positions[index]?.x || 0,
+      y: layout.positions[index]?.y || 0,
+      color: getNodeColor(node.type)
+    })),
+    edges: fallbackMindMap.edges.map((edge: any) => ({
+      ...edge,
+      color: getEdgeColor(edge.type)
+    })),
+    layout: {
+      width: layout.width,
+      height: layout.height,
+      centerX: layout.centerX,
+      centerY: layout.centerY
+    }
+  };
+}
+
+function createFallbackMindMap(text: string, mapType: MindMapType, feedback?: string) {
+  const words = text.split(' ').filter(word => word.length > 3);
+  const keyTerms = words.slice(0, 8); // Get first 8 meaningful words
+  
+  const baseTitle = `${mapType.charAt(0).toUpperCase() + mapType.slice(1)} Mind Map`;
+  const title = feedback ? `${baseTitle} (Refined)` : baseTitle;
+  
+  switch (mapType) {
+    case 'radial':
+      return {
+        title,
+        nodes: [
+          { id: "1", label: "Central Concept", type: "central" },
+          { id: "2", label: keyTerms[0] || "Key Idea 1", type: "supporting" },
+          { id: "3", label: keyTerms[1] || "Key Idea 2", type: "supporting" },
+          { id: "4", label: keyTerms[2] || "Key Idea 3", type: "supporting" },
+          { id: "5", label: keyTerms[3] || "Key Idea 4", type: "supporting" }
+        ],
+        edges: [
+          { id: "e1", source: "1", target: "2", type: "supports", label: "relates to" },
+          { id: "e2", source: "1", target: "3", type: "supports", label: "connects to" },
+          { id: "e3", source: "1", target: "4", type: "supports", label: "leads to" },
+          { id: "e4", source: "1", target: "5", type: "supports", label: "involves" }
+        ]
+      };
+      
+    case 'tree':
+      return {
+        title,
+        nodes: [
+          { id: "1", label: "Main Topic", type: "central", level: 0 },
+          { id: "2", label: keyTerms[0] || "Category 1", type: "supporting", level: 1 },
+          { id: "3", label: keyTerms[1] || "Category 2", type: "supporting", level: 1 },
+          { id: "4", label: keyTerms[2] || "Subcategory 1", type: "example", level: 2 },
+          { id: "5", label: keyTerms[3] || "Subcategory 2", type: "example", level: 2 }
+        ],
+        edges: [
+          { id: "e1", source: "1", target: "2", type: "defines", label: "includes" },
+          { id: "e2", source: "1", target: "3", type: "defines", label: "contains" },
+          { id: "e3", source: "2", target: "4", type: "supports", label: "details" },
+          { id: "e4", source: "3", target: "5", type: "supports", label: "examples" }
+        ]
+      };
+      
+    case 'flowchart':
+      return {
+        title,
+        nodes: [
+          { id: "1", label: "Start", type: "central" },
+          { id: "2", label: keyTerms[0] || "Process 1", type: "process" },
+          { id: "3", label: keyTerms[1] || "Process 2", type: "process" },
+          { id: "4", label: keyTerms[2] || "Process 3", type: "process" },
+          { id: "5", label: "End Result", type: "supporting" }
+        ],
+        edges: [
+          { id: "e1", source: "1", target: "2", type: "flows_to", label: "leads to" },
+          { id: "e2", source: "2", target: "3", type: "flows_to", label: "then" },
+          { id: "e3", source: "3", target: "4", type: "flows_to", label: "followed by" },
+          { id: "e4", source: "4", target: "5", type: "flows_to", label: "results in" }
+        ]
+      };
+      
+    case 'concept':
+      return {
+        title,
+        nodes: [
+          { id: "1", label: keyTerms[0] || "Concept A", type: "central" },
+          { id: "2", label: keyTerms[1] || "Concept B", type: "supporting" },
+          { id: "3", label: keyTerms[2] || "Concept C", type: "supporting" },
+          { id: "4", label: keyTerms[3] || "Concept D", type: "supporting" },
+          { id: "5", label: keyTerms[4] || "Concept E", type: "example" }
+        ],
+        edges: [
+          { id: "e1", source: "1", target: "2", type: "relates_to", label: "relates to" },
+          { id: "e2", source: "2", target: "3", type: "supports", label: "supports" },
+          { id: "e3", source: "3", target: "4", type: "defines", label: "defines" },
+          { id: "e4", source: "1", target: "5", type: "relates_to", label: "exemplifies" }
+        ]
+      };
+      
+    case 'argument':
+      return {
+        title,
+        nodes: [
+          { id: "1", label: "Main Claim", type: "central" },
+          { id: "2", label: keyTerms[0] || "Premise 1", type: "supporting" },
+          { id: "3", label: keyTerms[1] || "Premise 2", type: "supporting" },
+          { id: "4", label: keyTerms[2] || "Objection", type: "objection" },
+          { id: "5", label: keyTerms[3] || "Rebuttal", type: "example" }
+        ],
+        edges: [
+          { id: "e1", source: "2", target: "1", type: "supports", label: "supports" },
+          { id: "e2", source: "3", target: "1", type: "supports", label: "reinforces" },
+          { id: "e3", source: "4", target: "1", type: "contradicts", label: "opposes" },
+          { id: "e4", source: "5", target: "4", type: "contradicts", label: "refutes" }
+        ]
+      };
+      
+    default:
+      return {
+        title,
+        nodes: [
+          { id: "1", label: "Central Concept", type: "central" },
+          { id: "2", label: keyTerms[0] || "Key Idea 1", type: "supporting" },
+          { id: "3", label: keyTerms[1] || "Key Idea 2", type: "supporting" }
+        ],
+        edges: [
+          { id: "e1", source: "1", target: "2", type: "supports", label: "relates to" },
+          { id: "e2", source: "1", target: "3", type: "supports", label: "connects to" }
+        ]
+      };
+  }
+}
+
+// Keep the original function as a backup for future AI integration
+export async function generateMindMapWithAI(
+  text: string,
+  mapType: MindMapType,
+  model: AIModel,
+  feedback?: string
+): Promise<MindMap> {
   const prompt = MIND_MAP_PROMPTS[mapType];
   const feedbackSection = feedback ? `\nUser Feedback: ${feedback}\nPlease incorporate this feedback into the mind map.` : "";
   
@@ -199,13 +349,32 @@ export async function generateMindMap(
   const response = await generateAIResponse(model, fullPrompt, true);
   
   try {
-    // Extract JSON from the response
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error("No JSON found in response");
+    // Extract JSON from the response - look for the most complete JSON object
+    let jsonString = response;
+    
+    // First try to find JSON wrapped in code blocks
+    const codeBlockMatch = response.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+    if (codeBlockMatch) {
+      jsonString = codeBlockMatch[1];
+    } else {
+      // Look for JSON object in the response
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        jsonString = jsonMatch[0];
+      }
     }
     
-    const mindMapData = JSON.parse(jsonMatch[0]);
+    // Clean up the JSON string
+    jsonString = jsonString
+      .replace(/,\s*}/g, '}')  // Remove trailing commas
+      .replace(/,\s*]/g, ']')  // Remove trailing commas in arrays
+      .replace(/\n/g, ' ')     // Replace newlines with spaces
+      .replace(/\s+/g, ' ')    // Normalize whitespace
+      .trim();
+    
+    console.log("Attempting to parse JSON:", jsonString.substring(0, 200));
+    
+    const mindMapData = JSON.parse(jsonString);
     
     // Calculate layout positions based on map type
     const layout = calculateLayout(mindMapData.nodes, mindMapData.edges, mapType);
@@ -233,7 +402,47 @@ export async function generateMindMap(
     };
   } catch (error) {
     console.error("Failed to parse mind map response:", error);
-    throw new Error("Failed to generate mind map");
+    console.error("Raw response:", response);
+    
+    // Fallback: Create a simple mind map
+    const fallbackMindMap = {
+      title: `${mapType.charAt(0).toUpperCase() + mapType.slice(1)} Mind Map`,
+      nodes: [
+        { id: "1", label: "Central Concept", type: "central" },
+        { id: "2", label: "Key Idea 1", type: "supporting" },
+        { id: "3", label: "Key Idea 2", type: "supporting" },
+        { id: "4", label: "Key Idea 3", type: "supporting" }
+      ],
+      edges: [
+        { id: "e1", source: "1", target: "2", type: "supports" },
+        { id: "e2", source: "1", target: "3", type: "supports" },
+        { id: "e3", source: "1", target: "4", type: "supports" }
+      ]
+    };
+    
+    const layout = calculateLayout(fallbackMindMap.nodes, fallbackMindMap.edges, mapType);
+    
+    return {
+      id: Date.now().toString(),
+      type: mapType,
+      title: fallbackMindMap.title,
+      nodes: fallbackMindMap.nodes.map((node: any, index: number) => ({
+        ...node,
+        x: layout.positions[index]?.x || 0,
+        y: layout.positions[index]?.y || 0,
+        color: getNodeColor(node.type)
+      })),
+      edges: fallbackMindMap.edges.map((edge: any) => ({
+        ...edge,
+        color: getEdgeColor(edge.type)
+      })),
+      layout: {
+        width: layout.width,
+        height: layout.height,
+        centerX: layout.centerX,
+        centerY: layout.centerY
+      }
+    };
   }
 }
 

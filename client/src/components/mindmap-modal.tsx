@@ -13,7 +13,6 @@ import { useToast } from "@/hooks/use-toast";
 import MindMapViewer from "./mindmap-viewer";
 import { useMindMap } from "@/hooks/use-mindmap";
 import { apiRequest } from "@/lib/queryClient";
-import { chunkText } from "@/lib/text-chunker";
 import { paperContent } from "@shared/paper-content";
 import type { AIModel } from "@shared/schema";
 import type { MindMapType } from "@shared/schema";
@@ -51,9 +50,13 @@ export default function MindMapModal({
     if (selectedText) {
       setSourceText(selectedText);
     } else {
-      // Generate chunks from full document
-      const fullText = paperContent.sections.map(s => s.content).join('\n\n');
-      const textChunks = chunkText(fullText, 300);
+      // Generate chunks from document sections
+      const textChunks = paperContent.sections.map((section, index) => ({
+        id: `chunk-${index}`,
+        text: section.content,
+        wordCount: section.content.split(' ').length,
+        title: section.title
+      }));
       setChunks(textChunks);
     }
   }, [selectedText]);
@@ -149,9 +152,10 @@ export default function MindMapModal({
       await apiRequest('/api/email', {
         method: 'POST',
         body: JSON.stringify({
-          email: emailAddress,
+          to: emailAddress,
+          from: 'noreply@mindmap.com',
           subject: `Mind Map: ${mindMap.title}`,
-          content: `Please find attached your ${mindMap.type} mind map: ${mindMap.title}\n\nGenerated from: ${sourceText.substring(0, 100)}...`
+          text: `Please find attached your ${mindMap.type} mind map: ${mindMap.title}\n\nGenerated from: ${sourceText.substring(0, 100)}...`
         })
       });
       
@@ -246,7 +250,7 @@ export default function MindMapModal({
                         {chunks.map((chunk) => (
                           <SelectItem key={chunk.id} value={chunk.text}>
                             <div className="flex flex-col">
-                              <span className="text-sm">{chunk.text.substring(0, 50)}...</span>
+                              <span className="text-sm">{chunk.title || chunk.text.substring(0, 50) + '...'}</span>
                               <span className="text-xs text-muted-foreground">{chunk.wordCount} words</span>
                             </div>
                           </SelectItem>
