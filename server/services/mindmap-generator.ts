@@ -2,6 +2,27 @@ import type { AIModel } from "@shared/schema";
 import { generateAIResponse } from "./ai-models";
 import { paperContent } from "@shared/paper-content";
 
+// Helper function to parse JSON from AI responses that may be wrapped in markdown
+function parseAIResponse(response: string): any {
+  // Remove markdown code blocks if present
+  let cleanResponse = response.trim();
+  
+  // Handle markdown code blocks with language specification
+  if (cleanResponse.startsWith('```json') && cleanResponse.endsWith('```')) {
+    cleanResponse = cleanResponse.slice(7, -3).trim();
+  } else if (cleanResponse.startsWith('```') && cleanResponse.endsWith('```')) {
+    cleanResponse = cleanResponse.slice(3, -3).trim();
+  }
+  
+  // Try to find JSON within the response if it's mixed with other text
+  const jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    cleanResponse = jsonMatch[0];
+  }
+  
+  return JSON.parse(cleanResponse);
+}
+
 export interface MindMapNode {
   id: string;
   type: 'central' | 'supporting' | 'example' | 'objection' | 'implication';
@@ -121,7 +142,7 @@ Create a mind map with:
 4. Potential objections (philosophical challenges)
 5. Implications (consequences for philosophy)
 
-Return JSON with this structure:
+Return ONLY valid JSON (no explanations, no markdown) with this structure:
 {
   "centralClaim": "Main insight",
   "nodes": [
@@ -144,7 +165,7 @@ Return JSON with this structure:
   const response = await generateAIResponse(model, prompt, true);
   
   try {
-    const aiResult = JSON.parse(response);
+    const aiResult = parseAIResponse(response);
     
     // Convert AI response to our MindMapNode format
     const nodes: MindMapNode[] = aiResult.nodes.map((node: any, index: number) => ({
@@ -281,7 +302,7 @@ Create a meta-mind map showing how these sections relate to each other in Wittge
 - Thematic relationships (shared concepts)
 - Dialectical structure (tensions and resolutions)
 
-Return JSON with:
+Return ONLY valid JSON (no explanations, no markdown) with:
 {
   "nodes": [
     {
@@ -303,7 +324,7 @@ Return JSON with:
   const response = await generateAIResponse(model, prompt, true);
   
   try {
-    const aiResult = JSON.parse(response);
+    const aiResult = parseAIResponse(response);
     
     return {
       id: 'tractatus-meta',
