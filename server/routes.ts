@@ -167,6 +167,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Mind map routes
+  app.get("/api/mindmaps/structure", async (req, res) => {
+    try {
+      const { generateAllMindMaps } = await import("./services/mindmap-generator");
+      const model = (req.query.model as AIModel) || 'anthropic';
+      const structure = await generateAllMindMaps(model);
+      res.json(structure);
+    } catch (error) {
+      console.error('Error generating mind map structure:', error);
+      res.status(500).json({ error: "Failed to generate mind map structure" });
+    }
+  });
+
+  app.get("/api/mindmaps/local/:sectionId", async (req, res) => {
+    try {
+      const { generateLocalMindMap } = await import("./services/mindmap-generator");
+      const { sectionId } = req.params;
+      const model = (req.query.model as AIModel) || 'anthropic';
+      const mindMap = await generateLocalMindMap(sectionId, model);
+      res.json(mindMap);
+    } catch (error) {
+      console.error('Error generating local mind map:', error);
+      res.status(500).json({ error: "Failed to generate local mind map" });
+    }
+  });
+
+  app.get("/api/mindmaps/meta", async (req, res) => {
+    try {
+      const { generateAllMindMaps } = await import("./services/mindmap-generator");
+      const model = (req.query.model as AIModel) || 'anthropic';
+      const structure = await generateAllMindMaps(model);
+      res.json(structure.metaMap);
+    } catch (error) {
+      console.error('Error generating meta mind map:', error);
+      res.status(500).json({ error: "Failed to generate meta mind map" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

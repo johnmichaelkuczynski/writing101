@@ -3,7 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { renderMathInElement, renderMathString } from "@/lib/math-renderer";
 import { useTextSelection } from "@/hooks/use-text-selection";
 import SelectionToolbar from "@/components/selection-toolbar";
-import { paperContent } from "@/data/paper-content";
+import { paperContent } from "@shared/paper-content";
 
 interface DocumentContentProps {
   mathMode?: boolean;

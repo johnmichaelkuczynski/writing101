@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BookOpen, Edit3 } from "lucide-react";
+import { BookOpen, Edit3, Network, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NavigationSidebar from "@/components/navigation-sidebar";
 import DocumentContent from "@/components/document-content";
@@ -8,8 +8,10 @@ import ChatInterface from "@/components/chat-interface";
 import ModelSelector from "@/components/model-selector";
 import MathToggle from "@/components/math-toggle";
 import RewriteModal from "@/components/rewrite-modal";
+import MindMapModal from "@/components/mindmap-modal";
 import { initializeMathRenderer } from "@/lib/math-renderer";
-import { paperContent } from "@/data/paper-content";
+import { paperContent } from "@shared/paper-content";
+import { useMindMaps } from "@/hooks/use-mindmaps";
 import type { AIModel } from "@shared/schema";
 
 export default function LivingBook() {
@@ -20,10 +22,17 @@ export default function LivingBook() {
   const [rewriteModalOpen, setRewriteModalOpen] = useState(false);
   const [rewriteMode, setRewriteMode] = useState<"selection" | "chunks">("chunks");
   const [selectedTextForRewrite, setSelectedTextForRewrite] = useState<string>("");
+  const [mindMapModalOpen, setMindMapModalOpen] = useState(false);
+  const [mindMapInitialTab, setMindMapInitialTab] = useState<"meta" | "local">("meta");
+  const [mindMapSectionId, setMindMapSectionId] = useState<string>("");
+
+  const { preloadMindMaps } = useMindMaps();
 
   useEffect(() => {
     initializeMathRenderer();
-  }, []);
+    // Preload mind maps when the component mounts
+    preloadMindMaps(selectedModel).catch(console.error);
+  }, [selectedModel, preloadMindMaps]);
 
   const handleQuestionFromSelection = (question: string) => {
     setQuestionFromSelection(question);
@@ -59,9 +68,46 @@ export default function LivingBook() {
   };
 
   const getFullDocumentText = () => {
-    return Object.values(paperContent.sections)
+    return paperContent.sections
       .map(section => section.content)
       .join('\n\n');
+  };
+
+  const handleViewBookStructure = () => {
+    setMindMapInitialTab("meta");
+    setMindMapSectionId("");
+    setMindMapModalOpen(true);
+  };
+
+  const handleViewSectionMindMap = (sectionId?: string) => {
+    if (sectionId) {
+      setMindMapSectionId(sectionId);
+      setMindMapInitialTab("local");
+    } else {
+      setMindMapInitialTab("meta");
+      setMindMapSectionId("");
+    }
+    setMindMapModalOpen(true);
+  };
+
+  const handleMindMapSectionSelect = (sectionId: string) => {
+    // Scroll to the section in the document
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleMindMapAskQuestion = (question: string) => {
+    setQuestionFromSelection(question);
+    setMindMapModalOpen(false);
+  };
+
+  const handleMindMapRewrite = (text: string) => {
+    setSelectedTextForRewrite(text);
+    setRewriteMode("selection");
+    setMindMapModalOpen(false);
+    setRewriteModalOpen(true);
   };
 
   return (
@@ -81,6 +127,15 @@ export default function LivingBook() {
                 mathMode={mathMode} 
                 onToggle={setMathMode} 
               />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleViewBookStructure}
+                className="flex items-center space-x-2"
+              >
+                <Map className="w-4 h-4" />
+                <span>View Structure</span>
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -139,6 +194,18 @@ export default function LivingBook() {
         mode={rewriteMode}
         selectedText={selectedTextForRewrite}
         fullDocumentText={getFullDocumentText()}
+      />
+
+      {/* Mind Map Modal */}
+      <MindMapModal
+        isOpen={mindMapModalOpen}
+        onClose={() => setMindMapModalOpen(false)}
+        selectedModel={selectedModel}
+        initialTab={mindMapInitialTab}
+        initialSectionId={mindMapSectionId}
+        onSectionSelect={handleMindMapSectionSelect}
+        onAskQuestion={handleMindMapAskQuestion}
+        onRewrite={handleMindMapRewrite}
       />
     </div>
   );

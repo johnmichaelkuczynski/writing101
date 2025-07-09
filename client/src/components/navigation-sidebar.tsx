@@ -1,5 +1,5 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { paperContent } from "@/data/paper-content";
+import { paperContent } from "@shared/paper-content";
 
 export default function NavigationSidebar() {
   const handleNavClick = (id: string) => {
