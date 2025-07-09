@@ -177,16 +177,34 @@ export default function MindMapViewer({
       draggable: true,
     }));
 
-    // Convert mind map edges to ReactFlow edges
+    // Convert mind map edges to ReactFlow edges with proper arrows
+    const edgeTypeColors = {
+      supports: '#10b981',
+      objects: '#ef4444', 
+      exemplifies: '#f59e0b',
+      implies: '#8b5cf6'
+    };
+
     const flowEdges: Edge[] = mindMap.edges.map((edge) => ({
       id: edge.id,
       source: edge.source,
       target: edge.target,
       type: 'smoothstep',
       animated: true,
-      style: { stroke: '#94a3b8', strokeWidth: 2 },
+      style: { 
+        stroke: edgeTypeColors[edge.type as keyof typeof edgeTypeColors] || '#94a3b8', 
+        strokeWidth: 3 
+      },
       label: edge.type,
-      labelStyle: { fontSize: 10, fontWeight: 500 },
+      labelStyle: { 
+        fontSize: 10, 
+        fontWeight: 600,
+        color: edgeTypeColors[edge.type as keyof typeof edgeTypeColors] || '#64748b'
+      },
+      markerEnd: {
+        type: 'arrowclosed',
+        color: edgeTypeColors[edge.type as keyof typeof edgeTypeColors] || '#94a3b8'
+      }
     }));
 
     setNodes(flowNodes);

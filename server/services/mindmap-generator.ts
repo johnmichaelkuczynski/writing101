@@ -227,13 +227,31 @@ Return ONLY valid JSON (no explanations, no markdown) with this structure:
 
     const allNodes = [centralNode, ...nodes];
 
-    // Create edges based on relationships
-    const edges = aiResult.relationships?.map((rel: any, index: number) => ({
-      id: `${moduleId}-edge-${index}`,
-      source: rel.from === 'central' ? centralNode.id : allNodes[parseInt(rel.from) + 1]?.id,
-      target: rel.to === 'central' ? centralNode.id : allNodes[parseInt(rel.to) + 1]?.id,
-      type: rel.type
-    })).filter((edge: any) => edge.source && edge.target) || [];
+    // Create edges based on relationships with proper node ID mapping
+    const edges = aiResult.relationships?.map((rel: any, index: number) => {
+      let sourceId: string;
+      let targetId: string;
+      
+      // Handle different relationship formats from AI
+      if (typeof rel.from === 'string') {
+        sourceId = rel.from === 'central' ? centralNode.id : `${moduleId}-node-${rel.from}`;
+      } else {
+        sourceId = rel.from === 0 ? centralNode.id : allNodes[rel.from]?.id;
+      }
+      
+      if (typeof rel.to === 'string') {
+        targetId = rel.to === 'central' ? centralNode.id : `${moduleId}-node-${rel.to}`;
+      } else {
+        targetId = rel.to === 0 ? centralNode.id : allNodes[rel.to]?.id;
+      }
+      
+      return {
+        id: `${moduleId}-edge-${index}`,
+        source: sourceId || centralNode.id,
+        target: targetId || allNodes[1]?.id || centralNode.id,
+        type: rel.type || 'supports'
+      };
+    }).filter((edge: any) => edge.source && edge.target && edge.source !== edge.target) || [];
 
     return {
       id: moduleId,
@@ -245,8 +263,11 @@ Return ONLY valid JSON (no explanations, no markdown) with this structure:
     };
   } catch (error) {
     console.error('Failed to parse AI response for mind map:', error);
-    // Fallback: create simple mind map from section structure
-    return createFallbackMindMap(module);
+    // Fallback: create simple mind map from section structure with guaranteed working edges
+    const fallback = createFallbackMindMap(module);
+    console.log(`Generated fallback mindmap for ${moduleId} with ${fallback.nodes.length} nodes and ${fallback.edges.length} edges`);
+    console.log('Fallback edges:', fallback.edges.map(e => `${e.source} -> ${e.target} (${e.type})`));
+    return fallback;
   }
 }
 
