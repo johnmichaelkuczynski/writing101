@@ -23,6 +23,17 @@ export async function apiRequest(
   return res;
 }
 
+// Helper function for GET requests that returns JSON directly
+export async function apiGet(url: string): Promise<any> {
+  const res = await fetch(url, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  await throwIfResNotOk(res);
+  return await res.json();
+}
+
 type UnauthorizedBehavior = "returnNull" | "throw";
 export const getQueryFn: <T>(options: {
   on401: UnauthorizedBehavior;

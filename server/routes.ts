@@ -6,7 +6,7 @@ import { getFullDocumentContent } from "./services/document-processor";
 import { sendEmail } from "./services/email-service";
 import { generatePDF } from "./services/pdf-generator";
 import { transcribeAudio } from "./services/speech-service";
-import { chatRequestSchema, instructionRequestSchema, emailRequestSchema, rewriteRequestSchema } from "@shared/schema";
+import { chatRequestSchema, instructionRequestSchema, emailRequestSchema, rewriteRequestSchema, type AIModel } from "@shared/schema";
 import multer from "multer";
 
 export async function registerRoutes(app: Express): Promise<Server> {

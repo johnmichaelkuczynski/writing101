@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiGet } from "@/lib/queryClient";
 import type { AIModel } from "@shared/schema";
 
 export interface MindMapNode {
@@ -62,7 +62,7 @@ export interface BookStructure {
 export function useMindMapStructure(model: AIModel = 'anthropic') {
   return useQuery<BookStructure>({
     queryKey: ['/api/mindmaps/structure', model],
-    queryFn: () => apiRequest(`/api/mindmaps/structure?model=${model}`),
+    queryFn: () => apiGet(`/api/mindmaps/structure?model=${model}`),
     staleTime: 30 * 60 * 1000, // 30 minutes - mind maps are relatively static
     gcTime: 60 * 60 * 1000, // 1 hour
   });
@@ -71,7 +71,7 @@ export function useMindMapStructure(model: AIModel = 'anthropic') {
 export function useLocalMindMap(sectionId: string, model: AIModel = 'anthropic') {
   return useQuery<LocalMindMap>({
     queryKey: ['/api/mindmaps/local', sectionId, model],
-    queryFn: () => apiRequest(`/api/mindmaps/local/${sectionId}?model=${model}`),
+    queryFn: () => apiGet(`/api/mindmaps/local/${sectionId}?model=${model}`),
     enabled: !!sectionId,
     staleTime: 30 * 60 * 1000, // 30 minutes
     gcTime: 60 * 60 * 1000, // 1 hour
@@ -81,7 +81,7 @@ export function useLocalMindMap(sectionId: string, model: AIModel = 'anthropic')
 export function useMetaMindMap(model: AIModel = 'anthropic') {
   return useQuery<MetaMindMap>({
     queryKey: ['/api/mindmaps/meta', model],
-    queryFn: () => apiRequest(`/api/mindmaps/meta?model=${model}`),
+    queryFn: () => apiGet(`/api/mindmaps/meta?model=${model}`),
     staleTime: 30 * 60 * 1000, // 30 minutes
     gcTime: 60 * 60 * 1000, // 1 hour
   });
@@ -94,7 +94,7 @@ export function useMindMaps() {
     // Preload the entire structure
     return queryClient.prefetchQuery({
       queryKey: ['/api/mindmaps/structure', model],
-      queryFn: () => apiRequest(`/api/mindmaps/structure?model=${model}`),
+      queryFn: () => apiGet(`/api/mindmaps/structure?model=${model}`),
       staleTime: 30 * 60 * 1000,
     });
   };
@@ -102,7 +102,7 @@ export function useMindMaps() {
   const preloadLocalMindMap = async (sectionId: string, model: AIModel = 'anthropic') => {
     return queryClient.prefetchQuery({
       queryKey: ['/api/mindmaps/local', sectionId, model],
-      queryFn: () => apiRequest(`/api/mindmaps/local/${sectionId}?model=${model}`),
+      queryFn: () => apiGet(`/api/mindmaps/local/${sectionId}?model=${model}`),
       staleTime: 30 * 60 * 1000,
     });
   };
