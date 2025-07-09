@@ -90,3 +90,39 @@ export type ChatRequest = z.infer<typeof chatRequestSchema>;
 export type InstructionRequest = z.infer<typeof instructionRequestSchema>;
 export type EmailRequest = z.infer<typeof emailRequestSchema>;
 export type RewriteRequest = z.infer<typeof rewriteRequestSchema>;
+
+// Mind Map Types
+export type MindMapType = "radial" | "tree" | "flowchart" | "concept" | "argument";
+
+export interface MindMapNode {
+  id: string;
+  label: string;
+  type: "central" | "supporting" | "objection" | "example" | "implication" | "process";
+  x?: number;
+  y?: number;
+  level?: number;
+  color?: string;
+}
+
+export interface MindMapEdge {
+  id: string;
+  source: string;
+  target: string;
+  label?: string;
+  type: "supports" | "contradicts" | "flows_to" | "relates_to" | "implies" | "defines";
+  color?: string;
+}
+
+export interface MindMap {
+  id: string;
+  type: MindMapType;
+  title: string;
+  nodes: MindMapNode[];
+  edges: MindMapEdge[];
+  layout: {
+    width: number;
+    height: number;
+    centerX: number;
+    centerY: number;
+  };
+}

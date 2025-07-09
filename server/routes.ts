@@ -167,41 +167,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Mind map routes
-  app.get("/api/mindmaps/structure", async (req, res) => {
+  // Mind map generation endpoint
+  app.post("/api/mindmap/generate", async (req, res) => {
     try {
-      const { generateAllMindMaps } = await import("./services/mindmap-generator");
-      const model = (req.query.model as AIModel) || 'anthropic';
-      const structure = await generateAllMindMaps(model);
-      res.json(structure);
-    } catch (error) {
-      console.error('Error generating mind map structure:', error);
-      res.status(500).json({ error: "Failed to generate mind map structure" });
-    }
-  });
+      const { text, mapType, model, feedback } = req.body;
+      
+      if (!text || !mapType || !model) {
+        return res.status(400).json({ error: "Missing required fields: text, mapType, model" });
+      }
 
-  app.get("/api/mindmaps/local/:sectionId", async (req, res) => {
-    try {
-      const { generateLocalMindMap } = await import("./services/mindmap-generator");
-      const { sectionId } = req.params;
-      const model = (req.query.model as AIModel) || 'anthropic';
-      const mindMap = await generateLocalMindMap(sectionId, model);
+      const { generateMindMap } = await import("./services/mindmap-generator");
+      const mindMap = await generateMindMap(text, mapType, model, feedback);
+      
       res.json(mindMap);
     } catch (error) {
-      console.error('Error generating local mind map:', error);
-      res.status(500).json({ error: "Failed to generate local mind map" });
-    }
-  });
-
-  app.get("/api/mindmaps/meta", async (req, res) => {
-    try {
-      const { generateAllMindMaps } = await import("./services/mindmap-generator");
-      const model = (req.query.model as AIModel) || 'anthropic';
-      const structure = await generateAllMindMaps(model);
-      res.json(structure.metaMap);
-    } catch (error) {
-      console.error('Error generating meta mind map:', error);
-      res.status(500).json({ error: "Failed to generate meta mind map" });
+      console.error("Mind map generation error:", error);
+      res.status(500).json({ error: "Failed to generate mind map" });
     }
   });
 
