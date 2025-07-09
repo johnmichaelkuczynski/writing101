@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BookOpen, Edit3, Network } from "lucide-react";
+import { BookOpen, Edit3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NavigationSidebar from "@/components/navigation-sidebar";
 import DocumentContent from "@/components/document-content";
@@ -8,7 +8,6 @@ import ChatInterface from "@/components/chat-interface";
 import ModelSelector from "@/components/model-selector";
 import MathToggle from "@/components/math-toggle";
 import RewriteModal from "@/components/rewrite-modal";
-import MindMapModal from "@/components/mindmap-modal";
 import { initializeMathRenderer } from "@/lib/math-renderer";
 import { paperContent } from "@shared/paper-content";
 import type { AIModel } from "@shared/schema";
@@ -21,8 +20,6 @@ export default function LivingBook() {
   const [rewriteModalOpen, setRewriteModalOpen] = useState(false);
   const [rewriteMode, setRewriteMode] = useState<"selection" | "chunks">("chunks");
   const [selectedTextForRewrite, setSelectedTextForRewrite] = useState<string>("");
-  const [mindMapModalOpen, setMindMapModalOpen] = useState(false);
-  const [selectedTextForMindMap, setSelectedTextForMindMap] = useState<string>("");
 
   useEffect(() => {
     initializeMathRenderer();
@@ -61,20 +58,7 @@ export default function LivingBook() {
     setSelectedTextForRewrite("");
   };
 
-  const handleMindMapFromSelection = (text: string) => {
-    setSelectedTextForMindMap(text);
-    setMindMapModalOpen(true);
-  };
 
-  const handleMindMapGenerate = () => {
-    setSelectedTextForMindMap("");
-    setMindMapModalOpen(true);
-  };
-
-  const handleMindMapModalClose = () => {
-    setMindMapModalOpen(false);
-    setSelectedTextForMindMap("");
-  };
 
   const getFullDocumentText = () => {
     return paperContent.sections
@@ -101,15 +85,7 @@ export default function LivingBook() {
                 mathMode={mathMode} 
                 onToggle={setMathMode} 
               />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleMindMapGenerate}
-                className="flex items-center space-x-2"
-              >
-                <Network className="w-4 h-4" />
-                <span>Generate Mind Map</span>
-              </Button>
+
               <Button
                 variant="outline"
                 size="sm"
@@ -140,7 +116,6 @@ export default function LivingBook() {
             onQuestionFromSelection={handleQuestionFromSelection}
             onTextSelectedForChat={handleTextSelectedForChat}
             onRewriteFromSelection={handleRewriteFromSelection}
-            onMindMapFromSelection={handleMindMapFromSelection}
           />
         </main>
 
@@ -171,15 +146,7 @@ export default function LivingBook() {
         fullDocumentText={getFullDocumentText()}
       />
 
-      {/* Mind Map Modal */}
-      <MindMapModal
-        isOpen={mindMapModalOpen}
-        onClose={handleMindMapModalClose}
-        selectedModel={selectedModel}
-        selectedText={selectedTextForMindMap}
-        onAskQuestion={handleQuestionFromSelection}
-        onRewrite={handleRewriteFromSelection}
-      />
+
     </div>
   );
 }

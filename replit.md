@@ -213,14 +213,8 @@ Preferred communication style: Simple, everyday language.
   - Users can now read entire rewrites in-app without requiring PDF downloads
   - Maintained existing download functionality (TXT/PDF) alongside new viewing option
   - Improved user experience by providing immediate access to complete rewrite results
-- July 09, 2025: Comprehensive mind map functionality implementation
-  - Built complete mind map system with 5 types: radial, tree, flowchart, concept, and argument
-  - Added dynamic mind map generation using AI models with custom prompts for each type
-  - Implemented interactive canvas-based visualization with zoom, pan, and node interaction
-  - Added recursive feedback system: users can refine maps with written feedback
-  - Integrated export functionality: download as JPG, PNG, or PDF formats
-  - Added email sharing capability using SendGrid integration
-  - Created text selection and chunk-based input options for flexible source material
-  - Added mind map button to header and selection toolbar for easy access
-  - Built comprehensive modal interface with type selection, source management, and export controls
-  - All mind map types generate authentic visual representations with proper node styling and edge labels
+- July 09, 2025: Mind map functionality removed
+  - Removed all mind map components, hooks, and backend services
+  - Cleaned up UI elements including header button and selection toolbar mind map option
+  - Removed API endpoints and shared schema definitions for mind map functionality
+  - Simplified application architecture by removing unused features

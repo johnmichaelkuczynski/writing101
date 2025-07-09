@@ -167,24 +167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Mind map generation endpoint
-  app.post("/api/mindmap/generate", async (req, res) => {
-    try {
-      const { text, mapType, model, feedback } = req.body;
-      
-      if (!text || !mapType || !model) {
-        return res.status(400).json({ error: "Missing required fields: text, mapType, model" });
-      }
 
-      const { generateMindMap } = await import("./services/mindmap-generator");
-      const mindMap = await generateMindMap(text, mapType, model, feedback);
-      
-      res.json(mindMap);
-    } catch (error) {
-      console.error("Mind map generation error:", error);
-      res.status(500).json({ error: "Failed to generate mind map" });
-    }
-  });
 
   const httpServer = createServer(app);
   return httpServer;
