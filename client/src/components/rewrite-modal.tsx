@@ -48,6 +48,7 @@ export default function RewriteModal({
   const [showResults, setShowResults] = useState(false);
   const [originalText, setOriginalText] = useState("");
   const [selectedChunk, setSelectedChunk] = useState<TextChunk | null>(null);
+  const [viewingFullText, setViewingFullText] = useState<RewriteResult | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -57,7 +58,7 @@ export default function RewriteModal({
     }
   }, [mode, isOpen, fullDocumentText]);
 
-  // Render math when results are displayed
+  // Render math when results are displayed or when viewing full text
   useEffect(() => {
     if (showResults && rewriteResults.length > 0) {
       setTimeout(() => {
@@ -68,6 +69,18 @@ export default function RewriteModal({
       }, 200);
     }
   }, [showResults, rewriteResults]);
+
+  // Render math in full text viewer
+  useEffect(() => {
+    if (viewingFullText) {
+      setTimeout(() => {
+        const fullTextElement = document.querySelector('.full-text-content');
+        if (fullTextElement) {
+          renderMathInElement(fullTextElement as HTMLElement);
+        }
+      }, 100);
+    }
+  }, [viewingFullText]);
 
   const rewriteMutation = useMutation({
     mutationFn: async (data: {
@@ -441,7 +454,17 @@ export default function RewriteModal({
                             <p className="text-sm bg-muted p-2 rounded">{result.instructions}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-muted-foreground mb-1">Rewritten Text:</p>
+                            <div className="flex items-center justify-between mb-1">
+                              <p className="text-xs text-muted-foreground">Rewritten Text:</p>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setViewingFullText(result)}
+                                className="text-xs"
+                              >
+                                View Full Text
+                              </Button>
+                            </div>
                             <div className="text-sm bg-background border rounded p-3 max-h-40 overflow-y-auto whitespace-pre-wrap rewrite-content">
                               {result.rewrittenText}
                             </div>
@@ -462,6 +485,64 @@ export default function RewriteModal({
           )}
         </div>
       </DialogContent>
+
+      {/* Full Text Viewer */}
+      <Dialog open={!!viewingFullText} onOpenChange={() => setViewingFullText(null)}>
+        <DialogContent className="max-w-4xl w-[90vw] h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Full Rewrite View</DialogTitle>
+            <DialogDescription>
+              Complete rewritten text with original instructions
+            </DialogDescription>
+          </DialogHeader>
+          
+          {viewingFullText && (
+            <div className="flex-1 flex flex-col space-y-4 overflow-hidden">
+              <div>
+                <p className="text-sm font-medium mb-2">Instructions:</p>
+                <div className="text-sm bg-muted p-3 rounded border">
+                  {viewingFullText.instructions}
+                </div>
+              </div>
+              
+              <div className="flex-1 overflow-hidden">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium">Rewritten Text:</p>
+                  <div className="flex space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => downloadAsText(viewingFullText.rewrittenText, 'full-rewrite')}
+                    >
+                      <FileText className="w-4 h-4 mr-1" />
+                      Download TXT
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => downloadAsPDF(viewingFullText.rewrittenText, 'full-rewrite')}
+                    >
+                      <FileDown className="w-4 h-4 mr-1" />
+                      Download PDF
+                    </Button>
+                  </div>
+                </div>
+                <ScrollArea className="h-full border rounded">
+                  <div className="p-6 text-sm leading-relaxed whitespace-pre-wrap full-text-content">
+                    {viewingFullText.rewrittenText}
+                  </div>
+                </ScrollArea>
+              </div>
+              
+              <div className="flex justify-end pt-4 border-t">
+                <Button onClick={() => setViewingFullText(null)}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }

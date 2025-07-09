@@ -205,3 +205,11 @@ Preferred communication style: Simple, everyday language.
   - Content now features genuine numbered propositions (1-7) directly from the original Tractatus source
   - Authentic philosophical propositions include: "The world is everything that is the case," "Whereof one cannot speak, thereof one must be silent"
   - AI context updated to reflect authentic Wittgenstein concepts and terminology from the actual text
+- July 09, 2025: Enhanced rewrite functionality with in-app full text viewer
+  - Added "View Full Text" button to each rewrite result for in-app viewing
+  - Implemented full-screen popup modal (90% viewport width, 80% height) to display complete rewritten content
+  - Full text viewer includes original instructions, complete rewritten text, and download options
+  - Enhanced math rendering support for both preview and full text views
+  - Users can now read entire rewrites in-app without requiring PDF downloads
+  - Maintained existing download functionality (TXT/PDF) alongside new viewing option
+  - Improved user experience by providing immediate access to complete rewrite results
