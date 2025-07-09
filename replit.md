@@ -201,4 +201,7 @@ Preferred communication style: Simple, everyday language.
   - Emphasizes Wittgenstein's approach to dissolving philosophical problems through logical clarification
   - API keys activated for OpenAI, Anthropic, and Perplexity models (DeepSeek available as fallback)
   - All existing functionality (chat, rewrite, voice, text selection, math mode) preserved with new philosophical content
-  - Content includes original numbered propositions with explanatory commentary
+  - CRITICAL UPDATE: Replaced all created content with authentic Wittgenstein text extracted from authoritative edition PDF
+  - Content now features genuine numbered propositions (1-7) directly from the original Tractatus source
+  - Authentic philosophical propositions include: "The world is everything that is the case," "Whereof one cannot speak, thereof one must be silent"
+  - AI context updated to reflect authentic Wittgenstein concepts and terminology from the actual text
