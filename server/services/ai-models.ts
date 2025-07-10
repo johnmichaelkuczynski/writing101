@@ -143,16 +143,33 @@ Keep your explanation concise but insightful (3-4 sentences). Focus on helping t
 
 Provide a brief, enlightening explanation that helps the user understand Wittgenstein's meaning and philosophical significance.`;
 
-  switch (model) {
-    case "openai":
-      return await generateOpenAIResponse(prompt, systemPrompt);
-    case "anthropic":
-      return await generateAnthropicResponse(prompt, systemPrompt);
-    case "perplexity":
-      return await generatePerplexityResponse(prompt, systemPrompt);
-    case "deepseek":
-    default:
-      return await generateDeepSeekResponse(prompt, systemPrompt);
+  try {
+    switch (model) {
+      case "openai":
+        return await generateOpenAIResponse(prompt, systemPrompt);
+      case "anthropic":
+        return await generateAnthropicResponse(prompt, systemPrompt);
+      case "perplexity":
+        return await generatePerplexityResponse(prompt, systemPrompt);
+      case "deepseek":
+      default:
+        return await generateDeepSeekResponse(prompt, systemPrompt);
+    }
+  } catch (error) {
+    console.error(`Error in passage explanation with ${model}:`, error);
+    
+    // If current model fails, try OpenAI as fallback
+    if (model !== "openai") {
+      console.log(`Attempting OpenAI fallback for passage explanation due to ${model} failure`);
+      try {
+        return await generateOpenAIResponse(prompt, systemPrompt);
+      } catch (fallbackError) {
+        console.error("OpenAI fallback also failed:", fallbackError);
+        return "I'm sorry, but I'm having trouble connecting to the AI service right now. Please try again in a moment, or switch to the OpenAI model in the settings.";
+      }
+    }
+    
+    return "I'm sorry, but I'm having trouble generating a response right now. Please try again in a moment.";
   }
 }
 
@@ -183,16 +200,33 @@ Keep responses conversational but intellectually rigorous. Help the user deepen 
 
 Respond thoughtfully to continue our discussion about this passage from the Tractatus.`;
 
-  switch (model) {
-    case "openai":
-      return await generateOpenAIResponse(prompt, systemPrompt);
-    case "anthropic":
-      return await generateAnthropicResponse(prompt, systemPrompt);
-    case "perplexity":
-      return await generatePerplexityResponse(prompt, systemPrompt);
-    case "deepseek":
-    default:
-      return await generateDeepSeekResponse(prompt, systemPrompt);
+  try {
+    switch (model) {
+      case "openai":
+        return await generateOpenAIResponse(prompt, systemPrompt);
+      case "anthropic":
+        return await generateAnthropicResponse(prompt, systemPrompt);
+      case "perplexity":
+        return await generatePerplexityResponse(prompt, systemPrompt);
+      case "deepseek":
+      default:
+        return await generateDeepSeekResponse(prompt, systemPrompt);
+    }
+  } catch (error) {
+    console.error(`Error in passage discussion with ${model}:`, error);
+    
+    // If current model fails, try OpenAI as fallback
+    if (model !== "openai") {
+      console.log(`Attempting OpenAI fallback for passage discussion due to ${model} failure`);
+      try {
+        return await generateOpenAIResponse(prompt, systemPrompt);
+      } catch (fallbackError) {
+        console.error("OpenAI fallback also failed:", fallbackError);
+        return "I'm sorry, but I'm having trouble connecting to the AI service right now. Please try again in a moment, or switch to the OpenAI model in the settings.";
+      }
+    }
+    
+    return "I'm sorry, but I'm having trouble generating a response right now. Please try again in a moment.";
   }
 }
 
@@ -226,6 +260,17 @@ export async function generateAIResponse(model: AIModel, prompt: string, isInstr
     }
   } catch (error) {
     console.error(`Error generating AI response with ${model}:`, error);
+    
+    // If current model fails, try OpenAI as fallback
+    if (model !== "openai") {
+      console.log(`Attempting fallback to OpenAI due to ${model} failure`);
+      try {
+        return await generateOpenAIResponse(prompt, systemPrompt);
+      } catch (fallbackError) {
+        console.error("Fallback to OpenAI also failed:", fallbackError);
+      }
+    }
+    
     throw new Error(`Failed to generate response using ${model}: ${error instanceof Error ? error.message : String(error)}`);
   }
 }

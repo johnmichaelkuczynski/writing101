@@ -59,7 +59,7 @@ export type Instruction = typeof instructions.$inferSelect;
 export type InsertRewrite = z.infer<typeof insertRewriteSchema>;
 export type Rewrite = typeof rewrites.$inferSelect;
 
-export const aiModels = ["deepseek", "openai", "anthropic", "perplexity"] as const;
+export const aiModels = ["openai", "anthropic", "perplexity", "deepseek"] as const;
 export type AIModel = typeof aiModels[number];
 
 export const chatRequestSchema = z.object({
