@@ -8,7 +8,7 @@ import ChatInterface from "@/components/chat-interface";
 import ModelSelector from "@/components/model-selector";
 import MathToggle from "@/components/math-toggle";
 import RewriteModal from "@/components/rewrite-modal";
-import ConceptLatticeModal from "@/components/concept-lattice-modal";
+
 import { initializeMathRenderer } from "@/lib/math-renderer";
 import { paperContent } from "@shared/paper-content";
 import type { AIModel } from "@shared/schema";
@@ -21,8 +21,7 @@ export default function LivingBook() {
   const [rewriteModalOpen, setRewriteModalOpen] = useState(false);
   const [rewriteMode, setRewriteMode] = useState<"selection" | "chunks">("chunks");
   const [selectedTextForRewrite, setSelectedTextForRewrite] = useState<string>("");
-  const [conceptLatticeModalOpen, setConceptLatticeModalOpen] = useState(false);
-  const [selectedTextForLattice, setSelectedTextForLattice] = useState<string>("");
+
 
   useEffect(() => {
     initializeMathRenderer();
@@ -61,20 +60,7 @@ export default function LivingBook() {
     setSelectedTextForRewrite("");
   };
 
-  const handleConceptLatticeFromSelection = (text: string) => {
-    setSelectedTextForLattice(text);
-    setConceptLatticeModalOpen(true);
-  };
 
-  const handleConceptLatticeGenerate = () => {
-    setSelectedTextForLattice(getFullDocumentText());
-    setConceptLatticeModalOpen(true);
-  };
-
-  const handleConceptLatticeModalClose = () => {
-    setConceptLatticeModalOpen(false);
-    setSelectedTextForLattice("");
-  };
 
 
 
@@ -136,7 +122,7 @@ export default function LivingBook() {
             onQuestionFromSelection={handleQuestionFromSelection}
             onTextSelectedForChat={handleTextSelectedForChat}
             onRewriteFromSelection={handleRewriteFromSelection}
-            onConceptLatticeFromSelection={handleConceptLatticeFromSelection}
+
           />
         </main>
 
@@ -169,15 +155,7 @@ export default function LivingBook() {
         fullDocumentText={getFullDocumentText()}
       />
 
-      {/* Concept Lattice Modal */}
-      <ConceptLatticeModal
-        isOpen={conceptLatticeModalOpen}
-        onClose={handleConceptLatticeModalClose}
-        selectedModel={selectedModel}
-        selectedText={selectedTextForLattice}
-        onAskQuestion={handleQuestionFromSelection}
-        onRewrite={handleRewriteFromSelection}
-      />
+
 
     </div>
   );

@@ -10,10 +10,10 @@ interface DocumentContentProps {
   onQuestionFromSelection?: (question: string) => void;
   onTextSelectedForChat?: (text: string) => void;
   onRewriteFromSelection?: (text: string) => void;
-  onConceptLatticeFromSelection?: (text: string) => void;
+
 }
 
-export default function DocumentContent({ mathMode = true, onQuestionFromSelection, onTextSelectedForChat, onRewriteFromSelection, onConceptLatticeFromSelection }: DocumentContentProps) {
+export default function DocumentContent({ mathMode = true, onQuestionFromSelection, onTextSelectedForChat, onRewriteFromSelection }: DocumentContentProps) {
   const { selection, isSelecting, clearSelection, highlightSelection, removeHighlights } = useTextSelection();
 
   // Math rendering is handled in processContentForMathMode function
@@ -39,12 +39,7 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
     clearSelection();
   };
 
-  const handleConceptLattice = (text: string) => {
-    if (onConceptLatticeFromSelection) {
-      onConceptLatticeFromSelection(text);
-    }
-    clearSelection();
-  };
+
 
   const handleHighlight = () => {
     highlightSelection();
@@ -126,7 +121,7 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
           onAskQuestion={handleAskQuestion}
           onSendToChat={handleSendToChat}
           onRewrite={handleRewrite}
-          onVisualize={handleConceptLattice}
+
           onHighlight={handleHighlight}
           onClear={clearSelection}
         />

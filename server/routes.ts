@@ -167,64 +167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Concept Lattice endpoints
-  app.post("/api/concept-lattice/generate", async (req, res) => {
-    try {
-      const { text, model, globalInstructions } = req.body;
-      
-      if (!text || !model) {
-        return res.status(400).json({ error: "Missing required fields: text, model" });
-      }
 
-      const { generateConceptLattice } = await import("./services/concept-lattice-generator");
-      const lattice = await generateConceptLattice(text, model, globalInstructions);
-      
-      res.json(lattice);
-    } catch (error) {
-      console.error("Concept lattice generation error:", error);
-      res.status(500).json({ error: "Failed to generate concept lattice" });
-    }
-  });
-
-  app.post("/api/concept-lattice/edit-node", async (req, res) => {
-    try {
-      const { nodeId, newContent, instruction, model } = req.body;
-      
-      if (!nodeId || !newContent || !model) {
-        return res.status(400).json({ error: "Missing required fields: nodeId, newContent, model" });
-      }
-
-      // For now, return the updated node directly since we don't have persistent storage
-      // In a full implementation, this would update the stored lattice
-      const updatedNode = {
-        id: nodeId,
-        content: newContent,
-        // Note: This is a simplified response. The actual implementation in concept-lattice-generator
-        // would need access to the full lattice context
-      };
-      
-      res.json(updatedNode);
-    } catch (error) {
-      console.error("Node edit error:", error);
-      res.status(500).json({ error: "Failed to edit node" });
-    }
-  });
-
-  app.post("/api/concept-lattice/refine", async (req, res) => {
-    try {
-      const { latticeId, globalInstructions, model } = req.body;
-      
-      if (!latticeId || !globalInstructions || !model) {
-        return res.status(400).json({ error: "Missing required fields: latticeId, globalInstructions, model" });
-      }
-
-      // For now, return success. In a full implementation, this would refine the stored lattice
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Lattice refinement error:", error);
-      res.status(500).json({ error: "Failed to refine lattice" });
-    }
-  });
 
   const httpServer = createServer(app);
   return httpServer;
