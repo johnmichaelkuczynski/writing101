@@ -254,3 +254,11 @@ Preferred communication style: Simple, everyday language.
   - Fixed text preview window: now large (320px tall), resizable, scrollable, shows full text
   - Fixed missing Generate Concept Lattice button with clear blue styling
   - Document now contains authentic propositions, preface, numbered sections exactly as in PDF
+- July 10, 2025: PASSAGE DISCUSSION MODAL ENHANCEMENT - Export and email functionality
+  - Fixed scrollable text window for selected passages - now fully scrollable for any length text
+  - Added download/email buttons to each AI response in discussion modal
+  - Download saves responses as TXT files with timestamps
+  - Email functionality integrated with SendGrid for sharing responses
+  - Added 30-second timeout handling for AI API calls to prevent hanging
+  - Fixed API timeout issues with proper error handling and user feedback
+  - Modal now properly handles long discussions with export options for each response

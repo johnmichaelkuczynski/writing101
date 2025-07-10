@@ -286,28 +286,42 @@ async function generatePerplexityResponse(prompt: string, systemPrompt: string):
 }
 
 async function generateDeepSeekResponse(prompt: string, systemPrompt: string): Promise<string> {
-  const response = await fetch("https://api.deepseek.com/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${process.env.DEEPSEEK_API_KEY || process.env.DEEPSEEK_API_KEY_ENV_VAR || ""}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "deepseek-chat",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: prompt }
-      ],
-      max_tokens: 600, // Balanced for informative responses
-      temperature: 0.3, // Lower temp for more focused responses
-      stream: false,
-    }),
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
+  
+  try {
+    const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.DEEPSEEK_API_KEY || process.env.DEEPSEEK_API_KEY_ENV_VAR || ""}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "deepseek-chat",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: prompt }
+        ],
+        max_tokens: 600,
+        temperature: 0.3,
+        stream: false,
+      }),
+      signal: controller.signal
+    });
 
-  if (!response.ok) {
-    throw new Error(`DeepSeek API error: ${response.status} ${response.statusText}`);
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`DeepSeek API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.choices[0].message.content || "I apologize, but I couldn't generate a response.";
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Request timed out. Please try again.');
+    }
+    throw error;
   }
-
-  const data = await response.json();
-  return data.choices[0].message.content || "I apologize, but I couldn't generate a response.";
 }

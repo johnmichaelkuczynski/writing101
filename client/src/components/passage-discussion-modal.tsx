@@ -3,10 +3,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Send, Loader2, Download, Mail } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { renderMathInElement } from "@/lib/math-renderer";
+import { copyToClipboard, downloadPDF, emailContent } from "@/lib/export-utils";
+import { useToast } from "@/hooks/use-toast";
 import type { AIModel } from "@shared/schema";
 
 interface PassageDiscussionModalProps {
@@ -34,6 +37,10 @@ export default function PassageDiscussionModal({
   const [messages, setMessages] = useState<DiscussionMessage[]>([]);
   const [userInput, setUserInput] = useState("");
   const [hasGeneratedInitialExplanation, setHasGeneratedInitialExplanation] = useState(false);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
+  const [emailContent, setEmailContent] = useState("");
+  const [emailAddress, setEmailAddress] = useState("");
+  const { toast } = useToast();
 
   // Generate initial explanation when modal opens
   const initialExplanationMutation = useMutation({
@@ -59,11 +66,21 @@ export default function PassageDiscussionModal({
   // Send user message and get AI response
   const discussionMutation = useMutation({
     mutationFn: async (data: { message: string; passage: string; model: AIModel; conversationHistory: DiscussionMessage[] }) => {
-      const response = await apiRequest("/api/passage-discussion", {
-        method: "POST",
-        body: JSON.stringify(data)
-      });
-      return response;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
+      try {
+        const response = await apiRequest("/api/passage-discussion", {
+          method: "POST",
+          body: JSON.stringify(data),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        return response;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+      }
     },
     onSuccess: (data) => {
       const aiMessage: DiscussionMessage = {
@@ -73,6 +90,13 @@ export default function PassageDiscussionModal({
         timestamp: new Date()
       };
       setMessages(prev => [...prev, aiMessage]);
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to get AI response. Please try again.",
+        variant: "destructive"
+      });
     }
   });
 
@@ -131,6 +155,65 @@ export default function PassageDiscussionModal({
     }
   };
 
+  const handleDownloadResponse = (content: string) => {
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `passage-discussion-${Date.now()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Downloaded",
+      description: "Response downloaded as TXT file"
+    });
+  };
+
+  const handleEmailResponse = (content: string) => {
+    setEmailContent(content);
+    setEmailModalOpen(true);
+  };
+
+  const sendEmail = async () => {
+    if (!emailAddress.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter an email address",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await apiRequest("/api/email", {
+        method: "POST",
+        body: JSON.stringify({
+          email: emailAddress,
+          subject: "Passage Discussion Response",
+          content: emailContent
+        })
+      });
+      
+      toast({
+        title: "Email Sent",
+        description: `Response sent to ${emailAddress}`
+      });
+      
+      setEmailModalOpen(false);
+      setEmailAddress("");
+      setEmailContent("");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send email. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const processContentForMathMode = (content: string) => {
     if (!content) return "";
     
@@ -151,7 +234,8 @@ export default function PassageDiscussionModal({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-7xl max-h-[95vh] w-[95vw] flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-xl">Discuss This Passage</DialogTitle>
@@ -195,6 +279,28 @@ export default function PassageDiscussionModal({
                         .replace(/\n/g, '<br>')
                     }}
                   />
+                  {!message.isUser && (
+                    <div className="flex space-x-2 mt-3 pt-3 border-t border-border">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDownloadResponse(message.content)}
+                        className="flex items-center space-x-1"
+                      >
+                        <Download className="w-3 h-3" />
+                        <span>Download</span>
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEmailResponse(message.content)}
+                        className="flex items-center space-x-1"
+                      >
+                        <Mail className="w-3 h-3" />
+                        <span>Email</span>
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -231,5 +337,43 @@ export default function PassageDiscussionModal({
         </div>
       </DialogContent>
     </Dialog>
+
+    {/* Email Modal */}
+    <Dialog open={emailModalOpen} onOpenChange={setEmailModalOpen}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Email Response</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium">Email Address</label>
+            <Input
+              type="email"
+              value={emailAddress}
+              onChange={(e) => setEmailAddress(e.target.value)}
+              placeholder="Enter email address"
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium">Content Preview</label>
+            <ScrollArea className="h-32 w-full border rounded mt-1">
+              <div className="p-3 text-sm">
+                {emailContent.substring(0, 200)}...
+              </div>
+            </ScrollArea>
+          </div>
+          <div className="flex space-x-2">
+            <Button onClick={sendEmail} disabled={!emailAddress.trim()}>
+              Send Email
+            </Button>
+            <Button variant="outline" onClick={() => setEmailModalOpen(false)}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  </>
   );
 }
