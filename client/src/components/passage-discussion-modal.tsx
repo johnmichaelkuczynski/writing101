@@ -3,12 +3,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
-import { Send, Loader2, Download, Mail, FileText, Printer } from "lucide-react";
+import { Send, Loader2, Download, Mail } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { renderMathInElement } from "@/lib/math-renderer";
-import { copyToClipboard, downloadPDF, emailContent } from "@/lib/export-utils";
 import { useToast } from "@/hooks/use-toast";
 import type { AIModel } from "@shared/schema";
 
@@ -36,20 +33,26 @@ export default function PassageDiscussionModal({
 }: PassageDiscussionModalProps) {
   const [messages, setMessages] = useState<DiscussionMessage[]>([]);
   const [userInput, setUserInput] = useState("");
-  const [hasGeneratedInitialExplanation, setHasGeneratedInitialExplanation] = useState(false);
-  const [emailModalOpen, setEmailModalOpen] = useState(false);
-  const [emailContent, setEmailContent] = useState("");
-  const [emailAddress, setEmailAddress] = useState("");
+  const [isInitializing, setIsInitializing] = useState(false);
   const { toast } = useToast();
 
   // Generate initial explanation when modal opens
   const initialExplanationMutation = useMutation({
     mutationFn: async (data: { passage: string; model: AIModel }) => {
-      const response = await apiRequest("/api/passage-explanation", {
+      const response = await fetch("/api/passage-explanation", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(data)
       });
-      return response;
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      return result;
     },
     onSuccess: (data) => {
       const initialMessage: DiscussionMessage = {
@@ -59,28 +62,35 @@ export default function PassageDiscussionModal({
         timestamp: new Date()
       };
       setMessages([initialMessage]);
-      setHasGeneratedInitialExplanation(true);
+      setIsInitializing(false);
+    },
+    onError: (error) => {
+      setIsInitializing(false);
+      toast({
+        title: "Error",
+        description: "Failed to generate initial explanation",
+        variant: "destructive"
+      });
     }
   });
 
   // Send user message and get AI response
   const discussionMutation = useMutation({
     mutationFn: async (data: { message: string; passage: string; model: AIModel; conversationHistory: DiscussionMessage[] }) => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      const response = await fetch("/api/passage-discussion", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data)
+      });
       
-      try {
-        const response = await apiRequest("/api/passage-discussion", {
-          method: "POST",
-          body: JSON.stringify(data),
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        return response;
-      } catch (error) {
-        clearTimeout(timeoutId);
-        throw error;
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
+      
+      const result = await response.json();
+      return result;
     },
     onSuccess: (data) => {
       const aiMessage: DiscussionMessage = {
@@ -102,17 +112,18 @@ export default function PassageDiscussionModal({
 
   // Generate initial explanation when modal opens with new text
   useEffect(() => {
-    if (isOpen && selectedText && !hasGeneratedInitialExplanation) {
+    if (isOpen && selectedText && messages.length === 0 && !isInitializing) {
+      setIsInitializing(true);
       initialExplanationMutation.mutate({ passage: selectedText, model: selectedModel });
     }
-  }, [isOpen, selectedText, selectedModel, hasGeneratedInitialExplanation]);
+  }, [isOpen, selectedText, selectedModel, messages.length, isInitializing]);
 
   // Reset state when modal closes
   useEffect(() => {
     if (!isOpen) {
       setMessages([]);
       setUserInput("");
-      setHasGeneratedInitialExplanation(false);
+      setIsInitializing(false);
     }
   }, [isOpen]);
 
@@ -155,150 +166,6 @@ export default function PassageDiscussionModal({
     }
   };
 
-  const handleDownloadResponse = (content: string) => {
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `passage-discussion-${Date.now()}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    toast({
-      title: "Downloaded",
-      description: "Response downloaded as TXT file"
-    });
-  };
-
-  const handleEmailResponse = (content: string) => {
-    setEmailContent(content);
-    setEmailModalOpen(true);
-  };
-
-  const sendEmail = async () => {
-    if (!emailAddress.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter an email address",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      await apiRequest("/api/email", {
-        method: "POST",
-        body: JSON.stringify({
-          email: emailAddress,
-          subject: "Passage Discussion Response",
-          content: emailContent
-        })
-      });
-      
-      toast({
-        title: "Email Sent",
-        description: `Response sent to ${emailAddress}`
-      });
-      
-      setEmailModalOpen(false);
-      setEmailAddress("");
-      setEmailContent("");
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to send email. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleDownloadFullConversation = () => {
-    const fullConversation = `PASSAGE DISCUSSION
-Selected Passage:
-"${selectedText}"
-
-CONVERSATION:
-${messages.map((msg, idx) => 
-  `${msg.isUser ? 'USER' : 'AI'}: ${msg.content}`
-).join('\n\n')}
-
-Generated: ${new Date().toLocaleString()}`;
-
-    const blob = new Blob([fullConversation], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `passage-discussion-full-${Date.now()}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    toast({
-      title: "Downloaded",
-      description: "Full conversation downloaded as TXT file"
-    });
-  };
-
-  const handlePrintConversationAsPDF = () => {
-    // Create a formatted HTML version for printing
-    const htmlContent = `
-      <html>
-        <head>
-          <title>Passage Discussion</title>
-          <style>
-            body { font-family: 'Times New Roman', serif; margin: 40px; line-height: 1.6; }
-            .header { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
-            .passage { background: #f5f5f5; padding: 15px; margin: 20px 0; border-left: 4px solid #333; }
-            .message { margin: 20px 0; padding: 15px; }
-            .user { background: #e3f2fd; }
-            .ai { background: #f3e5f5; }
-            .label { font-weight: bold; margin-bottom: 10px; }
-            @media print { body { margin: 20px; } }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1>Passage Discussion</h1>
-            <p>Generated: ${new Date().toLocaleString()}</p>
-          </div>
-          
-          <div class="passage">
-            <div class="label">Selected Passage:</div>
-            <p>"${selectedText}"</p>
-          </div>
-          
-          <h2>Discussion:</h2>
-          ${messages.map((msg, idx) => 
-            `<div class="message ${msg.isUser ? 'user' : 'ai'}">
-              <div class="label">${msg.isUser ? 'USER' : 'AI'}:</div>
-              <div>${msg.content.replace(/\n/g, '<br>')}</div>
-            </div>`
-          ).join('')}
-        </body>
-      </html>
-    `;
-
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => {
-      printWindow.print();
-    }, 250);
-  };
-
-  const handleEmailFullConversation = () => {
-    const fullConversation = `PASSAGE DISCUSSION\n\nSelected Passage:\n"${selectedText}"\n\nCONVERSATION:\n${messages.map((msg, idx) => 
-      `${msg.isUser ? 'USER' : 'AI'}: ${msg.content}`
-    ).join('\n\n')}\n\nGenerated: ${new Date().toLocaleString()}`;
-    
-    setEmailContent(fullConversation);
-    setEmailModalOpen(true);
-  };
-
   const processContentForMathMode = (content: string) => {
     if (!content) return "";
     
@@ -319,179 +186,89 @@ Generated: ${new Date().toLocaleString()}`;
   };
 
   return (
-    <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-7xl max-h-[95vh] w-[95vw] flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-xl">Discuss This Passage</DialogTitle>
         </DialogHeader>
 
-        {/* Selected Passage - Fully Scrollable */}
-        <div className="bg-muted p-6 rounded-lg mb-6">
-          <h4 className="font-semibold mb-4 text-lg">Selected Passage:</h4>
-          <ScrollArea className="h-64 w-full border rounded">
-            <div className="p-4">
-              <p className="text-base leading-relaxed text-foreground whitespace-pre-wrap">
-                "{selectedText}"
-              </p>
-            </div>
+        {/* Selected Passage */}
+        <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500 mb-4">
+          <div className="font-semibold text-sm text-blue-700 mb-2">Selected Passage:</div>
+          <ScrollArea className="max-h-32">
+            <div className="text-sm">{selectedText}</div>
           </ScrollArea>
         </div>
 
-        {/* Discussion Messages - Much Larger */}
-        <ScrollArea className="flex-1 min-h-[400px] mb-6">
-          <div className="space-y-6 pr-4">
-            {initialExplanationMutation.isPending && (
-              <div className="flex items-center space-x-3 text-muted-foreground">
-                <Loader2 className="w-5 h-5 animate-spin" />
-                <span className="text-lg">Generating initial explanation...</span>
+        {/* Discussion Area */}
+        <div className="flex-1 flex flex-col min-h-0">
+          <ScrollArea className="flex-1 border rounded-lg p-4">
+            {isInitializing || initialExplanationMutation.isPending ? (
+              <div className="flex items-center gap-2 text-gray-500">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Generating explanation...
               </div>
-            )}
-
-            {messages.map((message) => (
-              <div key={message.id} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-4 rounded-lg ${
-                  message.isUser 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'bg-muted text-foreground'
-                }`}>
-                  <div 
-                    className="text-base leading-relaxed"
-                    dangerouslySetInnerHTML={{ 
-                      __html: processContentForMathMode(message.content)
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                        .replace(/\n/g, '<br>')
-                    }}
-                  />
-                  {!message.isUser && (
-                    <div className="flex space-x-2 mt-3 pt-3 border-t border-border">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDownloadResponse(message.content)}
-                        className="flex items-center space-x-1"
-                      >
-                        <Download className="w-3 h-3" />
-                        <span>Download</span>
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleEmailResponse(message.content)}
-                        className="flex items-center space-x-1"
-                      >
-                        <Mail className="w-3 h-3" />
-                        <span>Email</span>
-                      </Button>
+            ) : (
+              <div className="space-y-4">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`p-3 rounded-lg ${
+                      message.isUser
+                        ? "bg-blue-100 ml-8"
+                        : "bg-gray-100 mr-8"
+                    }`}
+                  >
+                    <div className="font-semibold text-xs text-gray-600 mb-1">
+                      {message.isUser ? "YOU" : "AI"}
                     </div>
-                  )}
-                </div>
-              </div>
-            ))}
-
-            {discussionMutation.isPending && (
-              <div className="flex justify-start">
-                <div className="bg-muted text-foreground p-4 rounded-lg flex items-center space-x-3">
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span className="text-base">Thinking...</span>
-                </div>
+                    <div className="text-sm whitespace-pre-wrap">
+                      {processContentForMathMode(message.content)}
+                    </div>
+                  </div>
+                ))}
+                {discussionMutation.isPending && (
+                  <div className="flex items-center gap-2 text-gray-500 bg-gray-100 p-3 rounded-lg mr-8">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    AI is thinking...
+                  </div>
+                )}
               </div>
             )}
-          </div>
-        </ScrollArea>
+          </ScrollArea>
 
-        {/* Conversation Export Buttons */}
-        {messages.length > 0 && (
-          <div className="flex justify-center space-x-3 mt-4 pt-4 border-t border-border">
-            <Button
-              onClick={handleDownloadFullConversation}
-              variant="outline"
-              size="sm"
-              className="flex items-center space-x-2"
-            >
-              <FileText className="w-4 h-4" />
-              <span>Download Full Conversation</span>
-            </Button>
-            <Button
-              onClick={handlePrintConversationAsPDF}
-              variant="outline"
-              size="sm"
-              className="flex items-center space-x-2"
-            >
-              <Printer className="w-4 h-4" />
-              <span>Save as PDF</span>
-            </Button>
-            <Button
-              onClick={handleEmailFullConversation}
-              variant="outline"
-              size="sm"
-              className="flex items-center space-x-2"
-            >
-              <Mail className="w-4 h-4" />
-              <span>Email Conversation</span>
-            </Button>
-          </div>
-        )}
-
-        {/* Input Area - Much Larger */}
-        <div className="flex space-x-4">
-          <Textarea
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Ask a question about this passage or share your thoughts..."
-            className="flex-1 min-h-[120px] text-base p-4 resize-y"
-            disabled={discussionMutation.isPending || initialExplanationMutation.isPending}
-          />
-          <Button
-            onClick={handleSendMessage}
-            disabled={!userInput.trim() || discussionMutation.isPending || initialExplanationMutation.isPending}
-            size="lg"
-            className="px-6 py-3"
-          >
-            <Send className="w-5 h-5" />
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-
-    {/* Email Modal */}
-    <Dialog open={emailModalOpen} onOpenChange={setEmailModalOpen}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Email Response</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          <div>
-            <label className="text-sm font-medium">Email Address</label>
-            <Input
-              type="email"
-              value={emailAddress}
-              onChange={(e) => setEmailAddress(e.target.value)}
-              placeholder="Enter email address"
-              className="mt-1"
+          {/* Input Area */}
+          <div className="mt-4 space-y-3">
+            <Textarea
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder="Ask a question about this passage... (Enter to send, Shift+Enter for new line)"
+              className="min-h-[80px] resize-none"
+              disabled={discussionMutation.isPending || isInitializing}
             />
-          </div>
-          <div>
-            <label className="text-sm font-medium">Content Preview</label>
-            <ScrollArea className="h-32 w-full border rounded mt-1">
-              <div className="p-3 text-sm">
-                {emailContent.substring(0, 200)}...
+            
+            <div className="flex justify-between items-center">
+              <div className="text-xs text-gray-500">
+                Press Enter to send • Shift+Enter for new line
               </div>
-            </ScrollArea>
-          </div>
-          <div className="flex space-x-2">
-            <Button onClick={sendEmail} disabled={!emailAddress.trim()}>
-              Send Email
-            </Button>
-            <Button variant="outline" onClick={() => setEmailModalOpen(false)}>
-              Cancel
-            </Button>
+              
+              <Button
+                onClick={handleSendMessage}
+                disabled={!userInput.trim() || discussionMutation.isPending || isInitializing}
+                className="gap-2"
+              >
+                {discussionMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+                Send
+              </Button>
+            </div>
           </div>
         </div>
       </DialogContent>
     </Dialog>
-  </>
   );
 }
