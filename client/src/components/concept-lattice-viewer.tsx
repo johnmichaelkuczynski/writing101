@@ -157,12 +157,14 @@ export default function ConceptLatticeViewer({
           setChatMessage(`About "${node.content.substring(0, 50)}..." - `);
         },
         onToggleExpand: (nodeId: string) => {
-          const updatedNodes = lattice.nodes.map(n => 
-            n.id === nodeId 
-              ? { ...n, style: { ...n.style, isExpanded: !n.style.isExpanded } }
-              : n
-          );
-          onLatticeUpdate({ ...lattice, nodes: updatedNodes });
+          if (lattice?.nodes) {
+            const updatedNodes = lattice.nodes.map(n => 
+              n.id === nodeId 
+                ? { ...n, style: { ...n.style, isExpanded: !n.style.isExpanded } }
+                : n
+            );
+            onLatticeUpdate({ ...lattice, nodes: updatedNodes });
+          }
         }
       },
       sourcePosition: Position.Bottom,
@@ -190,13 +192,15 @@ export default function ConceptLatticeViewer({
     }));
   }, []);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(convertToFlowNodes(lattice.nodes));
-  const [edges, setEdges, onEdgesChange] = useEdgesState(convertToFlowEdges(lattice.edges));
+  const [nodes, setNodes, onNodesChange] = useNodesState(convertToFlowNodes(lattice?.nodes || []));
+  const [edges, setEdges, onEdgesChange] = useEdgesState(convertToFlowEdges(lattice?.edges || []));
 
   // Update nodes when lattice changes
   useMemo(() => {
-    setNodes(convertToFlowNodes(lattice.nodes));
-    setEdges(convertToFlowEdges(lattice.edges));
+    if (lattice?.nodes && lattice?.edges) {
+      setNodes(convertToFlowNodes(lattice.nodes));
+      setEdges(convertToFlowEdges(lattice.edges));
+    }
   }, [lattice, convertToFlowNodes, convertToFlowEdges, setNodes, setEdges]);
 
   // Edit node mutation
@@ -209,10 +213,12 @@ export default function ConceptLatticeViewer({
       });
     },
     onSuccess: (updatedNode: LatticeNode) => {
-      const updatedNodes = lattice.nodes.map(n => 
-        n.id === updatedNode.id ? updatedNode : n
-      );
-      onLatticeUpdate({ ...lattice, nodes: updatedNodes });
+      if (lattice?.nodes) {
+        const updatedNodes = lattice.nodes.map(n => 
+          n.id === updatedNode.id ? updatedNode : n
+        );
+        onLatticeUpdate({ ...lattice, nodes: updatedNodes });
+      }
       setEditingNode(null);
       toast({
         title: "Node updated",
