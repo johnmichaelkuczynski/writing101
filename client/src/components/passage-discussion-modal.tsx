@@ -157,13 +157,15 @@ export default function PassageDiscussionModal({
           <DialogTitle className="text-xl">Discuss This Passage</DialogTitle>
         </DialogHeader>
 
-        {/* Selected Passage - Much Larger and Expandable */}
+        {/* Selected Passage - Fully Scrollable */}
         <div className="bg-muted p-6 rounded-lg mb-6">
           <h4 className="font-semibold mb-4 text-lg">Selected Passage:</h4>
-          <ScrollArea className="max-h-48">
-            <p className="text-base leading-relaxed text-foreground">
-              "{selectedText}"
-            </p>
+          <ScrollArea className="h-64 w-full border rounded">
+            <div className="p-4">
+              <p className="text-base leading-relaxed text-foreground whitespace-pre-wrap">
+                "{selectedText}"
+              </p>
+            </div>
           </ScrollArea>
         </div>
 
