@@ -302,3 +302,6 @@ Preferred communication style: Simple, everyday language.
   - All text selection functions (Select All, manual selection, toolbar actions) use chunking when needed
   - Main chat remains available for whole-document operations (e.g., "generate study guide")
   - Enhanced error handling with OpenAI fallback and increased server request limits to 10MB
+  - PERFECT SCROLLING: Fixed passage discussion modal selected text preview to be fully scrollable
+  - Replaced ScrollArea with native browser scrolling for reliable text viewing in preview window
+  - Users can now scroll through entire selected passages in the blue preview box with proper scrollbars
