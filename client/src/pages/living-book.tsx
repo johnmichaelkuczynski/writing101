@@ -93,9 +93,17 @@ export default function LivingBook() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <BookOpen className="text-primary text-xl" />
-              <h1 className="font-inter font-semibold text-lg text-foreground">
-                Living Book: Tractatus Logico-Philosophicus
-              </h1>
+              <div className="flex flex-col">
+                <h1 className="font-inter font-semibold text-lg text-foreground">
+                  Living Book: Tractatus Logico-Philosophicus
+                </h1>
+                <a 
+                  href="mailto:contact@zhisystems.ai"
+                  className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  Contact Us
+                </a>
+              </div>
             </div>
             <div className="flex items-center space-x-4">
               <MathToggle 
