@@ -272,7 +272,7 @@ export default function PassageDiscussionModal({
         </DialogHeader>
 
         {/* Selected Passage */}
-        <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500 mb-4">
+        <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500 mb-4 flex-shrink-0">
           <div className="font-semibold text-sm text-blue-700 mb-2">Selected Passage:</div>
           <ScrollArea className="max-h-32">
             <div className="text-sm">{selectedText}</div>
@@ -280,8 +280,9 @@ export default function PassageDiscussionModal({
         </div>
 
         {/* Discussion Area */}
-        <div className="flex-1 flex flex-col min-h-0">
-          <ScrollArea className="flex-1 border rounded-lg p-4">
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          <div className="flex-1 border rounded-lg overflow-hidden">
+            <ScrollArea className="h-full p-4">
             {isInitializing || initialExplanationMutation.isPending ? (
               <div className="flex items-center gap-2 text-gray-500">
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -337,10 +338,11 @@ export default function PassageDiscussionModal({
                 )}
               </div>
             )}
-          </ScrollArea>
+            </ScrollArea>
+          </div>
 
           {/* Input Area */}
-          <div className="mt-4 space-y-3">
+          <div className="mt-4 space-y-3 flex-shrink-0">
             <Textarea
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
