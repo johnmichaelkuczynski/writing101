@@ -58,14 +58,12 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
       selection?.removeAllRanges();
       selection?.addRange(range);
       
-      // Get the full document text for selection
-      const fullText = tractatusContent.sections.map(section => 
-        `${section.title}\n\n${section.content}`
-      ).join('\n\n');
+      // Get a summary text for selection instead of full document to avoid payload issues
+      const summaryText = `Full Document Selected: ${tractatusContent.title} by ${tractatusContent.author}\n\nThis includes all sections: ${tractatusContent.sections.map(s => s.title).join(', ')}\n\nPlease ask me any questions about the complete Tractatus text.`;
       
-      // Update the text selection hook with the full document text
+      // Update the text selection hook with the summary text
       if (onTextSelectedForChat) {
-        onTextSelectedForChat(fullText);
+        onTextSelectedForChat(summaryText);
       }
     }
   };
