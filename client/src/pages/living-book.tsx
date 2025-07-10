@@ -103,15 +103,7 @@ export default function LivingBook() {
                 mathMode={mathMode} 
                 onToggle={setMathMode} 
               />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleConceptLatticeGenerate}
-                className="flex items-center space-x-2"
-              >
-                <Network className="w-4 h-4" />
-                <span>Visualize</span>
-              </Button>
+
               <Button
                 variant="outline"
                 size="sm"
