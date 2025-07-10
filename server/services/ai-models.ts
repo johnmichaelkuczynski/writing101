@@ -64,8 +64,22 @@ function cleanRewriteText(text: string): string {
     .replace(/\*([^*]+)\*/g, '$1')
     .replace(/__([^_]+)__/g, '$1')
     .replace(/_([^_]+)_/g, '$1')
-    // Remove markdown headers
+    // Remove markdown headers (####, ###, ##, #)
     .replace(/^#{1,6}\s+/gm, '')
+    // Remove markdown links [text](url)
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    // Remove markdown code blocks ```
+    .replace(/```[\s\S]*?```/g, '')
+    // Remove inline code `text`
+    .replace(/`([^`]+)`/g, '$1')
+    // Remove markdown lists (- item, * item, 1. item)
+    .replace(/^[\s]*[-*+]\s+/gm, '')
+    .replace(/^[\s]*\d+\.\s+/gm, '')
+    // Remove markdown blockquotes
+    .replace(/^>\s+/gm, '')
+    // Remove markdown horizontal rules
+    .replace(/^---+$/gm, '')
+    .replace(/^\*\*\*+$/gm, '')
     // Ensure proper paragraph breaks
     .replace(/\n{3,}/g, '\n\n')
     // Clean up extra spaces
@@ -135,26 +149,41 @@ When a user highlights a passage, provide a brief, enlightening explanation that
 4. Engages the user with thought-provoking insights
 5. Uses accessible language while maintaining philosophical depth
 
+CRITICAL FORMATTING RULES:
+- Write in plain text format ONLY
+- Do NOT use any markdown formatting, headers (####), bold (**), italics, or special characters
+- Use natural paragraph breaks to separate ideas (double line breaks)
+- Write as if for publication in a book or formal document
+- No bullet points, numbered lists, or formatting markup of any kind
+
 Keep your explanation concise but insightful (3-4 sentences). Focus on helping the user understand what Wittgenstein means and why it matters.`;
 
   const prompt = `Explain this passage from the Tractatus:
 
 "${passage}"
 
-Provide a brief, enlightening explanation that helps the user understand Wittgenstein's meaning and philosophical significance.`;
+Provide a brief, enlightening explanation that helps the user understand Wittgenstein's meaning and philosophical significance. Use plain text only with no formatting.`;
 
   try {
+    let result: string;
     switch (model) {
       case "openai":
-        return await generateOpenAIResponse(prompt, systemPrompt);
+        result = await generateOpenAIResponse(prompt, systemPrompt);
+        break;
       case "anthropic":
-        return await generateAnthropicResponse(prompt, systemPrompt);
+        result = await generateAnthropicResponse(prompt, systemPrompt);
+        break;
       case "perplexity":
-        return await generatePerplexityResponse(prompt, systemPrompt);
+        result = await generatePerplexityResponse(prompt, systemPrompt);
+        break;
       case "deepseek":
       default:
-        return await generateDeepSeekResponse(prompt, systemPrompt);
+        result = await generateDeepSeekResponse(prompt, systemPrompt);
+        break;
     }
+    
+    // Clean the result to remove any markdown formatting
+    return cleanRewriteText(result);
   } catch (error) {
     console.error(`Error in passage explanation with ${model}:`, error);
     
@@ -162,7 +191,8 @@ Provide a brief, enlightening explanation that helps the user understand Wittgen
     if (model !== "openai") {
       console.log(`Attempting OpenAI fallback for passage explanation due to ${model} failure`);
       try {
-        return await generateOpenAIResponse(prompt, systemPrompt);
+        const fallbackResult = await generateOpenAIResponse(prompt, systemPrompt);
+        return cleanRewriteText(fallbackResult);
       } catch (fallbackError) {
         console.error("OpenAI fallback also failed:", fallbackError);
         return "I'm sorry, but I'm having trouble connecting to the AI service right now. Please try again in a moment, or switch to the OpenAI model in the settings.";
@@ -184,6 +214,13 @@ You are discussing a specific passage with the user. Engage in thoughtful dialog
 5. Asking engaging follow-up questions when appropriate
 6. Maintaining focus on Wittgenstein's ideas and their implications
 
+CRITICAL FORMATTING RULES:
+- Write in plain text format ONLY
+- Do NOT use any markdown formatting, headers (####), bold (**), italics, or special characters
+- Use natural paragraph breaks to separate ideas (double line breaks)
+- Write as if for publication in a book or formal document
+- No bullet points, numbered lists, or formatting markup of any kind
+
 Keep responses conversational but intellectually rigorous. Help the user deepen their understanding through dialogue. Do NOT repeat yourself or generate nonsensical text.`;
 
   // Build conversation context
@@ -198,20 +235,28 @@ Keep responses conversational but intellectually rigorous. Help the user deepen 
 
   const prompt = `${conversationContext}User: ${userMessage}
 
-Respond thoughtfully to continue our discussion about this passage from the Tractatus.`;
+Respond thoughtfully to continue our discussion about this passage from the Tractatus. Use plain text only with no formatting.`;
 
   try {
+    let result: string;
     switch (model) {
       case "openai":
-        return await generateOpenAIResponse(prompt, systemPrompt);
+        result = await generateOpenAIResponse(prompt, systemPrompt);
+        break;
       case "anthropic":
-        return await generateAnthropicResponse(prompt, systemPrompt);
+        result = await generateAnthropicResponse(prompt, systemPrompt);
+        break;
       case "perplexity":
-        return await generatePerplexityResponse(prompt, systemPrompt);
+        result = await generatePerplexityResponse(prompt, systemPrompt);
+        break;
       case "deepseek":
       default:
-        return await generateDeepSeekResponse(prompt, systemPrompt);
+        result = await generateDeepSeekResponse(prompt, systemPrompt);
+        break;
     }
+    
+    // Clean the result to remove any markdown formatting
+    return cleanRewriteText(result);
   } catch (error) {
     console.error(`Error in passage discussion with ${model}:`, error);
     
@@ -219,7 +264,8 @@ Respond thoughtfully to continue our discussion about this passage from the Trac
     if (model !== "openai") {
       console.log(`Attempting OpenAI fallback for passage discussion due to ${model} failure`);
       try {
-        return await generateOpenAIResponse(prompt, systemPrompt);
+        const fallbackResult = await generateOpenAIResponse(prompt, systemPrompt);
+        return cleanRewriteText(fallbackResult);
       } catch (fallbackError) {
         console.error("OpenAI fallback also failed:", fallbackError);
         return "I'm sorry, but I'm having trouble connecting to the AI service right now. Please try again in a moment, or switch to the OpenAI model in the settings.";
