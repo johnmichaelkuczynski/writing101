@@ -293,10 +293,14 @@ export default function ConceptLatticeModal({
                     {selectedText && (
                       <div className="text-left">
                         <label className="text-sm font-medium text-muted-foreground">Selected Text Preview:</label>
-                        <div className="mt-1 p-3 bg-muted rounded border text-sm max-h-32 overflow-y-auto">
-                          {selectedText.substring(0, 300)}
-                          {selectedText.length > 300 && "..."}
+                        <div className="mt-1 p-4 bg-muted rounded border text-sm h-80 overflow-y-auto resize-y min-h-40 max-h-96 border-2">
+                          <div className="whitespace-pre-wrap leading-relaxed">
+                            {selectedText}
+                          </div>
                         </div>
+                        <p className="text-xs text-muted-foreground mt-2 text-right">
+                          {selectedText.length.toLocaleString()} characters • Drag bottom edge to resize
+                        </p>
                       </div>
                     )}
 
