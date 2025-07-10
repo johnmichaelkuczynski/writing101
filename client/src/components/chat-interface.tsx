@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { MessageCircle, Send, Bot, User, Download, Mail, Copy } from "lucide-react";
+import { MessageCircle, Send, Bot, User, Download, Mail, Copy, Printer } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -143,10 +143,75 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
   const handleDownloadPDF = async (content: string) => {
     try {
       await downloadPDF(content);
-      toast({ title: "PDF downloaded successfully" });
+      toast({ title: "PDF generation initiated - check print dialog" });
     } catch (error) {
-      toast({ title: "Failed to download PDF", variant: "destructive" });
+      toast({ title: "Failed to generate PDF", variant: "destructive" });
     }
+  };
+
+  const handlePrintResponse = (content: string) => {
+    // Create a formatted print window for this specific response
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast({ title: "Popup blocked. Please allow popups for printing.", variant: "destructive" });
+      return;
+    }
+
+    const timestamp = new Date().toLocaleString();
+    
+    // Process content with math notation
+    let processedContent = content
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+      .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+      .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>');
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <title>AI Response - Living Book</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+        <style>
+          @page { margin: 1in; size: letter; }
+          body { font-family: Georgia, serif; font-size: 12pt; line-height: 1.6; color: #333; }
+          .header { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+          .title { font-size: 18pt; font-weight: bold; margin: 0; }
+          .timestamp { font-size: 10pt; color: #666; margin: 5px 0 0 0; }
+          .content { text-align: justify; }
+          .katex { font-size: 1em !important; }
+          .katex-display { margin: 1em 0 !important; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1 class="title">AI Response - Tractatus Logico-Philosophicus</h1>
+          <p class="timestamp">Generated: ${timestamp}</p>
+        </div>
+        <div class="content" id="math-content">${processedContent}</div>
+        <script>
+          document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.getElementById('math-content'), {
+              delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false}
+              ],
+              throwOnError: false
+            });
+            setTimeout(() => window.print(), 500);
+          });
+        </script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
   };
 
   const openEmailDialog = (content: string) => {
@@ -211,11 +276,20 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
                           <Button
                             variant="ghost"
                             size="sm"
+                            onClick={() => handlePrintResponse(chat.response)}
+                            className="text-xs text-blue-600 hover:text-blue-800 p-1 h-auto"
+                          >
+                            <Printer className="w-3 h-3 mr-1" />
+                            Print/PDF
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => handleDownloadPDF(chat.response)}
                             className="text-xs text-blue-600 hover:text-blue-800 p-1 h-auto"
                           >
                             <Download className="w-3 h-3 mr-1" />
-                            PDF
+                            Save PDF
                           </Button>
                           <Button
                             variant="ghost"

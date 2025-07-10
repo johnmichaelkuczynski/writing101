@@ -279,3 +279,11 @@ Preferred communication style: Simple, everyday language.
   - Document now displays exactly like authentic PDF with proper spacing and indentation
   - Numbered propositions remain flush left, normal paragraphs properly indented
   - Text formatting matches original Tractatus structure with 1.7 line height and proper margins
+- July 10, 2025: INDIVIDUAL RESPONSE PDF DOWNLOAD - Perfect LaTeX/KaTeX math notation support
+  - Added download buttons for EACH individual chatbot response with perfect math rendering
+  - Implemented dual PDF options: "Print/PDF" (browser print dialog) and "Save PDF" (automatic download)
+  - Enhanced export utilities with KaTeX CDN integration for proper mathematical notation rendering
+  - Added professional PDF formatting with headers, timestamps, and Georgia serif typography
+  - Extended functionality to both main chat interface and passage discussion modal
+  - PDF exports include selected passages context and maintain mathematical formatting integrity
+  - All LaTeX notation ($...$, $$...$$) properly renders in downloaded PDF files
