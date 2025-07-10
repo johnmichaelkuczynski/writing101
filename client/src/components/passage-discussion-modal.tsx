@@ -132,6 +132,8 @@ export default function PassageDiscussionModal({
   };
 
   const processContentForMathMode = (content: string) => {
+    if (!content) return "";
+    
     if (!mathMode) {
       return content
         .replace(/\$\$([^$]+)\$\$/g, '$1')
@@ -150,38 +152,40 @@ export default function PassageDiscussionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
+      <DialogContent className="max-w-7xl max-h-[95vh] w-[95vw] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Discuss This Passage</DialogTitle>
+          <DialogTitle className="text-xl">Discuss This Passage</DialogTitle>
         </DialogHeader>
 
-        {/* Selected Passage */}
-        <div className="bg-muted p-4 rounded-lg mb-4">
-          <h4 className="font-semibold mb-2">Selected Passage:</h4>
-          <p className="text-sm text-muted-foreground italic">
-            "{selectedText.substring(0, 200)}{selectedText.length > 200 ? '...' : ''}"
-          </p>
+        {/* Selected Passage - Much Larger and Expandable */}
+        <div className="bg-muted p-6 rounded-lg mb-6">
+          <h4 className="font-semibold mb-4 text-lg">Selected Passage:</h4>
+          <ScrollArea className="max-h-48">
+            <p className="text-base leading-relaxed text-foreground">
+              "{selectedText}"
+            </p>
+          </ScrollArea>
         </div>
 
-        {/* Discussion Messages */}
-        <ScrollArea className="flex-1 max-h-96 mb-4">
-          <div className="space-y-4 pr-4">
+        {/* Discussion Messages - Much Larger */}
+        <ScrollArea className="flex-1 min-h-[400px] mb-6">
+          <div className="space-y-6 pr-4">
             {initialExplanationMutation.isPending && (
-              <div className="flex items-center space-x-2 text-muted-foreground">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Generating initial explanation...</span>
+              <div className="flex items-center space-x-3 text-muted-foreground">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span className="text-lg">Generating initial explanation...</span>
               </div>
             )}
 
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] p-3 rounded-lg ${
+                <div className={`max-w-[85%] p-4 rounded-lg ${
                   message.isUser 
                     ? 'bg-primary text-primary-foreground' 
                     : 'bg-muted text-foreground'
                 }`}>
                   <div 
-                    className="text-sm"
+                    className="text-base leading-relaxed"
                     dangerouslySetInnerHTML={{ 
                       __html: processContentForMathMode(message.content)
                         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -195,31 +199,32 @@ export default function PassageDiscussionModal({
 
             {discussionMutation.isPending && (
               <div className="flex justify-start">
-                <div className="bg-muted text-foreground p-3 rounded-lg flex items-center space-x-2">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className="text-sm">Thinking...</span>
+                <div className="bg-muted text-foreground p-4 rounded-lg flex items-center space-x-3">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span className="text-base">Thinking...</span>
                 </div>
               </div>
             )}
           </div>
         </ScrollArea>
 
-        {/* Input Area */}
-        <div className="flex space-x-2">
+        {/* Input Area - Much Larger */}
+        <div className="flex space-x-4">
           <Textarea
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Ask a question about this passage or share your thoughts..."
-            className="flex-1 min-h-[60px] resize-none"
+            className="flex-1 min-h-[120px] text-base p-4 resize-y"
             disabled={discussionMutation.isPending || initialExplanationMutation.isPending}
           />
           <Button
             onClick={handleSendMessage}
             disabled={!userInput.trim() || discussionMutation.isPending || initialExplanationMutation.isPending}
             size="lg"
+            className="px-6 py-3"
           >
-            <Send className="w-4 h-4" />
+            <Send className="w-5 h-5" />
           </Button>
         </div>
       </DialogContent>
