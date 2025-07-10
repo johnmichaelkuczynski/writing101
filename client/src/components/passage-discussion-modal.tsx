@@ -281,15 +281,15 @@ export default function PassageDiscussionModal({
 
         {/* Discussion Area */}
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-          <div className="flex-1 border rounded-lg overflow-hidden">
-            <ScrollArea className="h-full p-4">
+          <div className="flex-1 border rounded-lg overflow-y-auto bg-white">
+            <div className="p-4 space-y-4 min-h-full">
             {isInitializing || initialExplanationMutation.isPending ? (
               <div className="flex items-center gap-2 text-gray-500">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Generating explanation...
               </div>
             ) : (
-              <div className="space-y-4">
+              <>
                 {messages.map((message) => (
                   <div
                     key={message.id}
@@ -336,9 +336,9 @@ export default function PassageDiscussionModal({
                     AI is thinking...
                   </div>
                 )}
-              </div>
+              </>
             )}
-            </ScrollArea>
+            </div>
           </div>
 
           {/* Input Area */}
