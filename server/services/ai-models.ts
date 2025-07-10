@@ -167,7 +167,7 @@ You are discussing a specific passage with the user. Engage in thoughtful dialog
 5. Asking engaging follow-up questions when appropriate
 6. Maintaining focus on Wittgenstein's ideas and their implications
 
-Keep responses conversational but intellectually rigorous. Help the user deepen their understanding through dialogue.`;
+Keep responses conversational but intellectually rigorous. Help the user deepen their understanding through dialogue. Do NOT repeat yourself or generate nonsensical text.`;
 
   // Build conversation context
   let conversationContext = `We are discussing this passage: "${passage}"\n\n`;

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
-import { Send, Loader2, Download, Mail } from "lucide-react";
+import { Send, Loader2, Download, Mail, FileText, Printer } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { renderMathInElement } from "@/lib/math-renderer";
@@ -214,6 +214,91 @@ export default function PassageDiscussionModal({
     }
   };
 
+  const handleDownloadFullConversation = () => {
+    const fullConversation = `PASSAGE DISCUSSION
+Selected Passage:
+"${selectedText}"
+
+CONVERSATION:
+${messages.map((msg, idx) => 
+  `${msg.isUser ? 'USER' : 'AI'}: ${msg.content}`
+).join('\n\n')}
+
+Generated: ${new Date().toLocaleString()}`;
+
+    const blob = new Blob([fullConversation], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `passage-discussion-full-${Date.now()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Downloaded",
+      description: "Full conversation downloaded as TXT file"
+    });
+  };
+
+  const handlePrintConversationAsPDF = () => {
+    // Create a formatted HTML version for printing
+    const htmlContent = `
+      <html>
+        <head>
+          <title>Passage Discussion</title>
+          <style>
+            body { font-family: 'Times New Roman', serif; margin: 40px; line-height: 1.6; }
+            .header { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+            .passage { background: #f5f5f5; padding: 15px; margin: 20px 0; border-left: 4px solid #333; }
+            .message { margin: 20px 0; padding: 15px; }
+            .user { background: #e3f2fd; }
+            .ai { background: #f3e5f5; }
+            .label { font-weight: bold; margin-bottom: 10px; }
+            @media print { body { margin: 20px; } }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Passage Discussion</h1>
+            <p>Generated: ${new Date().toLocaleString()}</p>
+          </div>
+          
+          <div class="passage">
+            <div class="label">Selected Passage:</div>
+            <p>"${selectedText}"</p>
+          </div>
+          
+          <h2>Discussion:</h2>
+          ${messages.map((msg, idx) => 
+            `<div class="message ${msg.isUser ? 'user' : 'ai'}">
+              <div class="label">${msg.isUser ? 'USER' : 'AI'}:</div>
+              <div>${msg.content.replace(/\n/g, '<br>')}</div>
+            </div>`
+          ).join('')}
+        </body>
+      </html>
+    `;
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+    }, 250);
+  };
+
+  const handleEmailFullConversation = () => {
+    const fullConversation = `PASSAGE DISCUSSION\n\nSelected Passage:\n"${selectedText}"\n\nCONVERSATION:\n${messages.map((msg, idx) => 
+      `${msg.isUser ? 'USER' : 'AI'}: ${msg.content}`
+    ).join('\n\n')}\n\nGenerated: ${new Date().toLocaleString()}`;
+    
+    setEmailContent(fullConversation);
+    setEmailModalOpen(true);
+  };
+
   const processContentForMathMode = (content: string) => {
     if (!content) return "";
     
@@ -315,6 +400,39 @@ export default function PassageDiscussionModal({
             )}
           </div>
         </ScrollArea>
+
+        {/* Conversation Export Buttons */}
+        {messages.length > 0 && (
+          <div className="flex justify-center space-x-3 mt-4 pt-4 border-t border-border">
+            <Button
+              onClick={handleDownloadFullConversation}
+              variant="outline"
+              size="sm"
+              className="flex items-center space-x-2"
+            >
+              <FileText className="w-4 h-4" />
+              <span>Download Full Conversation</span>
+            </Button>
+            <Button
+              onClick={handlePrintConversationAsPDF}
+              variant="outline"
+              size="sm"
+              className="flex items-center space-x-2"
+            >
+              <Printer className="w-4 h-4" />
+              <span>Save as PDF</span>
+            </Button>
+            <Button
+              onClick={handleEmailFullConversation}
+              variant="outline"
+              size="sm"
+              className="flex items-center space-x-2"
+            >
+              <Mail className="w-4 h-4" />
+              <span>Email Conversation</span>
+            </Button>
+          </div>
+        )}
 
         {/* Input Area - Much Larger */}
         <div className="flex space-x-4">
