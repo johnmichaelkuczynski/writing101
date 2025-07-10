@@ -232,3 +232,9 @@ Preferred communication style: Simple, everyday language.
   - Added visual styling with proper typography hierarchy, colors, and connecting lines
   - Created modal interface with full-screen lattice viewer and global instruction sidebar
   - All lattice generation and editing powered by AI models with full document context
+- July 10, 2025: CRITICAL CONCEPT LATTICE ISSUES IDENTIFIED
+  - User reported severe layout problems: nodes cramped in bottom third of modal, unreadable
+  - Nodes contain random phrases instead of meaningful Wittgenstein content
+  - ReactFlow edge connection errors preventing proper visualization
+  - Modal layout issues making visualization unusable
+  - URGENT: Complete concept lattice redesign needed with proper layout and meaningful content extraction

@@ -44,8 +44,8 @@ export async function generateConceptLattice(
       content: sentence.trim(),
       parentId: "main_1",
       position: { 
-        x: 600 + (index - 1) * 200, 
-        y: 250 + index * 100 
+        x: 200 + index * 300, 
+        y: 250 
       },
       style: {
         fontSize: "medium",
@@ -77,8 +77,8 @@ export async function generateConceptLattice(
       content: `📌 Example: ${word}`,
       parentId: nodes[index + 1]?.id || "main_1",
       position: { 
-        x: 400 + index * 150, 
-        y: 550 
+        x: 150 + index * 200, 
+        y: 400 
       },
       style: {
         fontSize: "small",
@@ -110,8 +110,8 @@ export async function generateConceptLattice(
       type: "supporting_quote",
       content: `"${quote.trim()}"`,
       position: { 
-        x: 750 + index * 100, 
-        y: 600 
+        x: 100 + index * 250, 
+        y: 550 
       },
       style: {
         fontSize: "very_small",
@@ -142,10 +142,10 @@ export async function generateConceptLattice(
     nodes,
     edges,
     layout: {
-      width: 1200,
-      height: 800,
-      centerX: 600,
-      centerY: 400
+      width: 1400,
+      height: 700,
+      centerX: 700,
+      centerY: 350
     },
     metadata: {
       createdAt: new Date(),
