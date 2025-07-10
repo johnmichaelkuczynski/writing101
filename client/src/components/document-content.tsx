@@ -98,17 +98,17 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
                 <h2 className="text-2xl font-georgia font-bold text-foreground mb-4">
                   {section.title}
                 </h2>
-                <div 
-                  className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
-                  dangerouslySetInnerHTML={{ 
-                    __html: processContentForMathMode(section.content)
-                      .replace(/\*\*(.*?)\*\*/g, '<strong class="text-foreground font-semibold">$1</strong>')
-                      .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
-                      .replace(/\n\n/g, '</p><p class="mb-4">')
-                      .replace(/^/, '<p class="mb-4">')
-                      .replace(/$/, '</p>')
-                  }}
-                />
+                <div className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}>
+                  {processContentForMathMode(section.content)
+                    .split('\n\n')
+                    .filter(paragraph => paragraph.trim())
+                    .map((paragraph, index) => (
+                      <p key={index} className="mb-4 whitespace-pre-wrap">
+                        {paragraph.trim()}
+                      </p>
+                    ))
+                  }
+                </div>
               </section>
             ))}
           </article>
