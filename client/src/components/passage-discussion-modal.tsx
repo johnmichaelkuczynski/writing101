@@ -274,8 +274,8 @@ export default function PassageDiscussionModal({
         {/* Selected Passage */}
         <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500 mb-4 flex-shrink-0">
           <div className="font-semibold text-sm text-blue-700 mb-2">Selected Passage:</div>
-          <ScrollArea className="max-h-32">
-            <div className="text-sm">{selectedText}</div>
+          <ScrollArea className="max-h-48 w-full">
+            <div className="text-sm leading-relaxed pr-2">{selectedText}</div>
           </ScrollArea>
         </div>
 
