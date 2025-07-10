@@ -30,22 +30,23 @@ function ConceptNodeComponent({ data }: { data: any }) {
   };
 
   const getNodeStyle = () => {
-    const baseStyle = "p-3 rounded-lg border-2 shadow-lg max-w-xs";
+    // MUCH WIDER nodes to show complete text without truncation
+    const baseStyle = "p-4 rounded-lg border-2 shadow-lg min-w-80 max-w-2xl";
     const color = node.style.color || '#3b82f6';
     
     switch (node.type) {
       case 'main_idea':
-        return `${baseStyle} bg-white border-4 shadow-xl font-bold min-w-48`;
+        return `${baseStyle} bg-white border-4 shadow-xl font-bold min-w-96`;
       case 'basic_argument':
-        return `${baseStyle} bg-blue-50 border-blue-200`;
+        return `${baseStyle} bg-blue-50 border-blue-200 min-w-80`;
       case 'example':
-        return `${baseStyle} bg-green-50 border-green-200`;
+        return `${baseStyle} bg-green-50 border-green-200 min-w-72`;
       case 'supporting_quote':
-        return `${baseStyle} bg-yellow-50 border-yellow-200`;
+        return `${baseStyle} bg-yellow-50 border-yellow-200 min-w-80`;
       case 'fine_argument':
-        return `${baseStyle} bg-purple-50 border-purple-200`;
+        return `${baseStyle} bg-purple-50 border-purple-200 min-w-80`;
       default:
-        return `${baseStyle} bg-gray-50 border-gray-200`;
+        return `${baseStyle} bg-gray-50 border-gray-200 min-w-80`;
     }
   };
 
@@ -57,10 +58,8 @@ function ConceptNodeComponent({ data }: { data: any }) {
       content = `"${content}"`;
     }
     
-    // Truncate if not expanded and content is long
-    if (!isExpanded && content.length > 100 && isExpandable) {
-      content = content.substring(0, 97) + "...";
-    }
+    // Show full content always - no truncation
+    // Users need to see complete statements, not truncated text
 
     return content;
   };

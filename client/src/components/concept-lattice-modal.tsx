@@ -223,7 +223,7 @@ export default function ConceptLatticeModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-7xl w-[95vw] h-[90vh] p-0">
+      <DialogContent className="max-w-none w-[98vw] h-[95vh] p-0">
         <DialogHeader className="p-4 border-b">
           <div className="flex items-center justify-between">
             <div>

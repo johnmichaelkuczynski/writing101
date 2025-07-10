@@ -131,11 +131,13 @@ export default function LivingBook() {
       </header>
 
       <div className="flex max-w-none w-full main-content-with-bottom-bar">
-        {/* Navigation Sidebar */}
-        <NavigationSidebar />
+        {/* Navigation Sidebar - Narrower */}
+        <div className="w-60 flex-shrink-0">
+          <NavigationSidebar />
+        </div>
 
-        {/* Main Content Area */}
-        <main className="flex-1 min-w-0">
+        {/* Main Content Area - MUCH WIDER FOR DOCUMENT READING */}
+        <main className="flex-1 max-w-5xl mx-4">
           {/* Document Content */}
           <DocumentContent 
             mathMode={mathMode}
@@ -146,13 +148,15 @@ export default function LivingBook() {
           />
         </main>
 
-        {/* Chat Panel - Much Larger */}
-        <ChatInterface 
-          selectedModel={selectedModel} 
-          mathMode={mathMode}
-          selectedText={selectedTextForChat}
-          onSelectedTextUsed={() => setSelectedTextForChat("")}
-        />
+        {/* Chat Panel - Fixed Width */}
+        <div className="w-96 flex-shrink-0">
+          <ChatInterface 
+            selectedModel={selectedModel} 
+            mathMode={mathMode}
+            selectedText={selectedTextForChat}
+            onSelectedTextUsed={() => setSelectedTextForChat("")}
+          />
+        </div>
       </div>
 
       {/* Instruction Interface - Bottom Bar */}

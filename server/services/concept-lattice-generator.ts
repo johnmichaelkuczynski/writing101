@@ -89,10 +89,10 @@ export async function generateConceptLattice(
     };
     nodes.push(exampleNode);
     
-    // Connect to parent
+    // Connect to main idea
     edges.push({
       id: `edge_example_${index + 1}`,
-      sourceId: nodes[index + 1]?.id || "main_1",
+      sourceId: "main_1",
       targetId: `example_${index + 1}`,
       type: "illustrates",
       style: {
