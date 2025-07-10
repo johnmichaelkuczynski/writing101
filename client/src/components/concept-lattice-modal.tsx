@@ -319,15 +319,17 @@ export default function ConceptLatticeModal({
                       <Button 
                         onClick={handleGenerate}
                         disabled={generateMutation.isPending || !selectedText}
-                        className="flex-1"
+                        className="flex-1 bg-blue-600 hover:bg-blue-700"
+                        size="lg"
                       >
-                        {generateMutation.isPending ? "Generating..." : "Use Full Text"}
+                        {generateMutation.isPending ? "Generating..." : "🧠 Generate Concept Lattice"}
                       </Button>
                       <Button 
                         variant="outline"
                         onClick={handleShowChunks}
                         disabled={!selectedText}
                         className="flex-1 flex items-center space-x-2"
+                        size="lg"
                       >
                         <FileText className="w-4 h-4" />
                         <span>Choose Chunks</span>

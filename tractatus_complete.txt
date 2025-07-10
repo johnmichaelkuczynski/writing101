@@ -1,12 +1,4 @@
-export const tractatusContent = {
-  title: "Tractatus Logico-Philosophicus",
-  author: "Ludwig Wittgenstein",
-  
-  sections: [
-    {
-      id: "introduction",
-      title: "Introduction by Bertrand Russell",
-      content: `Tractatus
+Tractatus
 Logico-
 Philosophicus
 
@@ -498,12 +490,9 @@ have achieved a work of extraordinary difficulty and importance. This merit,
 in my opinion, belongs to Mr Wittgenstein’s book, and makes it one which
 no serious philosopher can afford to neglect.
 BERTRAND RUSSELL.
-May 1922.`
-    },
-    {
-      id: "main-text",
-      title: "Tractatus Logico-Philosophicus",
-      content: `PREFACE
+May 1922.
+
+PREFACE
 This book will perhaps only be understood by those who have themselves
 already thought the thoughts which are expressed in it—or similar thoughts.
 It is therefore not a text-book. Its object would be attained if there were one
@@ -3421,19 +3410,5 @@ throw away the ladder, after he has climbed up on it.)
 He must surmount these propositions; then he sees the world
 rightly.
 7
-Whereof one cannot speak, thereof one must be silent.`
-    }
-  ]
-};
+Whereof one cannot speak, thereof one must be silent.
 
-export function getFullDocumentContent(): string {
-  return tractatusContent.sections.map(section => section.content).join('\n\n');
-}
-
-export function getDocumentTitle(): string {
-  return tractatusContent.title;
-}
-
-export function getDocumentAuthor(): string {
-  return tractatusContent.author;
-}
