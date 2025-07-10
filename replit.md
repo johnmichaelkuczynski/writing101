@@ -314,3 +314,6 @@ Preferred communication style: Simple, everyday language.
   - Updated all AI system prompts with strict plain text formatting rules
   - Enhanced cleaning function to remove ALL markdown (headers ####, bold **, italics, lists, links, code blocks)
   - Applied cleaning to passage explanations, discussions, and rewrite functions for clean, readable text output
+  - CRITICAL FIX: Applied markdown cleaning to main chat/instruction responses (was missing before)
+  - Added formatting rules to ALL AI system prompts ensuring clean text output across entire application
+  - All AI responses now display as clean, readable text without any formatting markup whatsoever
