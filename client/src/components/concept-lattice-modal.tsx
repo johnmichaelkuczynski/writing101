@@ -41,13 +41,18 @@ export default function ConceptLatticeModal({
   // Generate initial lattice
   const generateMutation = useMutation({
     mutationFn: async (data: { text: string; model: AIModel; globalInstructions?: string }) => {
-      return await apiRequest("/api/concept-lattice/generate", {
+      console.log("Making API request with data:", data);
+      const response = await apiRequest("/api/concept-lattice/generate", {
         method: "POST",
         body: JSON.stringify(data),
         headers: { "Content-Type": "application/json" }
       });
+      const json = await response.json();
+      console.log("API response JSON:", json);
+      return json;
     },
     onSuccess: (lattice: ConceptLattice) => {
+      console.log("Generate mutation success:", lattice);
       setCurrentLattice(lattice);
       toast({
         title: "Concept lattice generated",
@@ -66,11 +71,12 @@ export default function ConceptLatticeModal({
   // Refine entire lattice with global instructions
   const refineMutation = useMutation({
     mutationFn: async (data: { latticeId: string; globalInstructions: string; model: AIModel }) => {
-      return await apiRequest("/api/concept-lattice/refine", {
+      const response = await apiRequest("/api/concept-lattice/refine", {
         method: "POST",
         body: JSON.stringify(data),
         headers: { "Content-Type": "application/json" }
       });
+      return await response.json();
     },
     onSuccess: (refined: ConceptLattice) => {
       setCurrentLattice(refined);

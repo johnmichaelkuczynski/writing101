@@ -139,6 +139,13 @@ export default function ConceptLatticeViewer({
   const [chatMessage, setChatMessage] = useState("");
   const { toast } = useToast();
 
+  // Debug logging
+  console.log("ConceptLatticeViewer render:", {
+    lattice,
+    hasNodes: lattice?.nodes?.length,
+    hasEdges: lattice?.edges?.length
+  });
+
   // Convert lattice data to ReactFlow format
   const convertToFlowNodes = useCallback((latticeNodes: LatticeNode[]): Node[] => {
     return latticeNodes.map((node) => ({
@@ -194,6 +201,13 @@ export default function ConceptLatticeViewer({
 
   const [nodes, setNodes, onNodesChange] = useNodesState(convertToFlowNodes(lattice?.nodes || []));
   const [edges, setEdges, onEdgesChange] = useEdgesState(convertToFlowEdges(lattice?.edges || []));
+
+  // Debug logging
+  console.log("ReactFlow state:", {
+    nodes: nodes.length,
+    edges: edges.length,
+    nodesSample: nodes.slice(0, 2)
+  });
 
   // Update nodes when lattice changes
   useMemo(() => {
