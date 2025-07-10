@@ -310,3 +310,7 @@ Preferred communication style: Simple, everyday language.
   - SELECT ALL BUTTON OPTIMIZATION: Repositioned and resized Select All button for better UX
   - Moved button down from title area (top-16 instead of top-4) to avoid covering document content
   - Made button compact (28px height, smaller text/icon) while maintaining full functionality
+  - MARKDOWN FORMATTING ELIMINATION: Completely removed all markdown formatting from AI responses
+  - Updated all AI system prompts with strict plain text formatting rules
+  - Enhanced cleaning function to remove ALL markdown (headers ####, bold **, italics, lists, links, code blocks)
+  - Applied cleaning to passage explanations, discussions, and rewrite functions for clean, readable text output
