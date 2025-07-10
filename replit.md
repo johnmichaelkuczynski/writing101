@@ -305,3 +305,8 @@ Preferred communication style: Simple, everyday language.
   - PERFECT SCROLLING: Fixed passage discussion modal selected text preview to be fully scrollable
   - Replaced ScrollArea with native browser scrolling for reliable text viewing in preview window
   - Users can now scroll through entire selected passages in the blue preview box with proper scrollbars
+  - PERFECT CONVERSATION SCROLLING: Fixed discussion area in passage modal to be fully scrollable
+  - Users can now scroll through complete AI-user conversations without text being cut off
+  - SELECT ALL BUTTON OPTIMIZATION: Repositioned and resized Select All button for better UX
+  - Moved button down from title area (top-16 instead of top-4) to avoid covering document content
+  - Made button compact (28px height, smaller text/icon) while maintaining full functionality
