@@ -145,14 +145,14 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
   return (
     <div className="bg-card overflow-hidden relative">
       {/* Select All Button */}
-      <div className="absolute top-4 right-4 z-10">
+      <div className="absolute top-16 right-6 z-10">
         <Button
           variant="outline"
           size="sm"
           onClick={handleSelectAll}
-          className="bg-white/90 hover:bg-white border border-gray-300 shadow-sm"
+          className="bg-white/90 hover:bg-white border border-gray-300 shadow-sm text-xs px-2 py-1 h-7"
         >
-          <Copy className="w-4 h-4 mr-2" />
+          <Copy className="w-3 h-3 mr-1" />
           Select All
         </Button>
       </div>
