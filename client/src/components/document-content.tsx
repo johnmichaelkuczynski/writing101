@@ -102,11 +102,22 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
                   {processContentForMathMode(section.content)
                     .split('\n\n')
                     .filter(paragraph => paragraph.trim())
-                    .map((paragraph, index) => (
-                      <p key={index} className="mb-4 whitespace-pre-wrap">
-                        {paragraph.trim()}
-                      </p>
-                    ))
+                    .map((paragraph, index) => {
+                      const trimmed = paragraph.trim();
+                      // Check if paragraph starts with a number (numbered proposition)
+                      const isNumbered = /^\d+(\.\d+)*\s/.test(trimmed) || /^\d+$/.test(trimmed);
+                      
+                      return (
+                        <p 
+                          key={index} 
+                          className={`mb-4 whitespace-pre-wrap ${
+                            isNumbered ? '' : 'indent-8'
+                          }`}
+                        >
+                          {trimmed}
+                        </p>
+                      );
+                    })
                   }
                 </div>
               </section>
