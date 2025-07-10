@@ -293,3 +293,12 @@ Preferred communication style: Simple, everyday language.
   - Select All button automatically selects entire document content and populates chat interface
   - Eliminates need for manual dragging to select large document portions
   - Button positioned as floating overlay in top-right of document area for easy access
+- July 10, 2025: SCALABLE CHUNKING SYSTEM IMPLEMENTATION - Text processing for large documents
+  - Fixed critical Select All crash issue by implementing smart chunking for large text selections
+  - System automatically detects text selections over 1000 words and triggers chunking modal
+  - ChunkingModal divides large text into manageable ~1000-word chunks for per-chunk operations
+  - Users can select specific chunks for discussion, rewriting, or chat operations
+  - Prevents payload overflow errors and scales to massive books (600+ pages)
+  - All text selection functions (Select All, manual selection, toolbar actions) use chunking when needed
+  - Main chat remains available for whole-document operations (e.g., "generate study guide")
+  - Enhanced error handling with OpenAI fallback and increased server request limits to 10MB

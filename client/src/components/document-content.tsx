@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { renderMathInElement, renderMathString } from "@/lib/math-renderer";
 import { useTextSelection } from "@/hooks/use-text-selection";
 import SelectionToolbar from "@/components/selection-toolbar";
+import ChunkingModal from "@/components/chunking-modal";
 import { tractatusContent } from "@shared/tractatus-content";
 import { Copy } from "lucide-react";
 
@@ -18,26 +19,58 @@ interface DocumentContentProps {
 
 export default function DocumentContent({ mathMode = true, onQuestionFromSelection, onTextSelectedForChat, onRewriteFromSelection, onPassageDiscussion }: DocumentContentProps) {
   const { selection, isSelecting, clearSelection, highlightSelection, removeHighlights } = useTextSelection();
+  const [showChunkingModal, setShowChunkingModal] = useState(false);
+  const [selectedTextForChunking, setSelectedTextForChunking] = useState("");
 
   // Math rendering is handled in processContentForMathMode function
 
   const handleAskQuestion = (text: string) => {
-    if (onPassageDiscussion) {
-      onPassageDiscussion(text);
+    // Check if text is large and needs chunking
+    const wordCount = text.split(/\s+/).length;
+    
+    if (wordCount > 1000) {
+      // Open chunking modal for large selections
+      setShowChunkingModal(true);
+      setSelectedTextForChunking(text);
+    } else {
+      // For smaller texts, use normal selection
+      if (onPassageDiscussion) {
+        onPassageDiscussion(text);
+      }
     }
     clearSelection();
   };
 
   const handleSendToChat = (text: string) => {
-    if (onTextSelectedForChat) {
-      onTextSelectedForChat(text);
+    // Check if text is large and needs chunking
+    const wordCount = text.split(/\s+/).length;
+    
+    if (wordCount > 1000) {
+      // Open chunking modal for large selections
+      setShowChunkingModal(true);
+      setSelectedTextForChunking(text);
+    } else {
+      // For smaller texts, use normal selection
+      if (onTextSelectedForChat) {
+        onTextSelectedForChat(text);
+      }
     }
     clearSelection();
   };
 
   const handleRewrite = (text: string) => {
-    if (onRewriteFromSelection) {
-      onRewriteFromSelection(text);
+    // Check if text is large and needs chunking
+    const wordCount = text.split(/\s+/).length;
+    
+    if (wordCount > 1000) {
+      // Open chunking modal for large selections
+      setShowChunkingModal(true);
+      setSelectedTextForChunking(text);
+    } else {
+      // For smaller texts, use normal selection
+      if (onRewriteFromSelection) {
+        onRewriteFromSelection(text);
+      }
     }
     clearSelection();
   };
@@ -58,12 +91,23 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
       selection?.removeAllRanges();
       selection?.addRange(range);
       
-      // Get a summary text for selection instead of full document to avoid payload issues
-      const summaryText = `Full Document Selected: ${tractatusContent.title} by ${tractatusContent.author}\n\nThis includes all sections: ${tractatusContent.sections.map(s => s.title).join(', ')}\n\nPlease ask me any questions about the complete Tractatus text.`;
+      // Get the full document text
+      const fullText = tractatusContent.sections.map(section => 
+        `${section.title}\n\n${section.content}`
+      ).join('\n\n');
       
-      // Update the text selection hook with the summary text
-      if (onTextSelectedForChat) {
-        onTextSelectedForChat(summaryText);
+      // Check if text is large (over 1000 words) and needs chunking
+      const wordCount = fullText.split(/\s+/).length;
+      
+      if (wordCount > 1000) {
+        // Open chunking modal for large selections
+        setShowChunkingModal(true);
+        setSelectedTextForChunking(fullText);
+      } else {
+        // For smaller texts, use normal selection
+        if (onTextSelectedForChat) {
+          onTextSelectedForChat(fullText);
+        }
       }
     }
   };
@@ -156,6 +200,28 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
           onClear={clearSelection}
         />
       )}
+
+      {/* Chunking Modal */}
+      <ChunkingModal
+        isOpen={showChunkingModal}
+        onClose={() => setShowChunkingModal(false)}
+        selectedText={selectedTextForChunking}
+        onChunkSelected={(chunk) => {
+          if (onTextSelectedForChat) {
+            onTextSelectedForChat(chunk);
+          }
+        }}
+        onChunkDiscussion={(chunk) => {
+          if (onPassageDiscussion) {
+            onPassageDiscussion(chunk);
+          }
+        }}
+        onChunkRewrite={(chunk) => {
+          if (onRewriteFromSelection) {
+            onRewriteFromSelection(chunk);
+          }
+        }}
+      />
     </div>
   );
 }
