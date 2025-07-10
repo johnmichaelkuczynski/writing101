@@ -287,3 +287,9 @@ Preferred communication style: Simple, everyday language.
   - Extended functionality to both main chat interface and passage discussion modal
   - PDF exports include selected passages context and maintain mathematical formatting integrity
   - All LaTeX notation ($...$, $$...$$) properly renders in downloaded PDF files
+- July 10, 2025: CONTACT US LINK AND SELECT ALL FUNCTIONALITY
+  - Added "Contact Us" link in header under Living Book title that opens email to contact@zhisystems.ai
+  - Implemented "Select All" floating button in document area for easy full document selection
+  - Select All button automatically selects entire document content and populates chat interface
+  - Eliminates need for manual dragging to select large document portions
+  - Button positioned as floating overlay in top-right of document area for easy access

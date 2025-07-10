@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import { renderMathInElement, renderMathString } from "@/lib/math-renderer";
 import { useTextSelection } from "@/hooks/use-text-selection";
 import SelectionToolbar from "@/components/selection-toolbar";
 import { tractatusContent } from "@shared/tractatus-content";
+import { Copy } from "lucide-react";
 
 interface DocumentContentProps {
   mathMode?: boolean;
@@ -47,6 +49,27 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
     clearSelection();
   };
 
+  const handleSelectAll = () => {
+    const documentContent = document.querySelector('[data-document-content]');
+    if (documentContent) {
+      const range = document.createRange();
+      range.selectNodeContents(documentContent);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      
+      // Get the full document text for selection
+      const fullText = tractatusContent.sections.map(section => 
+        `${section.title}\n\n${section.content}`
+      ).join('\n\n');
+      
+      // Update the text selection hook with the full document text
+      if (onTextSelectedForChat) {
+        onTextSelectedForChat(fullText);
+      }
+    }
+  };
+
   // Function to convert math content based on mode
   const processContentForMathMode = (content: string) => {
     if (!mathMode) {
@@ -78,7 +101,20 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
   };
 
   return (
-    <div className="bg-card overflow-hidden">
+    <div className="bg-card overflow-hidden relative">
+      {/* Select All Button */}
+      <div className="absolute top-4 right-4 z-10">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleSelectAll}
+          className="bg-white/90 hover:bg-white border border-gray-300 shadow-sm"
+        >
+          <Copy className="w-4 h-4 mr-2" />
+          Select All
+        </Button>
+      </div>
+      
       <ScrollArea className="h-[calc(100vh-280px)]">
         <div className="p-8 w-full max-w-5xl mx-auto" data-document-content>
           <article className="prose prose-xl max-w-none text-foreground w-full leading-relaxed select-text">
