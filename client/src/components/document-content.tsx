@@ -98,29 +98,12 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
                 <h2 className="text-2xl font-georgia font-bold text-foreground mb-4">
                   {section.title}
                 </h2>
-                <div className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}>
-                  {processContentForMathMode(section.content)
-                    .split('\n\n')
-                    .filter(paragraph => paragraph.trim())
-                    .map((paragraph, index) => {
-                      const trimmed = paragraph.trim();
-                      // Check if paragraph starts with a number (numbered proposition) or is a title/header
-                      const isNumbered = /^\d+(\.\d+)*\s/.test(trimmed) || /^\d+$/.test(trimmed);
-                      const isTitle = /^(INTRODUCTION|By |MR |Tractatus|Logico-|Philosophicus)/.test(trimmed);
-                      
-                      return (
-                        <p 
-                          key={index} 
-                          className={`whitespace-pre-wrap ${
-                            isNumbered || isTitle ? 'document-paragraph-no-indent' : 'document-paragraph'
-                          }`}
-                        >
-                          {trimmed}
-                        </p>
-                      );
-                    })
-                  }
-                </div>
+                <div 
+                  className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
+                  dangerouslySetInnerHTML={{ 
+                    __html: processContentForMathMode(section.content)
+                  }}
+                />
               </section>
             ))}
           </article>

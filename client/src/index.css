@@ -96,15 +96,31 @@
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Document formatting styles */
+/* Document formatting styles - EXACT PDF MATCHING */
 .document-paragraph {
   text-indent: 2rem;
-  margin-bottom: 0.5rem;
-  line-height: 1.6;
+  margin-bottom: 0.8rem;
+  line-height: 1.7;
+  text-align: justify;
+  font-family: Georgia, serif;
+  font-size: 1rem;
 }
 
 .document-paragraph-no-indent {
   text-indent: 0;
-  margin-bottom: 0.5rem;
-  line-height: 1.6;
+  margin-bottom: 0.8rem;
+  line-height: 1.7;
+  text-align: justify;
+  font-family: Georgia, serif;
+  font-size: 1rem;
+}
+
+.document-proposition {
+  text-indent: 0;
+  margin-bottom: 1rem;
+  line-height: 1.7;
+  text-align: left;
+  font-family: Georgia, serif;
+  font-size: 1rem;
+  font-weight: normal;
 }
