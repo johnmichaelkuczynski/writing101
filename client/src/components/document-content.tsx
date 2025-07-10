@@ -104,14 +104,15 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
                     .filter(paragraph => paragraph.trim())
                     .map((paragraph, index) => {
                       const trimmed = paragraph.trim();
-                      // Check if paragraph starts with a number (numbered proposition)
+                      // Check if paragraph starts with a number (numbered proposition) or is a title/header
                       const isNumbered = /^\d+(\.\d+)*\s/.test(trimmed) || /^\d+$/.test(trimmed);
+                      const isTitle = /^(INTRODUCTION|By |MR |Tractatus|Logico-|Philosophicus)/.test(trimmed);
                       
                       return (
                         <p 
                           key={index} 
-                          className={`mb-4 whitespace-pre-wrap ${
-                            isNumbered ? '' : 'indent-8'
+                          className={`whitespace-pre-wrap ${
+                            isNumbered || isTitle ? 'document-paragraph-no-indent' : 'document-paragraph'
                           }`}
                         >
                           {trimmed}

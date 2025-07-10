@@ -95,3 +95,16 @@
 .font-mono {
   font-family: 'JetBrains Mono', monospace;
 }
+
+/* Document formatting styles */
+.document-paragraph {
+  text-indent: 2rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.document-paragraph-no-indent {
+  text-indent: 0;
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
