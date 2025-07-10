@@ -167,7 +167,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Passage explanation and discussion endpoints
+  app.post("/api/passage-explanation", async (req, res) => {
+    try {
+      const { passage, model } = req.body;
+      
+      if (!passage || !model) {
+        return res.status(400).json({ error: "Missing required fields: passage, model" });
+      }
 
+      const { generatePassageExplanation } = await import("./services/ai-models");
+      const explanation = await generatePassageExplanation(model, passage);
+      
+      res.json({ explanation });
+    } catch (error) {
+      console.error("Passage explanation error:", error);
+      res.status(500).json({ error: "Failed to generate passage explanation" });
+    }
+  });
+
+  app.post("/api/passage-discussion", async (req, res) => {
+    try {
+      const { message, passage, model, conversationHistory } = req.body;
+      
+      if (!message || !passage || !model) {
+        return res.status(400).json({ error: "Missing required fields: message, passage, model" });
+      }
+
+      const { generatePassageDiscussionResponse } = await import("./services/ai-models");
+      const response = await generatePassageDiscussionResponse(model, message, passage, conversationHistory || []);
+      
+      res.json({ response });
+    } catch (error) {
+      console.error("Passage discussion error:", error);
+      res.status(500).json({ error: "Failed to generate discussion response" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

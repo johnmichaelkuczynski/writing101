@@ -8,6 +8,7 @@ import ChatInterface from "@/components/chat-interface";
 import ModelSelector from "@/components/model-selector";
 import MathToggle from "@/components/math-toggle";
 import RewriteModal from "@/components/rewrite-modal";
+import PassageDiscussionModal from "@/components/passage-discussion-modal";
 
 import { initializeMathRenderer } from "@/lib/math-renderer";
 import { paperContent } from "@shared/paper-content";
@@ -21,6 +22,8 @@ export default function LivingBook() {
   const [rewriteModalOpen, setRewriteModalOpen] = useState(false);
   const [rewriteMode, setRewriteMode] = useState<"selection" | "chunks">("chunks");
   const [selectedTextForRewrite, setSelectedTextForRewrite] = useState<string>("");
+  const [passageDiscussionOpen, setPassageDiscussionOpen] = useState(false);
+  const [selectedTextForDiscussion, setSelectedTextForDiscussion] = useState<string>("");
 
 
   useEffect(() => {
@@ -58,6 +61,16 @@ export default function LivingBook() {
   const handleRewriteModalClose = () => {
     setRewriteModalOpen(false);
     setSelectedTextForRewrite("");
+  };
+
+  const handlePassageDiscussion = (text: string) => {
+    setSelectedTextForDiscussion(text);
+    setPassageDiscussionOpen(true);
+  };
+
+  const handlePassageDiscussionClose = () => {
+    setPassageDiscussionOpen(false);
+    setSelectedTextForDiscussion("");
   };
 
 
@@ -122,6 +135,7 @@ export default function LivingBook() {
             onQuestionFromSelection={handleQuestionFromSelection}
             onTextSelectedForChat={handleTextSelectedForChat}
             onRewriteFromSelection={handleRewriteFromSelection}
+            onPassageDiscussion={handlePassageDiscussion}
 
           />
         </main>
@@ -153,6 +167,15 @@ export default function LivingBook() {
         mode={rewriteMode}
         selectedText={selectedTextForRewrite}
         fullDocumentText={getFullDocumentText()}
+      />
+
+      {/* Passage Discussion Modal */}
+      <PassageDiscussionModal
+        isOpen={passageDiscussionOpen}
+        onClose={handlePassageDiscussionClose}
+        selectedText={selectedTextForDiscussion}
+        selectedModel={selectedModel}
+        mathMode={mathMode}
       />
 
 

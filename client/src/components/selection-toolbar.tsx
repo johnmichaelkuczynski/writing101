@@ -28,8 +28,7 @@ export default function SelectionToolbar({
   if (!isVisible || !selectedText) return null;
 
   const handleAskQuestion = () => {
-    const questionText = `About this passage: "${selectedText.substring(0, 100)}${selectedText.length > 100 ? '...' : ''}"\n\n`;
-    onAskQuestion(questionText);
+    onAskQuestion(selectedText);
     setIsVisible(false);
   };
 
@@ -85,7 +84,7 @@ export default function SelectionToolbar({
         className="flex items-center space-x-1 text-blue-600 border-blue-200 hover:bg-blue-50"
       >
         <MessageCircle className="w-3 h-3" />
-        <span className="text-xs">Ask</span>
+        <span className="text-xs">Discuss</span>
       </Button>
       
       <Button

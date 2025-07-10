@@ -10,17 +10,18 @@ interface DocumentContentProps {
   onQuestionFromSelection?: (question: string) => void;
   onTextSelectedForChat?: (text: string) => void;
   onRewriteFromSelection?: (text: string) => void;
+  onPassageDiscussion?: (text: string) => void;
 
 }
 
-export default function DocumentContent({ mathMode = true, onQuestionFromSelection, onTextSelectedForChat, onRewriteFromSelection }: DocumentContentProps) {
+export default function DocumentContent({ mathMode = true, onQuestionFromSelection, onTextSelectedForChat, onRewriteFromSelection, onPassageDiscussion }: DocumentContentProps) {
   const { selection, isSelecting, clearSelection, highlightSelection, removeHighlights } = useTextSelection();
 
   // Math rendering is handled in processContentForMathMode function
 
-  const handleAskQuestion = (questionText: string) => {
-    if (onQuestionFromSelection) {
-      onQuestionFromSelection(questionText);
+  const handleAskQuestion = (text: string) => {
+    if (onPassageDiscussion) {
+      onPassageDiscussion(text);
     }
     clearSelection();
   };

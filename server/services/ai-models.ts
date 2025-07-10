@@ -125,6 +125,77 @@ Please rewrite the text according to these instructions:`;
   }
 }
 
+export async function generatePassageExplanation(model: AIModel, passage: string): Promise<string> {
+  const systemPrompt = `You are an expert philosophical guide for Wittgenstein's "Tractatus Logico-Philosophicus". 
+
+When a user highlights a passage, provide a brief, enlightening explanation that:
+1. Clarifies the key philosophical concepts in the passage
+2. Explains Wittgenstein's logical argument or point
+3. Connects it to broader themes in the Tractatus
+4. Engages the user with thought-provoking insights
+5. Uses accessible language while maintaining philosophical depth
+
+Keep your explanation concise but insightful (3-4 sentences). Focus on helping the user understand what Wittgenstein means and why it matters.`;
+
+  const prompt = `Explain this passage from the Tractatus:
+
+"${passage}"
+
+Provide a brief, enlightening explanation that helps the user understand Wittgenstein's meaning and philosophical significance.`;
+
+  switch (model) {
+    case "openai":
+      return await generateOpenAIResponse(prompt, systemPrompt);
+    case "anthropic":
+      return await generateAnthropicResponse(prompt, systemPrompt);
+    case "perplexity":
+      return await generatePerplexityResponse(prompt, systemPrompt);
+    case "deepseek":
+    default:
+      return await generateDeepSeekResponse(prompt, systemPrompt);
+  }
+}
+
+export async function generatePassageDiscussionResponse(model: AIModel, userMessage: string, passage: string, conversationHistory: any[] = []): Promise<string> {
+  const systemPrompt = `You are an expert philosophical guide for Wittgenstein's "Tractatus Logico-Philosophicus". 
+
+You are discussing a specific passage with the user. Engage in thoughtful dialogue by:
+1. Responding directly to their questions and thoughts
+2. Building on the conversation history
+3. Referencing the specific passage being discussed
+4. Providing philosophical insights and clarifications
+5. Asking engaging follow-up questions when appropriate
+6. Maintaining focus on Wittgenstein's ideas and their implications
+
+Keep responses conversational but intellectually rigorous. Help the user deepen their understanding through dialogue.`;
+
+  // Build conversation context
+  let conversationContext = `We are discussing this passage: "${passage}"\n\n`;
+  if (conversationHistory.length > 0) {
+    conversationContext += "Previous conversation:\n";
+    conversationHistory.slice(-6).forEach((msg: any) => {
+      conversationContext += `${msg.isUser ? 'User' : 'Assistant'}: ${msg.content}\n`;
+    });
+    conversationContext += "\n";
+  }
+
+  const prompt = `${conversationContext}User: ${userMessage}
+
+Respond thoughtfully to continue our discussion about this passage from the Tractatus.`;
+
+  switch (model) {
+    case "openai":
+      return await generateOpenAIResponse(prompt, systemPrompt);
+    case "anthropic":
+      return await generateAnthropicResponse(prompt, systemPrompt);
+    case "perplexity":
+      return await generatePerplexityResponse(prompt, systemPrompt);
+    case "deepseek":
+    default:
+      return await generateDeepSeekResponse(prompt, systemPrompt);
+  }
+}
+
 export async function generateAIResponse(model: AIModel, prompt: string, isInstruction: boolean = false, chatHistory: ChatMessage[] = []): Promise<string> {
   const paperContext = getPaperContext();
   
