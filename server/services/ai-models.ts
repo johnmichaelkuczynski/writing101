@@ -288,22 +288,44 @@ export async function generateAIResponse(model: AIModel, prompt: string, isInstr
   }
   
   const systemPrompt = isInstruction 
-    ? `${paperContext}\n\nYou are helping analyze, modify, or explain the financial regulation document content. Follow the user's instructions precisely while staying true to the historical facts and arguments presented. Keep responses concise unless the user specifically asks for elaboration.`
-    : `${paperContext}${conversationContext}\n\nIMPORTANT: This is a conversation about the financial regulation document. Reference our previous discussion when relevant. Provide informative, helpful responses that fully answer questions about financial history, regulations, and economic arguments. Be clear and thorough while staying focused on the document content.`;
+    ? `${paperContext}\n\nYou are helping analyze, modify, or explain the Tractatus Logico-Philosophicus content. Follow the user's instructions precisely while staying true to Wittgenstein's philosophical concepts and arguments presented. Keep responses concise unless the user specifically asks for elaboration.
+
+CRITICAL FORMATTING RULES:
+- Write in plain text format ONLY
+- Do NOT use any markdown formatting, headers (####), bold (**), italics, or special characters
+- Use natural paragraph breaks to separate ideas (double line breaks)
+- Write as if for publication in a book or formal document
+- No bullet points, numbered lists, or formatting markup of any kind`
+    : `${paperContext}${conversationContext}\n\nIMPORTANT: This is a conversation about the Tractatus Logico-Philosophicus. Reference our previous discussion when relevant. Provide informative, helpful responses that fully answer questions about Wittgenstein's philosophy, logical concepts, and philosophical arguments. Be clear and thorough while staying focused on the document content.
+
+CRITICAL FORMATTING RULES:
+- Write in plain text format ONLY
+- Do NOT use any markdown formatting, headers (####), bold (**), italics, or special characters
+- Use natural paragraph breaks to separate ideas (double line breaks)
+- Write as if for publication in a book or formal document
+- No bullet points, numbered lists, or formatting markup of any kind`;
 
   try {
+    let result: string;
     switch (model) {
       case "openai":
-        return await generateOpenAIResponse(prompt, systemPrompt);
+        result = await generateOpenAIResponse(prompt, systemPrompt);
+        break;
       case "anthropic":
-        return await generateAnthropicResponse(prompt, systemPrompt);
+        result = await generateAnthropicResponse(prompt, systemPrompt);
+        break;
       case "perplexity":
-        return await generatePerplexityResponse(prompt, systemPrompt);
+        result = await generatePerplexityResponse(prompt, systemPrompt);
+        break;
       case "deepseek":
-        return await generateDeepSeekResponse(prompt, systemPrompt);
+        result = await generateDeepSeekResponse(prompt, systemPrompt);
+        break;
       default:
         throw new Error(`Unsupported AI model: ${model}`);
     }
+    
+    // Clean the result to remove any markdown formatting
+    return cleanRewriteText(result);
   } catch (error) {
     console.error(`Error generating AI response with ${model}:`, error);
     
@@ -311,7 +333,8 @@ export async function generateAIResponse(model: AIModel, prompt: string, isInstr
     if (model !== "openai") {
       console.log(`Attempting fallback to OpenAI due to ${model} failure`);
       try {
-        return await generateOpenAIResponse(prompt, systemPrompt);
+        const fallbackResult = await generateOpenAIResponse(prompt, systemPrompt);
+        return cleanRewriteText(fallbackResult);
       } catch (fallbackError) {
         console.error("Fallback to OpenAI also failed:", fallbackError);
       }
