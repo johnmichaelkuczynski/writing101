@@ -11,7 +11,7 @@ import RewriteModal from "@/components/rewrite-modal";
 import PassageDiscussionModal from "@/components/passage-discussion-modal";
 
 import { initializeMathRenderer } from "@/lib/math-renderer";
-import { paperContent } from "@shared/paper-content";
+import { tractatusContent } from "@shared/tractatus-content";
 import type { AIModel } from "@shared/schema";
 
 export default function LivingBook() {
@@ -78,7 +78,7 @@ export default function LivingBook() {
 
 
   const getFullDocumentText = () => {
-    return paperContent.sections
+    return tractatusContent.sections
       .map(section => section.content)
       .join('\n\n');
   };

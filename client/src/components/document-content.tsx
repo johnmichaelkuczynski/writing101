@@ -3,7 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { renderMathInElement, renderMathString } from "@/lib/math-renderer";
 import { useTextSelection } from "@/hooks/use-text-selection";
 import SelectionToolbar from "@/components/selection-toolbar";
-import { paperContent } from "@shared/paper-content";
+import { tractatusContent } from "@shared/tractatus-content";
 
 interface DocumentContentProps {
   mathMode?: boolean;
@@ -85,15 +85,15 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
             {/* Document Title */}
             <header className="text-center mb-12">
               <h1 className="text-3xl font-georgia font-bold text-foreground mb-2">
-                {paperContent.title}
+                {tractatusContent.title}
               </h1>
               <p className="text-lg font-georgia text-muted-foreground">
-                by {paperContent.author}
+                by {tractatusContent.author}
               </p>
             </header>
 
             {/* Dynamic Content Sections */}
-            {paperContent.sections.map((section) => (
+            {tractatusContent.sections.map((section) => (
               <section key={section.id} id={section.id} className="mb-12">
                 <h2 className="text-2xl font-georgia font-bold text-foreground mb-4">
                   {section.title}
