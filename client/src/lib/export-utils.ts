@@ -120,7 +120,7 @@ export async function downloadPDF(content: string, filename: string = 'ai-respon
         </head>
         <body>
           <div class="header">
-            <h1 class="title">AI Response - Tractatus Logico-Philosophicus</h1>
+            <h1 class="title">AI Response - Dictionary of Analytic Philosophy</h1>
             <p class="timestamp">Generated: ${timestamp}</p>
           </div>
           <div class="content" id="math-content">

@@ -1,4 +1,4 @@
-# Living Book: Incompleteness of Deductive Logic
+# Living Book: Dictionary of Analytic Philosophy
 
 ## Overview
 

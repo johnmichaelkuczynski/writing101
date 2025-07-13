@@ -87,7 +87,7 @@ export default function PassageDiscussionModal({
       </head>
       <body>
         <div class="header">
-          <h1 class="title">Passage Discussion - Tractatus Logico-Philosophicus</h1>
+          <h1 class="title">Passage Discussion - Dictionary of Analytic Philosophy</h1>
           <p class="timestamp">Generated: ${timestamp}</p>
         </div>
         <div class="passage">

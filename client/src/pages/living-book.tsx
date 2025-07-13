@@ -95,7 +95,7 @@ export default function LivingBook() {
               <BookOpen className="text-primary text-xl" />
               <div className="flex flex-col">
                 <h1 className="font-inter font-semibold text-lg text-foreground">
-                  Living Book: Tractatus Logico-Philosophicus
+                  Living Book: Dictionary of Analytic Philosophy
                 </h1>
                 <a 
                   href="mailto:contact@zhisystems.ai"

@@ -26,34 +26,33 @@ const anthropic = new Anthropic({
 function getPaperContext(): string {
   const fullContent = getFullDocumentContent();
   
-  return `You are an AI assistant helping users understand the "Tractatus Logico-Philosophicus" by Ludwig Wittgenstein.
+  return `You are an AI assistant helping users understand the "Dictionary of Analytic Philosophy" by J.-M. Kuczynski, PhD.
 
-This foundational work of analytic philosophy presents a logical structure of language and reality through numbered propositions (1-7). The work explores the relationship between language, thought, and reality, ultimately arguing for the limits of what can be meaningfully said.
+This comprehensive philosophical dictionary provides detailed definitions and explanations of key concepts in analytic philosophy. The work covers fundamental philosophical terminology and concepts that form the foundation of analytic philosophical discourse.
 
-KEY THEMES AND SECTIONS:
-1. The World - Reality consists of facts, not things; the world is everything that is the case
-2. Atomic Facts and Objects - Atomic facts as combinations of simple objects; the substance of reality
-3. Pictures and Propositions - The picture theory of meaning; how language represents reality
-4. Thought and Language - The logical structure of propositions; critique of traditional philosophy
-5. Truth Functions - All propositions are truth-functions of elementary propositions; logic says nothing
-6. Ethics and the Mystical - What cannot be expressed in language; the transcendental domain
-7. The Limits of Language - "Whereof one cannot speak, thereof one must be silent"
+KEY PHILOSOPHICAL AREAS COVERED:
+- Logic and formal systems (algorithms, axioms, inference rules)
+- Language and meaning (ambiguity, indexicality, vagueness, compositionality)
+- Knowledge and belief (a priori/a posteriori, empirical truth, analytic truth)
+- Metaphysics (propositions, properties, sets, causal laws)
+- Philosophy of mind (coherence, concepts, compatibilism)
+- Philosophy of language (reference, meaning, truth conditions)
 
-CENTRAL PHILOSOPHICAL CONCEPTS:
-- The picture theory of meaning: propositions mirror the logical structure of reality
-- Logical atomism: reality consists of atomic facts composed of simple objects
-- The limits of meaningful language: what can be said vs. what shows itself
-- The critique of traditional philosophy: many philosophical problems are pseudo-problems
-- The mystical: ethics, aesthetics, and the meaning of life lie beyond meaningful language
-- The ladder metaphor: Wittgenstein's propositions are ultimately senseless but therapeutically useful
+CENTRAL PHILOSOPHICAL CONCEPTS EXPLAINED:
+- The distinction between ambiguity and vagueness in language
+- The nature of propositions and their entailment relations
+- The axiom of comprehension and Russell's paradox
+- Causal inference and causal series
+- Coherence and incoherence in philosophical concepts
+- The relationship between meaning and truth conditions
 
-WITTGENSTEIN'S APPROACH:
-Wittgenstein presents philosophical insights through precisely numbered propositions in a hierarchical structure. His method attempts to show the logical structure of language and thought, ultimately revealing that the most important aspects of human experience cannot be captured in propositions but only shown or felt.
+KUCZYNSKI'S APPROACH:
+The dictionary presents precise definitions with careful attention to philosophical distinctions and debates. Each entry provides clear explanations while acknowledging areas of philosophical controversy and different schools of thought within analytic philosophy.
 
 DOCUMENT CONTENT:
 ${fullContent}
 
-Answer questions about this philosophical text, referencing specific propositions, concepts, and logical insights presented by Wittgenstein. Focus on the relationship between language, logic, and reality, and help users understand both the technical logical points and the broader philosophical implications.`;
+Answer questions about this philosophical dictionary, referencing specific definitions, concepts, and philosophical distinctions presented. Focus on helping users understand the precise meanings of philosophical terms and the debates surrounding them within analytic philosophy.`;
 }
 
 // Helper function to clean markdown and improve formatting
@@ -288,7 +287,7 @@ export async function generateAIResponse(model: AIModel, prompt: string, isInstr
   }
   
   const systemPrompt = isInstruction 
-    ? `${paperContext}\n\nYou are helping analyze, modify, or explain the Tractatus Logico-Philosophicus content. Follow the user's instructions precisely while staying true to Wittgenstein's philosophical concepts and arguments presented. Keep responses concise unless the user specifically asks for elaboration.
+    ? `${paperContext}\n\nYou are helping analyze, modify, or explain the Dictionary of Analytic Philosophy content. Follow the user's instructions precisely while staying true to the philosophical concepts and definitions presented. Keep responses concise unless the user specifically asks for elaboration.
 
 CRITICAL FORMATTING RULES:
 - Write in plain text format ONLY
@@ -296,7 +295,7 @@ CRITICAL FORMATTING RULES:
 - Use natural paragraph breaks to separate ideas (double line breaks)
 - Write as if for publication in a book or formal document
 - No bullet points, numbered lists, or formatting markup of any kind`
-    : `${paperContext}${conversationContext}\n\nIMPORTANT: This is a conversation about the Tractatus Logico-Philosophicus. Reference our previous discussion when relevant. Provide informative, helpful responses that fully answer questions about Wittgenstein's philosophy, logical concepts, and philosophical arguments. Be clear and thorough while staying focused on the document content.
+    : `${paperContext}${conversationContext}\n\nIMPORTANT: This is a conversation about the Dictionary of Analytic Philosophy. Reference our previous discussion when relevant. Provide informative, helpful responses that fully answer questions about philosophical concepts, definitions, and arguments presented in this dictionary. Be clear and thorough while staying focused on the document content.
 
 CRITICAL FORMATTING RULES:
 - Write in plain text format ONLY
