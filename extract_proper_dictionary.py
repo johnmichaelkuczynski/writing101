@@ -1,0 +1,54 @@
+"""
+Extract complete Dictionary content from DOCX using python-docx
+"""
+from docx import Document
+
+def extract_dictionary_from_docx():
+    """Extract all text from the DOCX file"""
+    doc = Document("attached_assets/Dictionary of Analytic Philosophy_1752438650632.docx")
+    
+    full_text = []
+    for paragraph in doc.paragraphs:
+        if paragraph.text.strip():  # Only add non-empty paragraphs
+            full_text.append(paragraph.text)
+    
+    return '\n\n'.join(full_text)
+
+def create_clean_typescript():
+    """Create the TypeScript content file with clean text"""
+    content = extract_dictionary_from_docx()
+    
+    # Escape backticks for TypeScript template literal
+    escaped_content = content.replace('`', '\\`').replace('${', '\\${')
+    
+    typescript_content = f'''export const tractatusContent = {{
+  sections: [
+    {{
+      id: "complete-dictionary",
+      title: "Dictionary of Analytic Philosophy",
+      content: `{escaped_content}`
+    }}
+  ]
+}};
+
+export function getFullDocumentContent(): string {{
+  return tractatusContent.sections.map(section => section.content).join('\\n\\n');
+}}
+
+export function getDocumentTitle(): string {{
+  return "Dictionary of Analytic Philosophy by J.-M. Kuczynski, PhD";
+}}
+
+export function getDocumentAuthor(): string {{
+  return "J.-M. Kuczynski, PhD";
+}}
+'''
+    
+    with open('shared/tractatus-content.ts', 'w', encoding='utf-8') as f:
+        f.write(typescript_content)
+    
+    print(f"Successfully extracted {len(content)} characters from DOCX")
+    print("Clean Dictionary content written to shared/tractatus-content.ts")
+
+if __name__ == "__main__":
+    create_clean_typescript()
