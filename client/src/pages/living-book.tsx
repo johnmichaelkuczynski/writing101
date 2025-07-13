@@ -10,6 +10,7 @@ import MathToggle from "@/components/math-toggle";
 import RewriteModal from "@/components/rewrite-modal";
 import PassageDiscussionModal from "@/components/passage-discussion-modal";
 import QuizModal from "@/components/quiz-modal";
+import StudyGuideModal from "@/components/study-guide-modal";
 import ChunkingModal from "@/components/chunking-modal";
 
 import { initializeMathRenderer } from "@/lib/math-renderer";
@@ -29,6 +30,9 @@ export default function LivingBook() {
   const [quizModalOpen, setQuizModalOpen] = useState(false);
   const [selectedTextForQuiz, setSelectedTextForQuiz] = useState<string>("");
   const [quizChunkIndex, setQuizChunkIndex] = useState<number | null>(null);
+  const [studyGuideModalOpen, setStudyGuideModalOpen] = useState(false);
+  const [selectedTextForStudyGuide, setSelectedTextForStudyGuide] = useState<string>("");
+  const [studyGuideChunkIndex, setStudyGuideChunkIndex] = useState<number | null>(null);
   const [chunkingModalOpen, setChunkingModalOpen] = useState(false);
   const [pendingChunkText, setPendingChunkText] = useState<string>("");
 
@@ -93,7 +97,7 @@ export default function LivingBook() {
     }
   };
 
-  const handleChunkAction = (chunk: string, chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite') => {
+  const handleChunkAction = (chunk: string, chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite' | 'study-guide') => {
     if (action === 'quiz') {
       setSelectedTextForQuiz(chunk);
       setQuizChunkIndex(chunkIndex);
@@ -104,7 +108,30 @@ export default function LivingBook() {
       setSelectedTextForRewrite(chunk);
       setRewriteMode("selection");
       setRewriteModalOpen(true);
+    } else if (action === 'study-guide') {
+      setSelectedTextForStudyGuide(chunk);
+      setStudyGuideChunkIndex(chunkIndex);
+      setStudyGuideModalOpen(true);
     }
+  };
+
+  const handleCreateStudyGuideFromSelection = (text: string) => {
+    const wordCount = text.split(/\s+/).length;
+    
+    if (wordCount > 1000) {
+      setPendingChunkText(text);
+      setChunkingModalOpen(true);
+    } else {
+      setSelectedTextForStudyGuide(text);
+      setStudyGuideChunkIndex(null);
+      setStudyGuideModalOpen(true);
+    }
+  };
+
+  const handleStudyGuideModalClose = () => {
+    setStudyGuideModalOpen(false);
+    setSelectedTextForStudyGuide("");
+    setStudyGuideChunkIndex(null);
   };
 
   const handleQuizModalClose = () => {
@@ -178,6 +205,19 @@ export default function LivingBook() {
                 <FileText className="w-4 h-4" />
                 <span>Create Test</span>
               </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const fullText = getFullDocumentContent();
+                  handleCreateStudyGuideFromSelection(fullText);
+                }}
+                className="flex items-center space-x-2 text-blue-600 border-blue-200 hover:bg-blue-50"
+              >
+                <BookOpen className="w-4 h-4" />
+                <span>Study Guide</span>
+              </Button>
               <ModelSelector 
                 selectedModel={selectedModel} 
                 onModelChange={setSelectedModel} 
@@ -203,6 +243,7 @@ export default function LivingBook() {
             onRewriteFromSelection={handleRewriteFromSelection}
             onPassageDiscussion={handlePassageDiscussion}
             onCreateTest={handleCreateTestFromSelection}
+            onCreateStudyGuide={handleCreateStudyGuideFromSelection}
           />
         </main>
 
@@ -250,6 +291,15 @@ export default function LivingBook() {
         onClose={handleQuizModalClose}
         sourceText={selectedTextForQuiz}
         chunkIndex={quizChunkIndex}
+        selectedModel={selectedModel}
+      />
+
+      {/* Study Guide Modal */}
+      <StudyGuideModal
+        isOpen={studyGuideModalOpen}
+        onClose={handleStudyGuideModalClose}
+        sourceText={selectedTextForStudyGuide}
+        chunkIndex={studyGuideChunkIndex}
         selectedModel={selectedModel}
       />
 

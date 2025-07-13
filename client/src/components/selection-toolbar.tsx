@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Highlighter, X, MessageSquare, Edit3, FileText } from "lucide-react";
+import { MessageCircle, Highlighter, X, MessageSquare, Edit3, FileText, BookOpen } from "lucide-react";
 import { useState } from "react";
 
 interface SelectionToolbarProps {
@@ -8,6 +8,7 @@ interface SelectionToolbarProps {
   onSendToChat: (text: string) => void;
   onRewrite: (text: string) => void;
   onCreateTest: (text: string) => void;
+  onCreateStudyGuide: (text: string) => void;
   onHighlight: () => void;
   onClear: () => void;
   position?: { x: number; y: number };
@@ -19,6 +20,7 @@ export default function SelectionToolbar({
   onSendToChat,
   onRewrite,
   onCreateTest,
+  onCreateStudyGuide,
   onHighlight, 
   onClear, 
   position 
@@ -44,6 +46,11 @@ export default function SelectionToolbar({
 
   const handleCreateTest = () => {
     onCreateTest(selectedText);
+    setIsVisible(false);
+  };
+
+  const handleCreateStudyGuide = () => {
+    onCreateStudyGuide(selectedText);
     setIsVisible(false);
   };
 
@@ -120,6 +127,16 @@ export default function SelectionToolbar({
       >
         <FileText className="w-3 h-3" />
         <span className="text-xs">Create Test</span>
+      </Button>
+      
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={handleCreateStudyGuide}
+        className="flex items-center space-x-1 text-blue-600 border-blue-200 hover:bg-blue-50"
+      >
+        <BookOpen className="w-3 h-3" />
+        <span className="text-xs">Study Guide</span>
       </Button>
       
       <Button

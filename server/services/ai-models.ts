@@ -492,6 +492,81 @@ ${includeAnswerKey ? 'Please provide both the test questions AND a separate answ
   }
 }
 
+export async function generateStudyGuide(model: AIModel, sourceText: string, instructions: string): Promise<{ guideContent: string }> {
+  const paperContext = getPaperContext();
+  
+  const systemPrompt = `${paperContext}
+
+You are helping create a comprehensive study guide based on the Dictionary of Analytic Philosophy content. Follow the user's specific instructions for study guide format, structure, and requirements.
+
+STUDY GUIDE GENERATION INSTRUCTIONS:
+- Create study materials that help understand the philosophical concepts and definitions
+- Follow the user's specific format requirements (outlines, summaries, key points, etc.)
+- Ensure content is academically rigorous and promotes genuine comprehension
+- Make information clear, well-organized, and study-friendly
+- Base all content directly on the provided source text
+- Include key concepts, definitions, arguments, and important details
+
+CRITICAL FORMATTING RULES:
+- Write in plain text format ONLY
+- Do NOT use any markdown formatting, headers (####), bold (**), italics, or special characters
+- Use natural paragraph breaks to separate sections and concepts
+- Write as if for a formal academic study document
+- No bullet points, numbered lists, or formatting markup of any kind
+- Structure content clearly with proper section organization`;
+
+  const fullPrompt = `Create a comprehensive study guide based on this content:
+
+SOURCE TEXT:
+${sourceText.substring(0, 8000)}
+
+INSTRUCTIONS:
+${instructions}
+
+Please provide a well-structured study guide that helps students understand and learn the key concepts.`;
+
+  try {
+    let result: string;
+    switch (model) {
+      case "openai":
+        result = await generateOpenAIResponse(fullPrompt, systemPrompt);
+        break;
+      case "anthropic":
+        result = await generateAnthropicResponse(fullPrompt, systemPrompt);
+        break;
+      case "perplexity":
+        result = await generatePerplexityResponse(fullPrompt, systemPrompt);
+        break;
+      case "deepseek":
+        result = await generateDeepSeekResponse(fullPrompt, systemPrompt);
+        break;
+      default:
+        throw new Error(`Unsupported AI model: ${model}`);
+    }
+    
+    // Clean the result
+    const cleanedResult = cleanRewriteText(result);
+    return { guideContent: cleanedResult };
+  } catch (error) {
+    console.error(`Error generating study guide with ${model}:`, error);
+    
+    // Fallback to OpenAI
+    if (model !== "openai") {
+      console.log(`Attempting fallback to OpenAI due to ${model} failure`);
+      try {
+        const fallbackResult = await generateOpenAIResponse(fullPrompt, systemPrompt);
+        const cleanedResult = cleanRewriteText(fallbackResult);
+        return { guideContent: cleanedResult };
+      } catch (fallbackError) {
+        console.error("OpenAI fallback also failed:", fallbackError);
+        throw new Error("Unable to generate study guide. Please try again with a different model.");
+      }
+    }
+    
+    throw new Error("Unable to generate study guide. Please try again.");
+  }
+}
+
 async function generateDeepSeekResponse(prompt: string, systemPrompt: string): Promise<string> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout

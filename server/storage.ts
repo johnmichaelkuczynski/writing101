@@ -1,4 +1,4 @@
-import { chatMessages, instructions, rewrites, quizzes, type ChatMessage, type InsertChatMessage, type Instruction, type InsertInstruction, type Rewrite, type InsertRewrite, type Quiz, type InsertQuiz } from "@shared/schema";
+import { chatMessages, instructions, rewrites, quizzes, studyGuides, type ChatMessage, type InsertChatMessage, type Instruction, type InsertInstruction, type Rewrite, type InsertRewrite, type Quiz, type InsertQuiz, type StudyGuide, type InsertStudyGuide } from "@shared/schema";
 
 export interface IStorage {
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
@@ -11,6 +11,9 @@ export interface IStorage {
   createQuiz(quiz: InsertQuiz): Promise<Quiz>;
   getQuizzes(): Promise<Quiz[]>;
   getQuizById(id: number): Promise<Quiz | null>;
+  createStudyGuide(studyGuide: InsertStudyGuide): Promise<StudyGuide>;
+  getStudyGuides(): Promise<StudyGuide[]>;
+  getStudyGuideById(id: number): Promise<StudyGuide | null>;
 }
 
 export class MemStorage implements IStorage {
@@ -18,20 +21,24 @@ export class MemStorage implements IStorage {
   private instructions: Map<number, Instruction>;
   private rewrites: Map<number, Rewrite>;
   private quizzes: Map<number, Quiz>;
+  private studyGuides: Map<number, StudyGuide>;
   private currentChatId: number;
   private currentInstructionId: number;
   private currentRewriteId: number;
   private currentQuizId: number;
+  private currentStudyGuideId: number;
 
   constructor() {
     this.chatMessages = new Map();
     this.instructions = new Map();
     this.rewrites = new Map();
     this.quizzes = new Map();
+    this.studyGuides = new Map();
     this.currentChatId = 1;
     this.currentInstructionId = 1;
     this.currentRewriteId = 1;
     this.currentQuizId = 1;
+    this.currentStudyGuideId = 1;
   }
 
   async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
@@ -118,6 +125,27 @@ export class MemStorage implements IStorage {
 
   async getQuizById(id: number): Promise<Quiz | null> {
     return this.quizzes.get(id) || null;
+  }
+
+  async createStudyGuide(insertStudyGuide: InsertStudyGuide): Promise<StudyGuide> {
+    const id = this.currentStudyGuideId++;
+    const studyGuide: StudyGuide = {
+      ...insertStudyGuide,
+      id,
+      timestamp: new Date(),
+    };
+    this.studyGuides.set(id, studyGuide);
+    return studyGuide;
+  }
+
+  async getStudyGuides(): Promise<StudyGuide[]> {
+    return Array.from(this.studyGuides.values()).sort((a, b) => 
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+  }
+
+  async getStudyGuideById(id: number): Promise<StudyGuide | null> {
+    return this.studyGuides.get(id) || null;
   }
 }
 

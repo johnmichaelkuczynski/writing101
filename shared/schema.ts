@@ -41,6 +41,16 @@ export const quizzes = pgTable("quizzes", {
   timestamp: timestamp("timestamp").defaultNow().notNull(),
 });
 
+export const studyGuides = pgTable("study_guides", {
+  id: serial("id").primaryKey(),
+  sourceText: text("source_text").notNull(),
+  instructions: text("instructions").notNull(),
+  guideContent: text("guide_content").notNull(),
+  model: text("model").notNull(),
+  chunkIndex: integer("chunk_index"),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+});
+
 export const insertChatMessageSchema = createInsertSchema(chatMessages).pick({
   message: true,
   response: true,
@@ -72,6 +82,14 @@ export const insertQuizSchema = createInsertSchema(quizzes).pick({
   chunkIndex: true,
 });
 
+export const insertStudyGuideSchema = createInsertSchema(studyGuides).pick({
+  sourceText: true,
+  instructions: true,
+  guideContent: true,
+  model: true,
+  chunkIndex: true,
+});
+
 export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
 export type ChatMessage = typeof chatMessages.$inferSelect;
 export type InsertInstruction = z.infer<typeof insertInstructionSchema>;
@@ -80,6 +98,8 @@ export type InsertRewrite = z.infer<typeof insertRewriteSchema>;
 export type Rewrite = typeof rewrites.$inferSelect;
 export type InsertQuiz = z.infer<typeof insertQuizSchema>;
 export type Quiz = typeof quizzes.$inferSelect;
+export type InsertStudyGuide = z.infer<typeof insertStudyGuideSchema>;
+export type StudyGuide = typeof studyGuides.$inferSelect;
 
 export const aiModels = ["openai", "anthropic", "perplexity", "deepseek"] as const;
 export type AIModel = typeof aiModels[number];
@@ -116,11 +136,19 @@ export const quizRequestSchema = z.object({
   chunkIndex: z.number().optional(),
 });
 
+export const studyGuideRequestSchema = z.object({
+  sourceText: z.string(),
+  instructions: z.string(),
+  model: z.enum(aiModels),
+  chunkIndex: z.number().optional(),
+});
+
 export type ChatRequest = z.infer<typeof chatRequestSchema>;
 export type InstructionRequest = z.infer<typeof instructionRequestSchema>;
 export type EmailRequest = z.infer<typeof emailRequestSchema>;
 export type RewriteRequest = z.infer<typeof rewriteRequestSchema>;
 export type QuizRequest = z.infer<typeof quizRequestSchema>;
+export type StudyGuideRequest = z.infer<typeof studyGuideRequestSchema>;
 
 // Mind Map Types
 

@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, MessageSquare, Edit3, X } from "lucide-react";
+import { FileText, MessageSquare, Edit3, X, BookOpen, FileQuestion } from "lucide-react";
 
 interface ChunkingModalProps {
   isOpen: boolean;
   onClose: () => void;
   text: string;
-  onChunkAction: (chunk: string, chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite') => void;
+  onChunkAction: (chunk: string, chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite' | 'study-guide') => void;
 }
 
 export default function ChunkingModal({ isOpen, onClose, text, onChunkAction }: ChunkingModalProps) {
@@ -22,7 +22,7 @@ export default function ChunkingModal({ isOpen, onClose, text, onChunkAction }: 
     chunks.push(words.slice(i, i + chunkSize).join(' '));
   }
 
-  const handleChunkAction = (chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite') => {
+  const handleChunkAction = (chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite' | 'study-guide') => {
     onChunkAction(chunks[chunkIndex], chunkIndex, action);
     onClose();
   };
@@ -66,22 +66,32 @@ export default function ChunkingModal({ isOpen, onClose, text, onChunkAction }: 
                     {chunk.substring(0, 200)}...
                   </div>
                   
-                  <div className="flex gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => handleChunkAction(index, 'quiz')}
-                      className="flex-1 text-orange-600 border-orange-200 hover:bg-orange-50"
+                      className="text-orange-600 border-orange-200 hover:bg-orange-50"
                     >
-                      <FileText className="w-3 h-3 mr-1" />
+                      <FileQuestion className="w-3 h-3 mr-1" />
                       Create Test
                     </Button>
                     
                     <Button
                       size="sm"
                       variant="outline"
+                      onClick={() => handleChunkAction(index, 'study-guide')}
+                      className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                    >
+                      <BookOpen className="w-3 h-3 mr-1" />
+                      Study Guide
+                    </Button>
+                    
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => handleChunkAction(index, 'chat')}
-                      className="flex-1 text-green-600 border-green-200 hover:bg-green-50"
+                      className="text-green-600 border-green-200 hover:bg-green-50"
                     >
                       <MessageSquare className="w-3 h-3 mr-1" />
                       Chat About
@@ -91,7 +101,7 @@ export default function ChunkingModal({ isOpen, onClose, text, onChunkAction }: 
                       size="sm"
                       variant="outline"
                       onClick={() => handleChunkAction(index, 'rewrite')}
-                      className="flex-1 text-purple-600 border-purple-200 hover:bg-purple-50"
+                      className="text-purple-600 border-purple-200 hover:bg-purple-50"
                     >
                       <Edit3 className="w-3 h-3 mr-1" />
                       Rewrite

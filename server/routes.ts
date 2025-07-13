@@ -1,12 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { generateAIResponse, generateRewrite, generatePassageExplanation, generatePassageDiscussionResponse, generateQuiz } from "./services/ai-models";
+import { generateAIResponse, generateRewrite, generatePassageExplanation, generatePassageDiscussionResponse, generateQuiz, generateStudyGuide } from "./services/ai-models";
 import { getFullDocumentContent } from "./services/document-processor";
 import { sendEmail } from "./services/email-service";
 import { generatePDF } from "./services/pdf-generator";
 import { transcribeAudio } from "./services/speech-service";
-import { chatRequestSchema, instructionRequestSchema, emailRequestSchema, rewriteRequestSchema, quizRequestSchema, type AIModel } from "@shared/schema";
+import { chatRequestSchema, instructionRequestSchema, emailRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, type AIModel } from "@shared/schema";
 import multer from "multer";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -239,6 +239,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(quizzes);
     } catch (error) {
       console.error("Get quizzes error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Study guide generation endpoint
+  app.post("/api/study-guide", async (req, res) => {
+    try {
+      const { sourceText, instructions, model, chunkIndex } = studyGuideRequestSchema.parse(req.body);
+      
+      const result = await generateStudyGuide(model, sourceText, instructions);
+      
+      const studyGuide = await storage.createStudyGuide({
+        sourceText,
+        instructions,
+        guideContent: result.guideContent,
+        model,
+        chunkIndex: chunkIndex || null
+      });
+      
+      res.json({ 
+        id: studyGuide.id,
+        guideContent: studyGuide.guideContent,
+        timestamp: studyGuide.timestamp
+      });
+    } catch (error) {
+      console.error("Study guide generation error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get study guides
+  app.get("/api/study-guides", async (req, res) => {
+    try {
+      const studyGuides = await storage.getStudyGuides();
+      res.json(studyGuides);
+    } catch (error) {
+      console.error("Get study guides error:", error);
       res.status(500).json({ error: error.message });
     }
   });
