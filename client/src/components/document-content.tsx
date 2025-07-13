@@ -14,10 +14,10 @@ interface DocumentContentProps {
   onTextSelectedForChat?: (text: string) => void;
   onRewriteFromSelection?: (text: string) => void;
   onPassageDiscussion?: (text: string) => void;
-
+  onCreateTest?: (text: string) => void;
 }
 
-export default function DocumentContent({ mathMode = true, onQuestionFromSelection, onTextSelectedForChat, onRewriteFromSelection, onPassageDiscussion }: DocumentContentProps) {
+export default function DocumentContent({ mathMode = true, onQuestionFromSelection, onTextSelectedForChat, onRewriteFromSelection, onPassageDiscussion, onCreateTest }: DocumentContentProps) {
   const { selection, isSelecting, clearSelection, highlightSelection, removeHighlights } = useTextSelection();
   const [showChunkingModal, setShowChunkingModal] = useState(false);
   const [selectedTextForChunking, setSelectedTextForChunking] = useState("");
@@ -71,6 +71,13 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
       if (onRewriteFromSelection) {
         onRewriteFromSelection(text);
       }
+    }
+    clearSelection();
+  };
+
+  const handleCreateTest = (text: string) => {
+    if (onCreateTest) {
+      onCreateTest(text);
     }
     clearSelection();
   };
@@ -192,7 +199,7 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
           onAskQuestion={handleAskQuestion}
           onSendToChat={handleSendToChat}
           onRewrite={handleRewrite}
-
+          onCreateTest={handleCreateTest}
           onHighlight={handleHighlight}
           onClear={clearSelection}
         />

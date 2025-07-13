@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BookOpen, Edit3, Network } from "lucide-react";
+import { BookOpen, Edit3, Network, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NavigationSidebar from "@/components/navigation-sidebar";
 import DocumentContent from "@/components/document-content";
@@ -9,9 +9,11 @@ import ModelSelector from "@/components/model-selector";
 import MathToggle from "@/components/math-toggle";
 import RewriteModal from "@/components/rewrite-modal";
 import PassageDiscussionModal from "@/components/passage-discussion-modal";
+import QuizModal from "@/components/quiz-modal";
+import ChunkingModal from "@/components/chunking-modal";
 
 import { initializeMathRenderer } from "@/lib/math-renderer";
-import { tractatusContent } from "@shared/tractatus-content";
+import { tractatusContent, getFullDocumentContent } from "@shared/tractatus-content";
 import type { AIModel } from "@shared/schema";
 
 export default function LivingBook() {
@@ -24,6 +26,11 @@ export default function LivingBook() {
   const [selectedTextForRewrite, setSelectedTextForRewrite] = useState<string>("");
   const [passageDiscussionOpen, setPassageDiscussionOpen] = useState(false);
   const [selectedTextForDiscussion, setSelectedTextForDiscussion] = useState<string>("");
+  const [quizModalOpen, setQuizModalOpen] = useState(false);
+  const [selectedTextForQuiz, setSelectedTextForQuiz] = useState<string>("");
+  const [quizChunkIndex, setQuizChunkIndex] = useState<number | null>(null);
+  const [chunkingModalOpen, setChunkingModalOpen] = useState(false);
+  const [pendingChunkText, setPendingChunkText] = useState<string>("");
 
 
   useEffect(() => {
@@ -73,6 +80,44 @@ export default function LivingBook() {
     setSelectedTextForDiscussion("");
   };
 
+  const handleCreateTestFromSelection = (text: string) => {
+    const wordCount = text.split(/\s+/).length;
+    
+    if (wordCount > 1000) {
+      setPendingChunkText(text);
+      setChunkingModalOpen(true);
+    } else {
+      setSelectedTextForQuiz(text);
+      setQuizChunkIndex(null);
+      setQuizModalOpen(true);
+    }
+  };
+
+  const handleChunkAction = (chunk: string, chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite') => {
+    if (action === 'quiz') {
+      setSelectedTextForQuiz(chunk);
+      setQuizChunkIndex(chunkIndex);
+      setQuizModalOpen(true);
+    } else if (action === 'chat') {
+      setSelectedTextForChat(chunk);
+    } else if (action === 'rewrite') {
+      setSelectedTextForRewrite(chunk);
+      setRewriteMode("selection");
+      setRewriteModalOpen(true);
+    }
+  };
+
+  const handleQuizModalClose = () => {
+    setQuizModalOpen(false);
+    setSelectedTextForQuiz("");
+    setQuizChunkIndex(null);
+  };
+
+  const handleChunkingModalClose = () => {
+    setChunkingModalOpen(false);
+    setPendingChunkText("");
+  };
+
 
 
 
@@ -120,6 +165,19 @@ export default function LivingBook() {
                 <Edit3 className="w-4 h-4" />
                 <span>Rewrite Document</span>
               </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const fullText = getFullDocumentContent();
+                  handleCreateTestFromSelection(fullText);
+                }}
+                className="flex items-center space-x-2 text-orange-600 border-orange-200 hover:bg-orange-50"
+              >
+                <FileText className="w-4 h-4" />
+                <span>Create Test</span>
+              </Button>
               <ModelSelector 
                 selectedModel={selectedModel} 
                 onModelChange={setSelectedModel} 
@@ -144,7 +202,7 @@ export default function LivingBook() {
             onTextSelectedForChat={handleTextSelectedForChat}
             onRewriteFromSelection={handleRewriteFromSelection}
             onPassageDiscussion={handlePassageDiscussion}
-
+            onCreateTest={handleCreateTestFromSelection}
           />
         </main>
 
@@ -174,7 +232,7 @@ export default function LivingBook() {
         selectedModel={selectedModel}
         mode={rewriteMode}
         selectedText={selectedTextForRewrite}
-        fullDocumentText={getFullDocumentText()}
+        fullDocumentText={getFullDocumentContent()}
       />
 
       {/* Passage Discussion Modal */}
@@ -186,8 +244,22 @@ export default function LivingBook() {
         mathMode={mathMode}
       />
 
+      {/* Quiz Modal */}
+      <QuizModal
+        isOpen={quizModalOpen}
+        onClose={handleQuizModalClose}
+        sourceText={selectedTextForQuiz}
+        chunkIndex={quizChunkIndex}
+        selectedModel={selectedModel}
+      />
 
-
+      {/* Chunking Modal */}
+      <ChunkingModal
+        isOpen={chunkingModalOpen}
+        onClose={handleChunkingModalClose}
+        text={pendingChunkText}
+        onChunkAction={handleChunkAction}
+      />
     </div>
   );
 }

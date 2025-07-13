@@ -398,6 +398,100 @@ async function generatePerplexityResponse(prompt: string, systemPrompt: string):
   return data.choices[0].message.content || "I apologize, but I couldn't generate a response.";
 }
 
+export async function generateQuiz(model: AIModel, sourceText: string, instructions: string, includeAnswerKey: boolean = false): Promise<{ testContent: string; answerKey?: string }> {
+  const paperContext = getPaperContext();
+  
+  const systemPrompt = `${paperContext}
+
+You are helping create a comprehensive quiz/test/exam based on the Dictionary of Analytic Philosophy content. Follow the user's specific instructions for test format, question types, and requirements.
+
+QUIZ GENERATION INSTRUCTIONS:
+- Create questions that test understanding of the philosophical concepts and definitions
+- Follow the user's specific format requirements (multiple choice, essay, short answer, etc.)
+- Ensure questions are academically rigorous and test genuine comprehension
+- Make questions clear, specific, and well-structured
+- Base all questions directly on the provided source text
+
+CRITICAL FORMATTING RULES:
+- Write in plain text format ONLY
+- Do NOT use any markdown formatting, headers (####), bold (**), italics, or special characters
+- Use natural paragraph breaks to separate questions and sections
+- Write as if for a formal academic test document
+- No bullet points, numbered lists, or formatting markup of any kind
+- Structure questions clearly with proper numbering (1. 2. 3. etc.)`;
+
+  const fullPrompt = `Create a ${includeAnswerKey ? 'test with answer key' : 'test'} based on this content:
+
+SOURCE TEXT:
+${sourceText.substring(0, 8000)}
+
+INSTRUCTIONS:
+${instructions}
+
+${includeAnswerKey ? 'Please provide both the test questions AND a separate answer key section.' : 'Please provide only the test questions.'}`;
+
+  try {
+    let result: string;
+    switch (model) {
+      case "openai":
+        result = await generateOpenAIResponse(fullPrompt, systemPrompt);
+        break;
+      case "anthropic":
+        result = await generateAnthropicResponse(fullPrompt, systemPrompt);
+        break;
+      case "perplexity":
+        result = await generatePerplexityResponse(fullPrompt, systemPrompt);
+        break;
+      case "deepseek":
+        result = await generateDeepSeekResponse(fullPrompt, systemPrompt);
+        break;
+      default:
+        throw new Error(`Unsupported AI model: ${model}`);
+    }
+    
+    // Clean the result
+    const cleanedResult = cleanRewriteText(result);
+    
+    if (includeAnswerKey) {
+      // Try to split test and answer key
+      const answerKeyMatch = cleanedResult.match(/(answer\s*key|answers?)\s*:?\s*([\s\S]+)$/i);
+      if (answerKeyMatch) {
+        const testContent = cleanedResult.replace(answerKeyMatch[0], '').trim();
+        const answerKey = answerKeyMatch[2].trim();
+        return { testContent, answerKey };
+      }
+    }
+    
+    return { testContent: cleanedResult };
+  } catch (error) {
+    console.error(`Error generating quiz with ${model}:`, error);
+    
+    // Fallback to OpenAI
+    if (model !== "openai") {
+      console.log(`Attempting fallback to OpenAI due to ${model} failure`);
+      try {
+        const fallbackResult = await generateOpenAIResponse(fullPrompt, systemPrompt);
+        const cleanedResult = cleanRewriteText(fallbackResult);
+        
+        if (includeAnswerKey) {
+          const answerKeyMatch = cleanedResult.match(/(answer\s*key|answers?)\s*:?\s*([\s\S]+)$/i);
+          if (answerKeyMatch) {
+            const testContent = cleanedResult.replace(answerKeyMatch[0], '').trim();
+            const answerKey = answerKeyMatch[2].trim();
+            return { testContent, answerKey };
+          }
+        }
+        
+        return { testContent: cleanedResult };
+      } catch (fallbackError) {
+        console.error("Fallback to OpenAI also failed:", fallbackError);
+      }
+    }
+    
+    throw new Error(`Failed to generate quiz using ${model}: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
 async function generateDeepSeekResponse(prompt: string, systemPrompt: string): Promise<string> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout

@@ -1,12 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { generateAIResponse, generateRewrite } from "./services/ai-models";
+import { generateAIResponse, generateRewrite, generatePassageExplanation, generatePassageDiscussionResponse, generateQuiz } from "./services/ai-models";
 import { getFullDocumentContent } from "./services/document-processor";
 import { sendEmail } from "./services/email-service";
 import { generatePDF } from "./services/pdf-generator";
 import { transcribeAudio } from "./services/speech-service";
-import { chatRequestSchema, instructionRequestSchema, emailRequestSchema, rewriteRequestSchema, type AIModel } from "@shared/schema";
+import { chatRequestSchema, instructionRequestSchema, emailRequestSchema, rewriteRequestSchema, quizRequestSchema, type AIModel } from "@shared/schema";
 import multer from "multer";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -201,6 +201,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Passage discussion error:", error);
       res.status(500).json({ error: "Failed to generate discussion response" });
+    }
+  });
+
+  // Quiz generation endpoint
+  app.post("/api/quiz", async (req, res) => {
+    try {
+      const { sourceText, instructions, model, includeAnswerKey, chunkIndex } = quizRequestSchema.parse(req.body);
+      
+      const result = await generateQuiz(model, sourceText, instructions, includeAnswerKey);
+      
+      const quiz = await storage.createQuiz({
+        sourceText,
+        instructions,
+        testContent: result.testContent,
+        answerKey: result.answerKey || null,
+        model,
+        chunkIndex
+      });
+      
+      res.json({ 
+        id: quiz.id,
+        testContent: quiz.testContent,
+        answerKey: quiz.answerKey,
+        timestamp: quiz.timestamp
+      });
+    } catch (error) {
+      console.error("Quiz generation error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get quizzes
+  app.get("/api/quizzes", async (req, res) => {
+    try {
+      const quizzes = await storage.getQuizzes();
+      res.json(quizzes);
+    } catch (error) {
+      console.error("Get quizzes error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get quiz by ID
+  app.get("/api/quiz/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const quiz = await storage.getQuizById(id);
+      
+      if (!quiz) {
+        return res.status(404).json({ error: "Quiz not found" });
+      }
+      
+      res.json(quiz);
+    } catch (error) {
+      console.error("Get quiz error:", error);
+      res.status(500).json({ error: error.message });
     }
   });
 

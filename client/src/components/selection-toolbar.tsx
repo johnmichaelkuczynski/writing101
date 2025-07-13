@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Highlighter, X, MessageSquare, Edit3 } from "lucide-react";
+import { MessageCircle, Highlighter, X, MessageSquare, Edit3, FileText } from "lucide-react";
 import { useState } from "react";
 
 interface SelectionToolbarProps {
@@ -7,7 +7,7 @@ interface SelectionToolbarProps {
   onAskQuestion: (text: string) => void;
   onSendToChat: (text: string) => void;
   onRewrite: (text: string) => void;
-
+  onCreateTest: (text: string) => void;
   onHighlight: () => void;
   onClear: () => void;
   position?: { x: number; y: number };
@@ -18,7 +18,7 @@ export default function SelectionToolbar({
   onAskQuestion, 
   onSendToChat,
   onRewrite,
-
+  onCreateTest,
   onHighlight, 
   onClear, 
   position 
@@ -39,6 +39,11 @@ export default function SelectionToolbar({
 
   const handleRewrite = () => {
     onRewrite(selectedText);
+    setIsVisible(false);
+  };
+
+  const handleCreateTest = () => {
+    onCreateTest(selectedText);
     setIsVisible(false);
   };
 
@@ -107,7 +112,15 @@ export default function SelectionToolbar({
         <span className="text-xs">Rewrite</span>
       </Button>
 
-
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={handleCreateTest}
+        className="flex items-center space-x-1 text-orange-600 border-orange-200 hover:bg-orange-50"
+      >
+        <FileText className="w-3 h-3" />
+        <span className="text-xs">Create Test</span>
+      </Button>
       
       <Button
         size="sm"

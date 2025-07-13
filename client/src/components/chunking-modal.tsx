@@ -1,187 +1,111 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Edit3, Send } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FileText, MessageSquare, Edit3, X } from "lucide-react";
 
 interface ChunkingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedText: string;
-  onChunkSelected: (chunk: string) => void;
-  onChunkDiscussion: (chunk: string) => void;
-  onChunkRewrite: (chunk: string) => void;
+  text: string;
+  onChunkAction: (chunk: string, chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite') => void;
 }
 
-export default function ChunkingModal({
-  isOpen,
-  onClose,
-  selectedText,
-  onChunkSelected,
-  onChunkDiscussion,
-  onChunkRewrite
-}: ChunkingModalProps) {
-  const [selectedChunks, setSelectedChunks] = useState<number[]>([]);
+export default function ChunkingModal({ isOpen, onClose, text, onChunkAction }: ChunkingModalProps) {
+  const chunkSize = 1000; // words per chunk
+  
+  // Split text into chunks
+  const words = (text || '').split(/\s+/);
+  const chunks = [];
+  for (let i = 0; i < words.length; i += chunkSize) {
+    chunks.push(words.slice(i, i + chunkSize).join(' '));
+  }
 
-  // Function to divide text into chunks of approximately 1000 words
-  const createChunks = (text: string): string[] => {
-    const words = text.split(/\s+/);
-    const chunks: string[] = [];
-    const chunkSize = 1000;
-    
-    for (let i = 0; i < words.length; i += chunkSize) {
-      const chunk = words.slice(i, i + chunkSize).join(' ');
-      chunks.push(chunk);
-    }
-    
-    return chunks;
+  const handleChunkAction = (chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite') => {
+    onChunkAction(chunks[chunkIndex], chunkIndex, action);
+    onClose();
   };
-
-  const chunks = createChunks(selectedText);
-
-  const toggleChunkSelection = (index: number) => {
-    setSelectedChunks(prev => 
-      prev.includes(index) 
-        ? prev.filter(i => i !== index)
-        : [...prev, index]
-    );
-  };
-
-  const getSelectedText = () => {
-    return selectedChunks
-      .sort((a, b) => a - b)
-      .map(index => chunks[index])
-      .join('\n\n');
-  };
-
-  const handleSendToChat = () => {
-    const combinedText = getSelectedText();
-    if (combinedText) {
-      onChunkSelected(combinedText);
-      onClose();
-      setSelectedChunks([]);
-    }
-  };
-
-  const handleDiscuss = () => {
-    const combinedText = getSelectedText();
-    if (combinedText) {
-      onChunkDiscussion(combinedText);
-      onClose();
-      setSelectedChunks([]);
-    }
-  };
-
-  const handleRewrite = () => {
-    const combinedText = getSelectedText();
-    if (combinedText) {
-      onChunkRewrite(combinedText);
-      onClose();
-      setSelectedChunks([]);
-    }
-  };
-
-  const totalWords = selectedText.split(/\s+/).length;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh]">
+      <DialogContent className="max-w-4xl h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Large Text Selection - Choose Chunks</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            Your selection contains {totalWords.toLocaleString()} words. 
-            Choose one or more chunks below for specific operations, or use the main chat for whole-document questions.
-          </p>
-        </DialogHeader>
-
-        <div className="space-y-4">
-          {/* Action Buttons */}
-          <div className="flex gap-2 items-center justify-between">
-            <div className="flex gap-2">
-              <Button
-                onClick={handleSendToChat}
-                disabled={selectedChunks.length === 0}
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <Send className="w-4 h-4" />
-                Send to Chat ({selectedChunks.length} chunks)
-              </Button>
-              <Button
-                onClick={handleDiscuss}
-                disabled={selectedChunks.length === 0}
-                size="sm"
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <MessageSquare className="w-4 h-4" />
-                Discuss
-              </Button>
-              <Button
-                onClick={handleRewrite}
-                disabled={selectedChunks.length === 0}
-                size="sm"
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <Edit3 className="w-4 h-4" />
-                Rewrite
-              </Button>
-            </div>
-            <Button
-              onClick={() => setSelectedChunks(chunks.map((_, i) => i))}
-              size="sm"
-              variant="ghost"
-            >
-              Select All Chunks
+          <DialogTitle className="flex items-center justify-between">
+            Large Text Selection - Choose Chunks
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <X className="w-4 h-4" />
             </Button>
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="mb-4 p-4 bg-blue-50 rounded-lg">
+          <div className="text-sm text-blue-900">
+            <strong>Selection too large:</strong> Your selection contains {words.length.toLocaleString()} words. 
+            We've divided it into {chunks.length} manageable chunks of ~{chunkSize} words each.
           </div>
-
-          {/* Chunks List */}
-          <ScrollArea className="h-[60vh] w-full border rounded-md p-4">
-            <div className="space-y-4">
-              {chunks.map((chunk, index) => {
-                const isSelected = selectedChunks.includes(index);
-                const wordCount = chunk.split(/\s+/).length;
-                
-                return (
-                  <div
-                    key={index}
-                    className={`border rounded-lg p-4 cursor-pointer transition-all ${
-                      isSelected 
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-950' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                    onClick={() => toggleChunkSelection(index)}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <Badge variant={isSelected ? "default" : "secondary"}>
-                          Chunk {index + 1}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {wordCount} words
-                        </span>
-                      </div>
-                      {isSelected && (
-                        <Badge variant="default" className="bg-blue-600">
-                          Selected
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      {chunk.substring(0, 200)}...
-                    </p>
+          <div className="text-xs text-blue-700 mt-1">
+            Choose which chunk(s) you'd like to work with:
+          </div>
+        </div>
+        
+        <ScrollArea className="flex-1">
+          <div className="space-y-4">
+            {chunks.map((chunk, index) => (
+              <Card key={index} className="border">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center justify-between">
+                    <span>Chunk {index + 1} of {chunks.length}</span>
+                    <span className="text-xs text-muted-foreground">
+                      ~{chunk.split(/\s+/).length} words
+                    </span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="text-xs text-gray-600 max-h-20 overflow-y-auto leading-relaxed">
+                    {chunk.substring(0, 200)}...
                   </div>
-                );
-              })}
-            </div>
-          </ScrollArea>
-
-          <div className="text-xs text-muted-foreground text-center">
-            Select chunks by clicking them. Use main chat interface for questions about the entire document.
+                  
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleChunkAction(index, 'quiz')}
+                      className="flex-1 text-orange-600 border-orange-200 hover:bg-orange-50"
+                    >
+                      <FileText className="w-3 h-3 mr-1" />
+                      Create Test
+                    </Button>
+                    
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleChunkAction(index, 'chat')}
+                      className="flex-1 text-green-600 border-green-200 hover:bg-green-50"
+                    >
+                      <MessageSquare className="w-3 h-3 mr-1" />
+                      Chat About
+                    </Button>
+                    
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleChunkAction(index, 'rewrite')}
+                      className="flex-1 text-purple-600 border-purple-200 hover:bg-purple-50"
+                    >
+                      <Edit3 className="w-3 h-3 mr-1" />
+                      Rewrite
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
+        </ScrollArea>
+        
+        <div className="mt-4 p-3 bg-gray-50 rounded text-xs text-gray-600">
+          <strong>Tip:</strong> You can also use the main chat interface to ask general questions about the entire document, 
+          like "generate a study guide" or "summarize the key concepts."
         </div>
       </DialogContent>
     </Dialog>
