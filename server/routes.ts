@@ -217,7 +217,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         testContent: result.testContent,
         answerKey: result.answerKey || null,
         model,
-        chunkIndex
+        chunkIndex: chunkIndex || null
       });
       
       res.json({ 

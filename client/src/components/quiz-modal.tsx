@@ -73,13 +73,19 @@ export default function QuizModal({ isOpen, onClose, sourceText, chunkIndex, sel
   });
 
   const handleGenerate = () => {
-    generateQuizMutation.mutate({
+    const data: any = {
       sourceText,
       instructions,
       model: selectedModel,
       includeAnswerKey,
-      chunkIndex
-    });
+    };
+    
+    // Only include chunkIndex if it's not null
+    if (chunkIndex !== null && chunkIndex !== undefined) {
+      data.chunkIndex = chunkIndex;
+    }
+    
+    generateQuizMutation.mutate(data);
   };
 
   const handleDownloadTxt = () => {
