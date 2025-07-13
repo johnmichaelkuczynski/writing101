@@ -4,13 +4,28 @@ Extract complete Dictionary content from DOCX using python-docx
 from docx import Document
 
 def extract_dictionary_from_docx():
-    """Extract all text from the DOCX file"""
-    doc = Document("attached_assets/Dictionary of Analytic Philosophy_1752438650632.docx")
+    """Extract all text from the DOCX file preserving sentence continuity"""
+    doc = Document("/home/runner/workspace/attached_assets/Dictionary of Analytic Philosophy_1752438650632.docx")
     
     full_text = []
+    current_paragraph = ""
+    
     for paragraph in doc.paragraphs:
-        if paragraph.text.strip():  # Only add non-empty paragraphs
-            full_text.append(paragraph.text)
+        text = paragraph.text.strip()
+        if text:
+            # Check if this text should be joined with previous text
+            if current_paragraph and not text[0].isupper() and not current_paragraph.endswith('.'):
+                # This looks like a continuation - join with previous
+                current_paragraph += " " + text
+            else:
+                # This starts a new paragraph
+                if current_paragraph:
+                    full_text.append(current_paragraph)
+                current_paragraph = text
+    
+    # Don't forget the last paragraph
+    if current_paragraph:
+        full_text.append(current_paragraph)
     
     return '\n\n'.join(full_text)
 

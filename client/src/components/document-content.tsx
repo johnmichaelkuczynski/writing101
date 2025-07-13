@@ -163,10 +163,10 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
             {/* Document Title */}
             <header className="text-center mb-12">
               <h1 className="text-3xl font-georgia font-bold text-foreground mb-2">
-                {tractatusContent.title}
+                Dictionary of Analytic Philosophy
               </h1>
-              <p className="text-lg font-georgia text-muted-foreground">
-                by {tractatusContent.author}
+              <p className="text-lg font-georgia text-muted-foreground text-center">
+                by J.-M. Kuczynski, PhD
               </p>
             </header>
 
