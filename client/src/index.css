@@ -124,3 +124,26 @@
   font-size: 1rem;
   font-weight: normal;
 }
+
+/* Dictionary entry styles */
+.dictionary-entry {
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+  text-align: justify;
+  font-family: Georgia, serif;
+  font-size: 1rem;
+  padding: 0.75rem;
+  border-left: 3px solid hsl(221, 83%, 53%);
+  background-color: hsl(210, 40%, 98%);
+  border-radius: 0.375rem;
+}
+
+.dark .dictionary-entry {
+  background-color: hsl(217, 33%, 17%);
+  border-left-color: hsl(221, 83%, 53%);
+}
+
+.dictionary-entry strong {
+  color: hsl(221, 83%, 53%);
+  font-weight: 600;
+}

@@ -1,5 +1,5 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { paperContent } from "@shared/paper-content";
+import { tractatusContent } from "@shared/tractatus-content";
 
 export default function NavigationSidebar() {
   const handleNavClick = (id: string) => {
@@ -17,7 +17,7 @@ export default function NavigationSidebar() {
         </h3>
         <ScrollArea className="sidebar-scroll">
           <nav className="space-y-1">
-            {paperContent.sections.map((section) => (
+            {tractatusContent.sections.map((section) => (
               <button
                 key={section.id}
                 onClick={() => handleNavClick(section.id)}
