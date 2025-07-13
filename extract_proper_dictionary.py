@@ -18,8 +18,21 @@ def create_clean_typescript():
     """Create the TypeScript content file with clean text"""
     content = extract_dictionary_from_docx()
     
-    # Escape backticks for TypeScript template literal
-    escaped_content = content.replace('`', '\\`').replace('${', '\\${')
+    # Convert to HTML with proper paragraph structure
+    paragraphs = content.split('\n\n')
+    html_content = '<div class="document-content">'
+    
+    for paragraph in paragraphs:
+        if paragraph.strip():
+            # Clean the paragraph text
+            clean_para = paragraph.strip()
+            # Add proper paragraph tags with styling
+            html_content += f'<p class="document-paragraph">{clean_para}</p>'
+    
+    html_content += '</div>'
+    
+    # Escape backticks and template literals for TypeScript
+    escaped_content = html_content.replace('`', '\\`').replace('${', '\\${')
     
     typescript_content = f'''export const tractatusContent = {{
   sections: [
@@ -48,7 +61,7 @@ export function getDocumentAuthor(): string {{
         f.write(typescript_content)
     
     print(f"Successfully extracted {len(content)} characters from DOCX")
-    print("Clean Dictionary content written to shared/tractatus-content.ts")
+    print("Clean Dictionary content with HTML formatting written to shared/tractatus-content.ts")
 
 if __name__ == "__main__":
     create_clean_typescript()

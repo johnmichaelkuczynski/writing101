@@ -173,13 +173,10 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
             {/* Dynamic Content Sections */}
             {tractatusContent.sections.map((section) => (
               <section key={section.id} id={section.id} className="mb-12">
-                <h2 className="text-2xl font-georgia font-bold text-foreground mb-4">
-                  {section.title}
-                </h2>
                 <div 
                   className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
                   dangerouslySetInnerHTML={{ 
-                    __html: processContentForMathMode(section.content)
+                    __html: processContentForMathMode(section.content) 
                   }}
                 />
               </section>

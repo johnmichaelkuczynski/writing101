@@ -147,3 +147,12 @@
   color: hsl(221, 83%, 53%);
   font-weight: 600;
 }
+
+/* Dictionary HTML content styling */
+.document-content p {
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+  font-family: Georgia, serif;
+  text-align: justify;
+  text-indent: 0;
+}
