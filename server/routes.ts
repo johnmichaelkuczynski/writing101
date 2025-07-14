@@ -454,7 +454,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { generatePassageExplanation } = await import("./services/ai-models");
-      const explanation = await generatePassageExplanation(model, passage);
+      let explanation = await generatePassageExplanation(model, passage);
+      
+      // For unregistered users, truncate response and add upgrade prompt
+      if (!req.isAuthenticated()) {
+        const words = explanation.split(' ');
+        if (words.length > 200) {
+          explanation = words.slice(0, 200).join(' ') + '... [Response truncated - register for full access and unlimited AI features]';
+        }
+      }
       
       res.json({ explanation });
     } catch (error) {
@@ -471,8 +479,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Missing required fields: message, passage, model" });
       }
 
+      // Check authentication and credits for registered users
+      if (req.isAuthenticated()) {
+        const user = req.user;
+        const tokensNeeded = Math.ceil((message.length + passage.length) / 4);
+        
+        if (user.credits < tokensNeeded) {
+          return res.status(402).json({ 
+            error: "Insufficient credits",
+            creditsNeeded: tokensNeeded,
+            currentCredits: user.credits
+          });
+        }
+        
+        // Deduct credits
+        await storage.updateUserCredits(user.id, user.credits - tokensNeeded);
+      }
+
       const { generatePassageDiscussionResponse } = await import("./services/ai-models");
-      const response = await generatePassageDiscussionResponse(model, message, passage, conversationHistory || []);
+      let response = await generatePassageDiscussionResponse(model, message, passage, conversationHistory || []);
+      
+      // For unregistered users, truncate response and add upgrade prompt
+      if (!req.isAuthenticated()) {
+        const words = response.split(' ');
+        if (words.length > 200) {
+          response = words.slice(0, 200).join(' ') + '... [Response truncated - register for full access and unlimited AI features]';
+        }
+      }
       
       res.json({ response });
     } catch (error) {
