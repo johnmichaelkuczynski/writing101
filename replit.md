@@ -365,3 +365,13 @@ Preferred communication style: Simple, everyday language.
   - Complete alphabetical listing provides instant access to any philosophical term or concept
   - FIXED navigation panel scrolling issue with proper flexbox layout and ScrollArea height constraints
   - Users can now scroll through entire dictionary entry list beyond "Causal series" to access all terms
+- July 14, 2025: FREEMIUM MODEL IMPLEMENTATION - Proper preview functionality with real AI content
+  - FIXED premium feature access to provide REAL previews instead of blocking entirely
+  - Quiz generation: Shows first 10 lines of actual generated quiz + preview message
+  - Study guide: Shows first 15 lines of actual generated study guide + preview message
+  - Rewrite: Shows first 150 words of actual rewrite + preview message
+  - Passage discussion: Allows 3 full exchanges, then truncates responses with preview message
+  - Chat interface: Completely blocked for users without tokens (0 messages allowed)
+  - Document access: Limited to 20% of content (2 sections out of ~10 total) for users without tokens
+  - Users see quality of AI generation to encourage token purchases for full access
+  - All premium features generate real content but show truncated versions as previews

@@ -77,26 +77,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rewrite endpoint
   app.post("/api/rewrite", async (req, res) => {
     try {
-      // Check user authentication and token status for premium features
-      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
-      if (!user || user.tokens === 0) {
-        return res.status(403).json({ error: "This feature requires tokens. Please purchase tokens to continue." });
-      }
-      
       const { originalText, instructions, model, chunkIndex, parentRewriteId } = rewriteRequestSchema.parse(req.body);
       
-      const rewrittenText = await generateRewrite(model, originalText, instructions);
+      // Check user authentication and token status
+      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
+      const isPreviewMode = !user || user.tokens === 0;
+      
+      // Generate the full rewrite
+      const fullRewrittenText = await generateRewrite(model, originalText, instructions);
+      
+      // For preview users, truncate the rewrite content
+      let displayText = fullRewrittenText;
+      
+      if (isPreviewMode) {
+        const words = fullRewrittenText.split(' ');
+        const previewWords = words.slice(0, 150); // Show first 150 words
+        displayText = previewWords.join(' ') + '...\n\n[PREVIEW - Purchase tokens to see complete rewrite]';
+      }
       
       const rewrite = await storage.createRewrite({
         originalText,
-        rewrittenText,
+        rewrittenText: displayText,
         instructions,
         model,
         chunkIndex,
         parentRewriteId,
       });
       
-      res.json({ rewrite });
+      res.json({ 
+        rewrite: {
+          ...rewrite,
+          isPreview: isPreviewMode
+        }
+      });
     } catch (error) {
       console.error("Rewrite error:", error);
       res.status(500).json({ error: error.message });
@@ -201,16 +214,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Missing required fields: message, passage, model" });
       }
 
-      // Check user authentication and token status for premium features
+      // Check user authentication and token status
       const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
-      if (!user || user.tokens === 0) {
-        return res.status(403).json({ error: "This feature requires tokens. Please purchase tokens to continue." });
-      }
+      const isPreviewMode = !user || user.tokens === 0;
 
       const { generatePassageDiscussionResponse } = await import("./services/ai-models");
-      const response = await generatePassageDiscussionResponse(model, message, passage, conversationHistory || []);
+      const fullResponse = await generatePassageDiscussionResponse(model, message, passage, conversationHistory || []);
       
-      res.json({ response });
+      // For preview users, truncate after 3 exchanges
+      let displayResponse = fullResponse;
+      
+      if (isPreviewMode && conversationHistory && conversationHistory.length >= 6) {
+        const sentences = fullResponse.split('. ');
+        const previewSentences = sentences.slice(0, 2);
+        displayResponse = previewSentences.join('. ') + '...\n\n[PREVIEW - Purchase tokens for unlimited discussion]';
+      }
+      
+      res.json({ 
+        response: displayResponse,
+        isPreview: isPreviewMode && conversationHistory && conversationHistory.length >= 6
+      });
     } catch (error) {
       console.error("Passage discussion error:", error);
       res.status(500).json({ error: "Failed to generate discussion response" });
@@ -220,21 +243,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Quiz generation endpoint
   app.post("/api/quiz", async (req, res) => {
     try {
-      // Check user authentication and token status for premium features
-      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
-      if (!user || user.tokens === 0) {
-        return res.status(403).json({ error: "This feature requires tokens. Please purchase tokens to continue." });
-      }
-      
       const { sourceText, instructions, model, includeAnswerKey, chunkIndex } = quizRequestSchema.parse(req.body);
       
+      // Check user authentication and token status
+      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
+      const isPreviewMode = !user || user.tokens === 0;
+      
+      // Generate the full quiz content
       const result = await generateQuiz(model, sourceText, instructions, includeAnswerKey);
+      
+      // For preview users, truncate the quiz content to show first few questions
+      let displayContent = result.testContent;
+      let displayAnswerKey = result.answerKey;
+      
+      if (isPreviewMode) {
+        const lines = result.testContent.split('\n');
+        const previewLines = lines.slice(0, 10); // Show first 10 lines
+        displayContent = previewLines.join('\n') + '\n\n[PREVIEW - Purchase tokens to see complete quiz with all questions]';
+        displayAnswerKey = null; // No answer key in preview
+      }
       
       const quiz = await storage.createQuiz({
         sourceText,
         instructions,
-        testContent: result.testContent,
-        answerKey: result.answerKey || null,
+        testContent: displayContent,
+        answerKey: displayAnswerKey,
         model,
         chunkIndex: chunkIndex || null
       });
@@ -243,7 +276,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         id: quiz.id,
         testContent: quiz.testContent,
         answerKey: quiz.answerKey,
-        timestamp: quiz.timestamp
+        timestamp: quiz.timestamp,
+        isPreview: isPreviewMode
       });
     } catch (error) {
       console.error("Quiz generation error:", error);
@@ -265,20 +299,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Study guide generation endpoint
   app.post("/api/study-guide", async (req, res) => {
     try {
-      // Check user authentication and token status for premium features
-      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
-      if (!user || user.tokens === 0) {
-        return res.status(403).json({ error: "This feature requires tokens. Please purchase tokens to continue." });
-      }
-      
       const { sourceText, instructions, model, chunkIndex } = studyGuideRequestSchema.parse(req.body);
       
+      // Check user authentication and token status
+      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
+      const isPreviewMode = !user || user.tokens === 0;
+      
+      // Generate the full study guide content
       const result = await generateStudyGuide(model, sourceText, instructions);
+      
+      // For preview users, truncate the study guide content
+      let displayContent = result.guideContent;
+      
+      if (isPreviewMode) {
+        const lines = result.guideContent.split('\n');
+        const previewLines = lines.slice(0, 15); // Show first 15 lines
+        displayContent = previewLines.join('\n') + '\n\n[PREVIEW - Purchase tokens to see complete study guide with all sections]';
+      }
       
       const studyGuide = await storage.createStudyGuide({
         sourceText,
         instructions,
-        guideContent: result.guideContent,
+        guideContent: displayContent,
         model,
         chunkIndex: chunkIndex || null
       });
@@ -286,7 +328,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ 
         id: studyGuide.id,
         guideContent: studyGuide.guideContent,
-        timestamp: studyGuide.timestamp
+        timestamp: studyGuide.timestamp,
+        isPreview: isPreviewMode
       });
     } catch (error) {
       console.error("Study guide generation error:", error);
