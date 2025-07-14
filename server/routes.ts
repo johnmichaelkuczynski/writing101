@@ -6,7 +6,8 @@ import { getFullDocumentContent } from "./services/document-processor";
 import { sendEmail } from "./services/email-service";
 import { generatePDF } from "./services/pdf-generator";
 import { transcribeAudio } from "./services/speech-service";
-import { chatRequestSchema, instructionRequestSchema, emailRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, type AIModel } from "@shared/schema";
+import { chatRequestSchema, instructionRequestSchema, emailRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, registerRequestSchema, loginRequestSchema, type AIModel } from "@shared/schema";
+import { AuthService } from "./services/auth-service";
 import multer from "multer";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -294,6 +295,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get quiz error:", error);
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Authentication routes
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const request = registerRequestSchema.parse(req.body);
+      const result = await AuthService.register(request);
+      
+      if (!result.success) {
+        return res.status(400).json({ error: result.error });
+      }
+      
+      // Set session cookie
+      res.cookie('sessionId', result.session.id, { 
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+      });
+      
+      res.json({ user: { id: result.user.id, username: result.user.username, tokens: result.user.tokens } });
+    } catch (error) {
+      console.error("Registration error:", error);
+      res.status(500).json({ error: "Registration failed" });
+    }
+  });
+
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const request = loginRequestSchema.parse(req.body);
+      const result = await AuthService.login(request);
+      
+      if (!result.success) {
+        return res.status(400).json({ error: result.error });
+      }
+      
+      // Set session cookie
+      res.cookie('sessionId', result.session.id, { 
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+      });
+      
+      res.json({ user: { id: result.user.id, username: result.user.username, tokens: result.user.tokens } });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ error: "Login failed" });
+    }
+  });
+
+  app.post("/api/auth/logout", async (req, res) => {
+    try {
+      const sessionId = req.cookies.sessionId;
+      if (sessionId) {
+        await AuthService.logout(sessionId);
+      }
+      res.clearCookie('sessionId');
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Logout error:", error);
+      res.status(500).json({ error: "Logout failed" });
+    }
+  });
+
+  app.get("/api/auth/me", async (req, res) => {
+    try {
+      const sessionId = req.cookies?.sessionId;
+      if (!sessionId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      const user = await AuthService.validateSession(sessionId);
+      
+      if (!user) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      res.json({ user: { id: user.id, username: user.username, tokens: user.tokens } });
+    } catch (error) {
+      console.error("Auth check error:", error);
+      res.status(500).json({ error: "Authentication check failed" });
     }
   });
 

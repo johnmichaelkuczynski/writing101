@@ -5,8 +5,10 @@ import { renderMathInElement, renderMathString } from "@/lib/math-renderer";
 import { useTextSelection } from "@/hooks/use-text-selection";
 import SelectionToolbar from "@/components/selection-toolbar";
 import ChunkingModal from "@/components/chunking-modal";
+import UpgradeWall from "@/components/upgrade-wall";
+import { useAuth } from "@/contexts/auth-context";
 import { tractatusContent } from "@shared/tractatus-content";
-import { Copy } from "lucide-react";
+import { Copy, Lock } from "lucide-react";
 
 interface DocumentContentProps {
   mathMode?: boolean;
@@ -22,6 +24,8 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
   const { selection, isSelecting, clearSelection, highlightSelection, removeHighlights } = useTextSelection();
   const [showChunkingModal, setShowChunkingModal] = useState(false);
   const [selectedTextForChunking, setSelectedTextForChunking] = useState("");
+  const [showUpgradeWall, setShowUpgradeWall] = useState(false);
+  const { isAuthenticated, canAccessContent } = useAuth();
 
   // Math rendering is handled in processContentForMathMode function
 
@@ -186,16 +190,49 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
             </header>
 
             {/* Dynamic Content Sections */}
-            {tractatusContent.sections.map((section) => (
-              <section key={section.id} id={section.id} className="mb-12">
-                <div 
-                  className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
-                  dangerouslySetInnerHTML={{ 
-                    __html: processContentForMathMode(section.content) 
-                  }}
-                />
-              </section>
-            ))}
+            {tractatusContent.sections.map((section, index) => {
+              // Show only first 5 sections for non-authenticated users
+              const canViewSection = isAuthenticated || index < 5;
+              
+              if (!canViewSection) {
+                return null; // Don't render restricted sections
+              }
+              
+              return (
+                <section key={section.id} id={section.id} className="mb-12">
+                  <div 
+                    className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
+                    dangerouslySetInnerHTML={{ 
+                      __html: processContentForMathMode(section.content) 
+                    }}
+                  />
+                </section>
+              );
+            })}
+            
+            {/* Upgrade Wall for non-authenticated users */}
+            {!isAuthenticated && (
+              <div className="mt-16 text-center py-12 px-8 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg border-2 border-dashed border-blue-300">
+                <div className="max-w-md mx-auto">
+                  <Lock className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                    Continue Reading
+                  </h3>
+                  <p className="text-gray-700 mb-6">
+                    You've reached the preview limit. Create a free account to access the complete Dictionary of Analytic Philosophy plus premium AI features.
+                  </p>
+                  <Button 
+                    onClick={() => setShowUpgradeWall(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold"
+                  >
+                    Unlock Full Access
+                  </Button>
+                  <p className="text-sm text-gray-600 mt-3">
+                    Join thousands exploring philosophical masterworks with AI-powered insights
+                  </p>
+                </div>
+              </div>
+            )}
           </article>
         </div>
       </ScrollArea>
@@ -234,6 +271,13 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
             onRewriteFromSelection(chunk);
           }
         }}
+      />
+      
+      {/* Upgrade Wall Modal */}
+      <UpgradeWall
+        isOpen={showUpgradeWall}
+        onClose={() => setShowUpgradeWall(false)}
+        trigger="page_limit"
       />
     </div>
   );
