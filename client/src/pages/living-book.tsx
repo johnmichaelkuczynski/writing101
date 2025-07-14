@@ -18,7 +18,7 @@ import { tractatusContent, getFullDocumentContent } from "@shared/tractatus-cont
 import type { AIModel } from "@shared/schema";
 
 export default function LivingBook() {
-  const [selectedModel, setSelectedModel] = useState<AIModel>("deepseek");
+  const [selectedModel, setSelectedModel] = useState<AIModel>("openai");
   const [mathMode, setMathMode] = useState<boolean>(true);
   const [questionFromSelection, setQuestionFromSelection] = useState<string>("");
   const [selectedTextForChat, setSelectedTextForChat] = useState<string>("");
