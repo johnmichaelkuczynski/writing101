@@ -57,7 +57,7 @@ const CheckoutForm = ({ onSuccess }: { onSuccess: () => void }) => {
         disabled={!stripe || isLoading}
         className="w-full"
       >
-        {isLoading ? "Processing..." : "Pay 1¢ for 10 Tokens"}
+        {isLoading ? "Processing..." : "Complete Payment"}
       </Button>
     </form>
   );
@@ -66,7 +66,7 @@ const CheckoutForm = ({ onSuccess }: { onSuccess: () => void }) => {
 export default function Checkout() {
   const [clientSecret, setClientSecret] = useState("");
   const [upgradeOptions, setUpgradeOptions] = useState([]);
-  const [selectedAmount, setSelectedAmount] = useState(0.01);
+  const [selectedAmount, setSelectedAmount] = useState(0.50);
 
   useEffect(() => {
     // Get upgrade options
