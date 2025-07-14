@@ -365,3 +365,10 @@ Preferred communication style: Simple, everyday language.
   - Complete alphabetical listing provides instant access to any philosophical term or concept
   - FIXED navigation panel scrolling issue with proper flexbox layout and ScrollArea height constraints
   - Users can now scroll through entire dictionary entry list beyond "Causal series" to access all terms
+- July 14, 2025: FREEMIUM PAYWALL POSITIONING OPTIMIZATION - Early unlock prompt placement
+  - REPOSITIONED "Unlock Full Access" prompt to appear after "axiom of comprehension" entry
+  - Changed from showing 3 full sections to showing only 4 dictionary entries before paywall
+  - Unregistered users now see: Algorithm, Axiom, Axiom (second definition), Axiom of comprehension, then paywall
+  - Earlier paywall placement increases conversion potential while providing meaningful content preview
+  - Maintains AI response limitations (200-word previews) and export restrictions for guests
+  - Registered users continue to access complete dictionary and full AI functionality
