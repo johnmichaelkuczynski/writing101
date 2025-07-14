@@ -25,7 +25,7 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
   const [showChunkingModal, setShowChunkingModal] = useState(false);
   const [selectedTextForChunking, setSelectedTextForChunking] = useState("");
   const [showUpgradeWall, setShowUpgradeWall] = useState(false);
-  const { isAuthenticated, canAccessContent } = useAuth();
+  const { user, isAuthenticated, canAccessContent } = useAuth();
 
   // Math rendering is handled in processContentForMathMode function
 
@@ -189,13 +189,41 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
               </p>
             </header>
 
-            {/* Dynamic Content Sections */}
+            {/* Dynamic Content Sections with Paywall */}
             {tractatusContent.sections.map((section, index) => {
-              // Show only first 5 sections for non-authenticated users
-              const canViewSection = isAuthenticated || index < 5;
+              // Calculate 20% of sections (about 2 sections out of ~10 total)
+              const freeContentLimit = Math.max(1, Math.floor(tractatusContent.sections.length * 0.2));
+              const hasTokens = user?.tokens > 0;
               
-              if (!canViewSection) {
-                return null; // Don't render restricted sections
+              // Show upgrade wall after free content for users without tokens
+              if (!hasTokens && index === freeContentLimit) {
+                return (
+                  <div key="upgrade-wall" className="mt-16 text-center py-12 px-8 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg border-2 border-dashed border-blue-300">
+                    <div className="max-w-md mx-auto">
+                      <Lock className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+                      <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                        Continue Reading
+                      </h3>
+                      <p className="text-gray-700 mb-6">
+                        You've reached the 20% preview limit. Purchase tokens to access the complete Dictionary of Analytic Philosophy plus premium AI features.
+                      </p>
+                      <Button 
+                        onClick={() => setShowUpgradeWall(true)}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold"
+                      >
+                        Unlock Full Access
+                      </Button>
+                      <p className="text-sm text-gray-600 mt-3">
+                        Purchase tokens for complete access and AI-powered features
+                      </p>
+                    </div>
+                  </div>
+                );
+              }
+              
+              // Don't render sections beyond free limit for users without tokens
+              if (!hasTokens && index >= freeContentLimit) {
+                return null;
               }
               
               return (
@@ -209,30 +237,6 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
                 </section>
               );
             })}
-            
-            {/* Upgrade Wall for non-authenticated users */}
-            {!isAuthenticated && (
-              <div className="mt-16 text-center py-12 px-8 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg border-2 border-dashed border-blue-300">
-                <div className="max-w-md mx-auto">
-                  <Lock className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                    Continue Reading
-                  </h3>
-                  <p className="text-gray-700 mb-6">
-                    You've reached the preview limit. Create a free account to access the complete Dictionary of Analytic Philosophy plus premium AI features.
-                  </p>
-                  <Button 
-                    onClick={() => setShowUpgradeWall(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold"
-                  >
-                    Unlock Full Access
-                  </Button>
-                  <p className="text-sm text-gray-600 mt-3">
-                    Join thousands exploring philosophical masterworks with AI-powered insights
-                  </p>
-                </div>
-              </div>
-            )}
           </article>
         </div>
       </ScrollArea>

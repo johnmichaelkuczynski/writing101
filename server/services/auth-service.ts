@@ -23,7 +23,7 @@ export class AuthService {
       // Hash password
       const passwordHash = await bcrypt.hash(request.password, 10);
 
-      // Create user
+      // Create user with 0 tokens - they need to purchase to access premium features
       const user = await storage.createUser({
         username: request.username,
         email: request.email || null,

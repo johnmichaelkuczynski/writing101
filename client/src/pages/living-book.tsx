@@ -302,6 +302,7 @@ export default function LivingBook() {
             mathMode={mathMode}
             selectedText={selectedTextForChat}
             onSelectedTextUsed={() => setSelectedTextForChat("")}
+            onUpgradeWallTrigger={() => setShowUpgradeWall(true)}
           />
         </div>
       </div>

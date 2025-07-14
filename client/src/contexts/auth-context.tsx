@@ -58,8 +58,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return ["chat_preview", "text_selection", "basic_navigation"].includes(feature);
     }
     
-    // Registered users can access all features if they have tokens
-    return user.tokens > 0;
+    // Registered users need tokens for premium features
+    const premiumFeatures = ["rewrite", "quiz", "study_guide", "passage_discussion", "unlimited_chat"];
+    if (premiumFeatures.includes(feature)) {
+      return user.tokens > 0;
+    }
+    
+    // Basic features available to all registered users
+    return true;
   };
 
   const canAccessContent = (pageNumber?: number): boolean => {

@@ -4,10 +4,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { MessageCircle, Send, Bot, User, Download, Mail, Copy, Printer } from "lucide-react";
+import { MessageCircle, Send, Bot, User, Download, Mail, Copy, Printer, Lock } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/auth-context";
 import { copyToClipboard, downloadPDF, emailContent } from "@/lib/export-utils";
 import { renderMathInElement, renderMathString } from "@/lib/math-renderer";
 import type { AIModel, ChatMessage } from "@shared/schema";
@@ -17,14 +18,16 @@ interface ChatInterfaceProps {
   mathMode?: boolean;
   selectedText?: string;
   onSelectedTextUsed?: () => void;
+  onUpgradeWallTrigger?: () => void;
 }
 
-export default function ChatInterface({ selectedModel, mathMode = true, selectedText, onSelectedTextUsed }: ChatInterfaceProps) {
+export default function ChatInterface({ selectedModel, mathMode = true, selectedText, onSelectedTextUsed, onUpgradeWallTrigger }: ChatInterfaceProps) {
   const [message, setMessage] = useState("");
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [emailAddress, setEmailAddress] = useState("");
   const [contentToEmail, setContentToEmail] = useState("");
   const { toast } = useToast();
+  const { user, canAccessFeature } = useAuth();
 
   const { data: chatHistory = [], refetch } = useQuery({
     queryKey: ["/api/chat/history"],
@@ -116,6 +119,32 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
+    
+    // Check chat limits - free users get 0 messages (only previews)
+    if (!user) {
+      toast({
+        title: "Chat Feature Requires Account", 
+        description: "Create a free account to access chat functionality.",
+        variant: "destructive",
+      });
+      if (onUpgradeWallTrigger) {
+        onUpgradeWallTrigger();
+      }
+      return;
+    }
+    
+    // Check chat limits for users without tokens  
+    if (user && !canAccessFeature("unlimited_chat")) {
+      toast({
+        title: "Chat Feature Requires Tokens",
+        description: "Purchase tokens for AI chat conversations.", 
+        variant: "destructive",
+      });
+      if (onUpgradeWallTrigger) {
+        onUpgradeWallTrigger();
+      }
+      return;
+    }
     
     let finalMessage = message.trim();
     

@@ -77,6 +77,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rewrite endpoint
   app.post("/api/rewrite", async (req, res) => {
     try {
+      // Check user authentication and token status for premium features
+      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
+      if (!user || user.tokens === 0) {
+        return res.status(403).json({ error: "This feature requires tokens. Please purchase tokens to continue." });
+      }
+      
       const { originalText, instructions, model, chunkIndex, parentRewriteId } = rewriteRequestSchema.parse(req.body);
       
       const rewrittenText = await generateRewrite(model, originalText, instructions);
@@ -195,6 +201,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Missing required fields: message, passage, model" });
       }
 
+      // Check user authentication and token status for premium features
+      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
+      if (!user || user.tokens === 0) {
+        return res.status(403).json({ error: "This feature requires tokens. Please purchase tokens to continue." });
+      }
+
       const { generatePassageDiscussionResponse } = await import("./services/ai-models");
       const response = await generatePassageDiscussionResponse(model, message, passage, conversationHistory || []);
       
@@ -208,6 +220,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Quiz generation endpoint
   app.post("/api/quiz", async (req, res) => {
     try {
+      // Check user authentication and token status for premium features
+      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
+      if (!user || user.tokens === 0) {
+        return res.status(403).json({ error: "This feature requires tokens. Please purchase tokens to continue." });
+      }
+      
       const { sourceText, instructions, model, includeAnswerKey, chunkIndex } = quizRequestSchema.parse(req.body);
       
       const result = await generateQuiz(model, sourceText, instructions, includeAnswerKey);
@@ -247,6 +265,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Study guide generation endpoint
   app.post("/api/study-guide", async (req, res) => {
     try {
+      // Check user authentication and token status for premium features
+      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
+      if (!user || user.tokens === 0) {
+        return res.status(403).json({ error: "This feature requires tokens. Please purchase tokens to continue." });
+      }
+      
       const { sourceText, instructions, model, chunkIndex } = studyGuideRequestSchema.parse(req.body);
       
       const result = await generateStudyGuide(model, sourceText, instructions);
