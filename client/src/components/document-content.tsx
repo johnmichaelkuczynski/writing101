@@ -189,54 +189,47 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
             </header>
 
             {/* Dynamic Content Sections */}
-            {user ? (
-              // Registered users see all content
-              tractatusContent.sections.map((section) => (
-                <section key={section.id} id={section.id} className="mb-12">
+            {tractatusContent.sections.map((section, sectionIndex) => (
+              <section key={section.id} id={section.id} className="mb-12">
+                {sectionIndex === 0 && !user ? (
+                  // For unregistered users, show content up to axiom of comprehension, then paywall
+                  <>
+                    <div 
+                      className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
+                      dangerouslySetInnerHTML={{ 
+                        __html: processContentForMathMode(section.content.split('<p class="dictionary-entry"><strong>Axiom of extensionality:</strong>')[0] + 
+                        '<p class="dictionary-entry"><strong>The axiom of comprehension:</strong> This is the principle that, given any property, there is a set containing all and only those objects that have that property. There is a set containing all and only those things that are people (i.e., that have the property of being a person). There\'s a set containing all and only those things that are acorns (i.e., that have the property of being an acorn). And so on. The axiom of comprehension seems self-evident. But Bertrand Russell discovered that it has self-contradictory consequences and is therefore false. The set of people is not a member of itself, since no person is a set. But some sets do seem to be members of themselves. The set of sets would seem to be such a set.</p>')
+                      }}
+                    />
+                    
+                    {/* Freemium Paywall - Positioned after axiom of comprehension */}
+                    <div className="bg-gradient-to-t from-background via-background/90 to-transparent p-8 border border-border rounded-lg shadow-lg text-center mb-12">
+                      <Lock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                      <h3 className="text-xl font-semibold mb-3">Unlock Full Access</h3>
+                      <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                        You've seen the first 5 pages. Register now to access the complete Dictionary of Analytic Philosophy with full AI features and unlimited content.
+                      </p>
+                      <div className="space-y-3">
+                        <Button asChild size="lg" className="w-48">
+                          <Link href="/auth">Sign Up for Free</Link>
+                        </Button>
+                        <p className="text-sm text-muted-foreground">
+                          Already have an account? <Link href="/auth" className="text-primary hover:underline">Sign in</Link>
+                        </p>
+                      </div>
+                    </div>
+                  </>
+                ) : user || sectionIndex > 0 ? (
+                  // For registered users or sections after the first, show full content
                   <div 
                     className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
                     dangerouslySetInnerHTML={{ 
                       __html: processContentForMathMode(section.content) 
                     }}
                   />
-                </section>
-              ))
-            ) : (
-              // Unregistered users see truncated content with paywall after axiom of comprehension
-              <>
-                <section key="fundamentals-preview" id="fundamentals" className="mb-12">
-                  <div 
-                    className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
-                    dangerouslySetInnerHTML={{ 
-                      __html: processContentForMathMode(`<p class="dictionary-entry"><strong>Algorithm:</strong> A fixed procedure for carrying out a task. The rules that we learn in grade school to multiply, add, etc., multi-digit numbers are algorithms. By formalizing inferences, logicians create algorithms for determining whether, given two statements, one of them follows from the other. A problem with algorithms is that what one has to know in order to know whether a given algorithm is applicable to a given task is often much heftier than what one would have to know to carry out that task in an ad hoc manner. In this fact lies the doom of attempts to algorithmize—or, to use the more popular term—"mechanize" thought.</p>
-
-<p class="dictionary-entry"><strong>Axiom:</strong> A statement that, in some context, is assumed to be true and therefore isn't argued for.</p>
-
-<p class="dictionary-entry"><strong>Axiom (second definition):</strong> A statement-form that, in some context, is assumed to have a true interpretation. See "interpretation."</p>
-
-<p class="dictionary-entry"><strong>The axiom of comprehension:</strong> This is the principle that, given any property, there is a set containing all and only those objects that have that property. There is a set containing all and only those things that are people (i.e., that have the property of being a person). There's a set containing all and only those things that are acorns (i.e., that have the property of being an acorn). And so on. The axiom of comprehension seems self-evident. But Bertrand Russell discovered that it has self-contradictory consequences and is therefore false. The set of people is not a member of itself, since no person is a set. But some sets do seem to be members of themselves. The set of sets would seem to be such a set.</p>`) 
-                    }}
-                  />
-                </section>
-                
-                {/* Freemium Paywall for Unregistered Users - Positioned after axiom of comprehension */}
-                <div className="bg-gradient-to-t from-background via-background/90 to-transparent p-8 border border-border rounded-lg shadow-lg text-center mb-12">
-                  <Lock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-xl font-semibold mb-3">Unlock Full Access</h3>
-                  <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                    You've seen the first 5 pages. Register now to access the complete Dictionary of Analytic Philosophy with full AI features and unlimited content.
-                  </p>
-                  <div className="space-y-3">
-                    <Button asChild size="lg" className="w-48">
-                      <Link href="/auth">Sign Up for Free</Link>
-                    </Button>
-                    <p className="text-sm text-muted-foreground">
-                      Already have an account? <Link href="/auth" className="text-primary hover:underline">Sign in</Link>
-                    </p>
-                  </div>
-                </div>
-              </>
-            )}
+                ) : null}
+              </section>
+            ))}
           </article>
         </div>
       </ScrollArea>
