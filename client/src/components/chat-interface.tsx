@@ -4,12 +4,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { MessageCircle, Send, Bot, User, Download, Mail, Copy, Printer } from "lucide-react";
+import { MessageCircle, Send, Bot, User, Download, Mail, Copy, Printer, Lock, CreditCard } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 import { copyToClipboard, downloadPDF, emailContent } from "@/lib/export-utils";
 import { renderMathInElement, renderMathString } from "@/lib/math-renderer";
+import { Link } from "wouter";
 import type { AIModel, ChatMessage } from "@shared/schema";
 
 interface ChatInterfaceProps {
@@ -20,6 +22,7 @@ interface ChatInterfaceProps {
 }
 
 export default function ChatInterface({ selectedModel, mathMode = true, selectedText, onSelectedTextUsed }: ChatInterfaceProps) {
+  const { user } = useAuth();
   const [message, setMessage] = useState("");
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
   const [emailAddress, setEmailAddress] = useState("");
@@ -52,10 +55,24 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
     return content;
   };
 
+  // Function to truncate response for preview (freemium limitation)
+  const truncateForPreview = (content: string, isPreview: boolean) => {
+    if (!user && isPreview) {
+      const words = content.split(/\s+/);
+      if (words.length > 50) { // ~200 characters = ~50 words
+        return words.slice(0, 50).join(' ') + '...';
+      }
+    }
+    return content;
+  };
+
   // Function to render markdown-style text
-  const renderMessageContent = (content: string) => {
-    // Process content based on math mode first
-    const processedContent = processContentForMathMode(content);
+  const renderMessageContent = (content: string, isPreview: boolean = false) => {
+    // Apply freemium truncation first
+    const truncatedContent = truncateForPreview(content, isPreview);
+    
+    // Process content based on math mode
+    const processedContent = processContentForMathMode(truncatedContent);
     
     // If math mode is enabled, process LaTeX notation
     let mathProcessedContent = processedContent;
@@ -269,47 +286,71 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
                       <div className="flex-1">
                         <div 
                           className={`text-lg text-foreground prose prose-lg max-w-none chat-response ${mathMode ? 'math-enabled' : 'math-disabled'}`}
-                          dangerouslySetInnerHTML={renderMessageContent(chat.response)}
+                          dangerouslySetInnerHTML={renderMessageContent(chat.response, chat.isPreview || false)}
                         />
-                        {/* Export Controls */}
-                        <div className="flex items-center space-x-2 mt-3 pt-2 border-t border-blue-200">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handlePrintResponse(chat.response)}
-                            className="text-xs text-blue-600 hover:text-blue-800 p-1 h-auto"
-                          >
-                            <Printer className="w-3 h-3 mr-1" />
-                            Print/PDF
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDownloadPDF(chat.response)}
-                            className="text-xs text-blue-600 hover:text-blue-800 p-1 h-auto"
-                          >
-                            <Download className="w-3 h-3 mr-1" />
-                            Save PDF
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => openEmailDialog(chat.response)}
-                            className="text-xs text-blue-600 hover:text-blue-800 p-1 h-auto"
-                          >
-                            <Mail className="w-3 h-3 mr-1" />
-                            Email
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleCopy(chat.response)}
-                            className="text-xs text-blue-600 hover:text-blue-800 p-1 h-auto"
-                          >
-                            <Copy className="w-3 h-3 mr-1" />
-                            Copy
-                          </Button>
-                        </div>
+                        
+                        {/* Freemium Upgrade Prompt for Preview Responses */}
+                        {!user && chat.isPreview && (
+                          <div className="mt-3 p-3 bg-gradient-to-r from-orange-50 to-blue-50 border border-orange-200 rounded-lg">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <Lock className="w-4 h-4 text-orange-600" />
+                              <span className="text-sm font-medium text-orange-800">Preview Response</span>
+                            </div>
+                            <p className="text-xs text-gray-600 mb-3">
+                              This is a 200-word preview. Register for free to get complete AI responses and full access to all features.
+                            </p>
+                            <div className="flex space-x-2">
+                              <Button asChild size="sm" className="text-xs">
+                                <Link href="/auth">Sign Up Free</Link>
+                              </Button>
+                              <Button asChild variant="outline" size="sm" className="text-xs">
+                                <Link href="/credits">Buy Credits</Link>
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Export Controls - Only for registered users */}
+                        {user && (
+                          <div className="flex items-center space-x-2 mt-3 pt-2 border-t border-blue-200">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handlePrintResponse(chat.response)}
+                              className="text-xs text-blue-600 hover:text-blue-800 p-1 h-auto"
+                            >
+                              <Printer className="w-3 h-3 mr-1" />
+                              Print/PDF
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDownloadPDF(chat.response)}
+                              className="text-xs text-blue-600 hover:text-blue-800 p-1 h-auto"
+                            >
+                              <Download className="w-3 h-3 mr-1" />
+                              Save PDF
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => openEmailDialog(chat.response)}
+                              className="text-xs text-blue-600 hover:text-blue-800 p-1 h-auto"
+                            >
+                              <Mail className="w-3 h-3 mr-1" />
+                              Email
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleCopy(chat.response)}
+                              className="text-xs text-blue-600 hover:text-blue-800 p-1 h-auto"
+                            >
+                              <Copy className="w-3 h-3 mr-1" />
+                              Copy
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
