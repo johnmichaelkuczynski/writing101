@@ -191,12 +191,12 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
 
             {/* Dynamic Content Sections with Paywall */}
             {tractatusContent.sections.map((section, index) => {
-              // Calculate 20% of sections (about 2 sections out of ~10 total)
-              const freeContentLimit = Math.max(1, Math.floor(tractatusContent.sections.length * 0.2));
+              // Show paywall after first 2 sections (early middle of document)
+              const freeContentLimit = 2;
               const hasTokens = user?.tokens > 0;
               
-              // Show upgrade wall after free content for users without tokens
-              if (!hasTokens && index === freeContentLimit) {
+              // Show upgrade wall after free content (always show for now)
+              if (index === freeContentLimit) {
                 return (
                   <div key="upgrade-wall" className="mt-16 text-center py-12 px-8 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg border-2 border-dashed border-blue-300">
                     <div className="max-w-md mx-auto">
@@ -221,8 +221,8 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
                 );
               }
               
-              // Don't render sections beyond free limit for users without tokens
-              if (!hasTokens && index >= freeContentLimit) {
+              // Don't render sections beyond free limit
+              if (index >= freeContentLimit) {
                 return null;
               }
               
