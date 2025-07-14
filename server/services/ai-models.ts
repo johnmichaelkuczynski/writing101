@@ -585,7 +585,7 @@ Please provide a well-structured study guide that helps students understand and 
 
 async function generateDeepSeekResponse(prompt: string, systemPrompt: string): Promise<string> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
+  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
   
   try {
     const response = await fetch("https://api.deepseek.com/v1/chat/completions", {

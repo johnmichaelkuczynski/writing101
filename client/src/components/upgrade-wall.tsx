@@ -68,10 +68,8 @@ export default function UpgradeWall({ isOpen, onClose, trigger }: UpgradeWallPro
   };
 
   const handlePurchase = async (tierId: string) => {
-    toast({
-      title: "Purchase Feature",
-      description: "Stripe integration will be implemented here for token purchases.",
-    });
+    // Redirect to checkout page
+    window.location.href = '/checkout';
   };
 
   if (showAuth) {
@@ -207,7 +205,11 @@ export default function UpgradeWall({ isOpen, onClose, trigger }: UpgradeWallPro
         </div>
 
         <div className="flex gap-4 pt-6 border-t">
-          <Button onClick={() => setShowAuth(true)} className="flex-1">
+          <Button onClick={() => window.location.href = '/checkout'} className="flex-1 bg-green-600 hover:bg-green-700">
+            <Zap className="w-4 h-4 mr-2" />
+            Upgrade for 1¢
+          </Button>
+          <Button onClick={() => setShowAuth(true)} variant="outline" className="flex-1">
             <Crown className="w-4 h-4 mr-2" />
             Create Account
           </Button>
