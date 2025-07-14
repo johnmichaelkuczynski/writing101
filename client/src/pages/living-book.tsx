@@ -18,7 +18,7 @@ import StudyGuideModal from "@/components/study-guide-modal";
 import ChunkingModal from "@/components/chunking-modal";
 
 import { initializeMathRenderer } from "@/lib/math-renderer";
-import { tractatusContent, getFullDocumentContent } from "@shared/dictionary-content";
+import { tractatusContent, getFullDocumentContent } from "@shared/tractatus-content";
 import type { AIModel } from "@shared/schema";
 
 export default function LivingBook() {

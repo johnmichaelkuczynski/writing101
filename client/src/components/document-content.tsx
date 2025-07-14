@@ -6,7 +6,7 @@ import { useTextSelection } from "@/hooks/use-text-selection";
 import { useAuth } from "@/hooks/use-auth";
 import SelectionToolbar from "@/components/selection-toolbar";
 import ChunkingModal from "@/components/chunking-modal";
-import { tractatusContent } from "@shared/dictionary-content";
+import { tractatusContent } from "@shared/tractatus-content";
 import { Copy, Lock } from "lucide-react";
 import { Link } from "wouter";
 

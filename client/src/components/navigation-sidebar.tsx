@@ -1,5 +1,5 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { tractatusContent } from "@shared/dictionary-content";
+import { tractatusContent } from "@shared/tractatus-content";
 
 // Dictionary entries for navigation
 const dictionaryEntries = [
