@@ -1,152 +1,179 @@
-import { chatMessages, instructions, rewrites, quizzes, studyGuides, type ChatMessage, type InsertChatMessage, type Instruction, type InsertInstruction, type Rewrite, type InsertRewrite, type Quiz, type InsertQuiz, type StudyGuide, type InsertStudyGuide } from "@shared/schema";
+import { 
+  users, 
+  creditTransactions, 
+  storageUsage, 
+  chatMessages, 
+  instructions, 
+  rewrites, 
+  quizzes, 
+  studyGuides, 
+  type User, 
+  type InsertUser, 
+  type CreditTransaction, 
+  type InsertCreditTransaction, 
+  type StorageUsage, 
+  type InsertStorageUsage, 
+  type ChatMessage, 
+  type InsertChatMessage, 
+  type Instruction, 
+  type InsertInstruction, 
+  type Rewrite, 
+  type InsertRewrite, 
+  type Quiz, 
+  type InsertQuiz, 
+  type StudyGuide, 
+  type InsertStudyGuide 
+} from "@shared/schema";
+import { db } from "./db";
+import { eq, isNull } from "drizzle-orm";
 
 export interface IStorage {
+  // User authentication methods
+  createUser(user: InsertUser): Promise<User>;
+  getUserByUsername(username: string): Promise<User | null>;
+  getUserById(id: number): Promise<User | null>;
+  updateUserCredits(userId: number, credits: number): Promise<void>;
+  
+  // Credit transaction methods
+  createCreditTransaction(transaction: InsertCreditTransaction): Promise<CreditTransaction>;
+  getCreditTransactionsByUserId(userId: number): Promise<CreditTransaction[]>;
+  
+  // Storage usage methods
+  createStorageUsage(usage: InsertStorageUsage): Promise<StorageUsage>;
+  getStorageUsageByUserId(userId: number): Promise<StorageUsage[]>;
+  
+  // Content methods (now user-scoped)
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
-  getChatMessages(): Promise<ChatMessage[]>;
+  getChatMessagesByUserId(userId: number | null): Promise<ChatMessage[]>;
   createInstruction(instruction: InsertInstruction): Promise<Instruction>;
-  getInstructions(): Promise<Instruction[]>;
+  getInstructionsByUserId(userId: number | null): Promise<Instruction[]>;
   createRewrite(rewrite: InsertRewrite): Promise<Rewrite>;
-  getRewrites(): Promise<Rewrite[]>;
+  getRewritesByUserId(userId: number | null): Promise<Rewrite[]>;
   getRewriteById(id: number): Promise<Rewrite | null>;
   createQuiz(quiz: InsertQuiz): Promise<Quiz>;
-  getQuizzes(): Promise<Quiz[]>;
+  getQuizzesByUserId(userId: number | null): Promise<Quiz[]>;
   getQuizById(id: number): Promise<Quiz | null>;
   createStudyGuide(studyGuide: InsertStudyGuide): Promise<StudyGuide>;
-  getStudyGuides(): Promise<StudyGuide[]>;
+  getStudyGuidesByUserId(userId: number | null): Promise<StudyGuide[]>;
   getStudyGuideById(id: number): Promise<StudyGuide | null>;
 }
 
-export class MemStorage implements IStorage {
-  private chatMessages: Map<number, ChatMessage>;
-  private instructions: Map<number, Instruction>;
-  private rewrites: Map<number, Rewrite>;
-  private quizzes: Map<number, Quiz>;
-  private studyGuides: Map<number, StudyGuide>;
-  private currentChatId: number;
-  private currentInstructionId: number;
-  private currentRewriteId: number;
-  private currentQuizId: number;
-  private currentStudyGuideId: number;
-
-  constructor() {
-    this.chatMessages = new Map();
-    this.instructions = new Map();
-    this.rewrites = new Map();
-    this.quizzes = new Map();
-    this.studyGuides = new Map();
-    this.currentChatId = 1;
-    this.currentInstructionId = 1;
-    this.currentRewriteId = 1;
-    this.currentQuizId = 1;
-    this.currentStudyGuideId = 1;
+export class DatabaseStorage implements IStorage {
+  // User authentication methods
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
   }
 
+  async getUserByUsername(username: string): Promise<User | null> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || null;
+  }
+
+  async getUserById(id: number): Promise<User | null> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || null;
+  }
+
+  async updateUserCredits(userId: number, credits: number): Promise<void> {
+    await db.update(users).set({ credits }).where(eq(users.id, userId));
+  }
+
+  // Credit transaction methods
+  async createCreditTransaction(insertTransaction: InsertCreditTransaction): Promise<CreditTransaction> {
+    const [transaction] = await db.insert(creditTransactions).values(insertTransaction).returning();
+    return transaction;
+  }
+
+  async getCreditTransactionsByUserId(userId: number): Promise<CreditTransaction[]> {
+    return await db.select().from(creditTransactions).where(eq(creditTransactions.userId, userId));
+  }
+
+  // Storage usage methods
+  async createStorageUsage(insertUsage: InsertStorageUsage): Promise<StorageUsage> {
+    const [usage] = await db.insert(storageUsage).values(insertUsage).returning();
+    return usage;
+  }
+
+  async getStorageUsageByUserId(userId: number): Promise<StorageUsage[]> {
+    return await db.select().from(storageUsage).where(eq(storageUsage.userId, userId));
+  }
+
+  // Content methods (user-scoped)
   async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
-    const id = this.currentChatId++;
-    const message: ChatMessage = {
-      ...insertMessage,
-      id,
-      timestamp: new Date(),
-    };
-    this.chatMessages.set(id, message);
+    const [message] = await db.insert(chatMessages).values(insertMessage).returning();
     return message;
   }
 
-  async getChatMessages(): Promise<ChatMessage[]> {
-    return Array.from(this.chatMessages.values()).sort((a, b) => 
-      a.timestamp.getTime() - b.timestamp.getTime()
-    );
+  async getChatMessagesByUserId(userId: number | null): Promise<ChatMessage[]> {
+    if (userId === null) {
+      return await db.select().from(chatMessages).where(isNull(chatMessages.userId));
+    }
+    return await db.select().from(chatMessages).where(eq(chatMessages.userId, userId));
   }
 
   async createInstruction(insertInstruction: InsertInstruction): Promise<Instruction> {
-    const id = this.currentInstructionId++;
-    const instruction: Instruction = {
-      ...insertInstruction,
-      id,
-      timestamp: new Date(),
-    };
-    this.instructions.set(id, instruction);
+    const [instruction] = await db.insert(instructions).values(insertInstruction).returning();
     return instruction;
   }
 
-  async getInstructions(): Promise<Instruction[]> {
-    return Array.from(this.instructions.values()).sort((a, b) => 
-      a.timestamp.getTime() - b.timestamp.getTime()
-    );
+  async getInstructionsByUserId(userId: number | null): Promise<Instruction[]> {
+    if (userId === null) {
+      return await db.select().from(instructions).where(isNull(instructions.userId));
+    }
+    return await db.select().from(instructions).where(eq(instructions.userId, userId));
   }
 
   async createRewrite(insertRewrite: InsertRewrite): Promise<Rewrite> {
-    const rewrite: Rewrite = {
-      id: this.currentRewriteId++,
-      originalText: insertRewrite.originalText,
-      rewrittenText: insertRewrite.rewrittenText,
-      instructions: insertRewrite.instructions,
-      model: insertRewrite.model,
-      chunkIndex: insertRewrite.chunkIndex || null,
-      parentRewriteId: insertRewrite.parentRewriteId || null,
-      timestamp: new Date(),
-    };
-
-    this.rewrites.set(rewrite.id, rewrite);
+    const [rewrite] = await db.insert(rewrites).values(insertRewrite).returning();
     return rewrite;
   }
 
-  async getRewrites(): Promise<Rewrite[]> {
-    return Array.from(this.rewrites.values()).sort((a, b) => 
-      a.timestamp.getTime() - b.timestamp.getTime()
-    );
+  async getRewritesByUserId(userId: number | null): Promise<Rewrite[]> {
+    if (userId === null) {
+      return await db.select().from(rewrites).where(isNull(rewrites.userId));
+    }
+    return await db.select().from(rewrites).where(eq(rewrites.userId, userId));
   }
 
   async getRewriteById(id: number): Promise<Rewrite | null> {
-    return this.rewrites.get(id) || null;
+    const [rewrite] = await db.select().from(rewrites).where(eq(rewrites.id, id));
+    return rewrite || null;
   }
 
   async createQuiz(insertQuiz: InsertQuiz): Promise<Quiz> {
-    const quiz: Quiz = {
-      id: this.currentQuizId++,
-      sourceText: insertQuiz.sourceText,
-      instructions: insertQuiz.instructions,
-      testContent: insertQuiz.testContent,
-      answerKey: insertQuiz.answerKey || null,
-      model: insertQuiz.model,
-      chunkIndex: insertQuiz.chunkIndex || null,
-      timestamp: new Date(),
-    };
-
-    this.quizzes.set(quiz.id, quiz);
+    const [quiz] = await db.insert(quizzes).values(insertQuiz).returning();
     return quiz;
   }
 
-  async getQuizzes(): Promise<Quiz[]> {
-    return Array.from(this.quizzes.values()).sort((a, b) => 
-      a.timestamp.getTime() - b.timestamp.getTime()
-    );
+  async getQuizzesByUserId(userId: number | null): Promise<Quiz[]> {
+    if (userId === null) {
+      return await db.select().from(quizzes).where(isNull(quizzes.userId));
+    }
+    return await db.select().from(quizzes).where(eq(quizzes.userId, userId));
   }
 
   async getQuizById(id: number): Promise<Quiz | null> {
-    return this.quizzes.get(id) || null;
+    const [quiz] = await db.select().from(quizzes).where(eq(quizzes.id, id));
+    return quiz || null;
   }
 
   async createStudyGuide(insertStudyGuide: InsertStudyGuide): Promise<StudyGuide> {
-    const id = this.currentStudyGuideId++;
-    const studyGuide: StudyGuide = {
-      ...insertStudyGuide,
-      id,
-      timestamp: new Date(),
-    };
-    this.studyGuides.set(id, studyGuide);
+    const [studyGuide] = await db.insert(studyGuides).values(insertStudyGuide).returning();
     return studyGuide;
   }
 
-  async getStudyGuides(): Promise<StudyGuide[]> {
-    return Array.from(this.studyGuides.values()).sort((a, b) => 
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    );
+  async getStudyGuidesByUserId(userId: number | null): Promise<StudyGuide[]> {
+    if (userId === null) {
+      return await db.select().from(studyGuides).where(isNull(studyGuides.userId));
+    }
+    return await db.select().from(studyGuides).where(eq(studyGuides.userId, userId));
   }
 
   async getStudyGuideById(id: number): Promise<StudyGuide | null> {
-    return this.studyGuides.get(id) || null;
+    const [studyGuide] = await db.select().from(studyGuides).where(eq(studyGuides.id, id));
+    return studyGuide || null;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
