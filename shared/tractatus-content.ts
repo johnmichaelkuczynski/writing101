@@ -12,12 +12,8 @@ export function getFullDocumentContent(): string {
   return tractatusContent.sections.map(section => section.content).join('\n\n');
 }
 
-export function getFullDocumentContent(): string {
-  return tractatusContent.sections.map(section => section.content).join('\n\n');
-}
-
 export function getDocumentTitle(): string {
-  return "Dictionary of Analytic Philosophy";
+  return "Dictionary of Analytic Philosophy by J.-M. Kuczynski, PhD";
 }
 
 export function getDocumentAuthor(): string {

@@ -3,12 +3,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { renderMathInElement, renderMathString } from "@/lib/math-renderer";
 import { useTextSelection } from "@/hooks/use-text-selection";
-import { useAuth } from "@/hooks/use-auth";
 import SelectionToolbar from "@/components/selection-toolbar";
 import ChunkingModal from "@/components/chunking-modal";
 import { tractatusContent } from "@shared/tractatus-content";
-import { Copy, Lock } from "lucide-react";
-import { Link } from "wouter";
+import { Copy } from "lucide-react";
 
 interface DocumentContentProps {
   mathMode?: boolean;
@@ -21,7 +19,6 @@ interface DocumentContentProps {
 }
 
 export default function DocumentContent({ mathMode = true, onQuestionFromSelection, onTextSelectedForChat, onRewriteFromSelection, onPassageDiscussion, onCreateTest, onCreateStudyGuide }: DocumentContentProps) {
-  const { user } = useAuth();
   const { selection, isSelecting, clearSelection, highlightSelection, removeHighlights } = useTextSelection();
   const [showChunkingModal, setShowChunkingModal] = useState(false);
   const [selectedTextForChunking, setSelectedTextForChunking] = useState("");
@@ -189,50 +186,16 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
             </header>
 
             {/* Dynamic Content Sections */}
-            {user ? (
-              // Registered users see all content
-              tractatusContent.sections.map((section) => (
-                <section key={section.id} id={section.id} className="mb-12">
-                  <div 
-                    className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
-                    dangerouslySetInnerHTML={{ 
-                      __html: processContentForMathMode(section.content) 
-                    }}
-                  />
-                </section>
-              ))
-            ) : (
-              // Unregistered users see only content up to "The axiom of comprehension", then paywall
-              <>
-                <section key="fundamentals-preview" id="fundamentals" className="mb-12">
-                  <div 
-                    className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
-                    dangerouslySetInnerHTML={{ 
-                      __html: processContentForMathMode(
-                        tractatusContent.sections[0].content.split('<p class="document-paragraph">A priori:')[0]
-                      )
-                    }}
-                  />
-                  
-                  {/* Freemium Paywall - Positioned after "The axiom of comprehension" */}
-                  <div className="bg-gradient-to-t from-background via-background/90 to-transparent p-8 border border-border rounded-lg shadow-lg text-center mb-12">
-                    <Lock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-xl font-semibold mb-3">Unlock Full Access</h3>
-                    <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                      You've seen the first 5 pages. Register now to access the complete Dictionary of Analytic Philosophy with full AI features and unlimited content.
-                    </p>
-                    <div className="space-y-3">
-                      <Button asChild size="lg" className="w-48">
-                        <Link href="/auth">Sign Up for Free</Link>
-                      </Button>
-                      <p className="text-sm text-muted-foreground">
-                        Already have an account? <Link href="/auth" className="text-primary hover:underline">Sign in</Link>
-                      </p>
-                    </div>
-                  </div>
-                </section>
-              </>
-            )}
+            {tractatusContent.sections.map((section) => (
+              <section key={section.id} id={section.id} className="mb-12">
+                <div 
+                  className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
+                  dangerouslySetInnerHTML={{ 
+                    __html: processContentForMathMode(section.content) 
+                  }}
+                />
+              </section>
+            ))}
           </article>
         </div>
       </ScrollArea>

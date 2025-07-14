@@ -1,4 +1,4 @@
-import { tractatusContent } from "@shared/tractatus-content";
+import { paperContent } from "@shared/paper-content";
 
 export interface DocumentSection {
   id: string;
@@ -8,12 +8,13 @@ export interface DocumentSection {
 }
 
 export function extractDocumentSections(): DocumentSection[] {
-  return tractatusContent.sections.map(section => ({
+  return paperContent.sections.map(section => ({
     ...section,
     level: 1
   }));
 }
 
 export function getFullDocumentContent(): string {
-  return tractatusContent.getFullDocumentContent();
+  const sections = extractDocumentSections();
+  return sections.map(section => `${section.title}\n\n${section.content}`).join('\n\n');
 }

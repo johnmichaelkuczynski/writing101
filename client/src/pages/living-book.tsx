@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
-import { BookOpen, Edit3, Network, FileText, User, CreditCard, LogIn, LogOut } from "lucide-react";
+import { BookOpen, Edit3, Network, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Link } from "wouter";
-import { useAuth } from "@/hooks/use-auth";
 import NavigationSidebar from "@/components/navigation-sidebar";
 import DocumentContent from "@/components/document-content";
 import InstructionInterface from "@/components/instruction-interface";
@@ -22,7 +18,6 @@ import { tractatusContent, getFullDocumentContent } from "@shared/tractatus-cont
 import type { AIModel } from "@shared/schema";
 
 export default function LivingBook() {
-  const { user, logoutMutation } = useAuth();
   const [selectedModel, setSelectedModel] = useState<AIModel>("openai");
   const [mathMode, setMathMode] = useState<boolean>(true);
   const [questionFromSelection, setQuestionFromSelection] = useState<string>("");
@@ -223,57 +218,10 @@ export default function LivingBook() {
                 <BookOpen className="w-4 h-4" />
                 <span>Study Guide</span>
               </Button>
-              
               <ModelSelector 
                 selectedModel={selectedModel} 
                 onModelChange={setSelectedModel} 
               />
-
-              {/* Authentication Section */}
-              {user ? (
-                <div className="flex items-center space-x-3">
-                  <Badge variant="secondary" className="flex items-center space-x-1">
-                    <CreditCard className="w-3 h-3" />
-                    <span>{user.credits.toLocaleString()} credits</span>
-                  </Badge>
-                  
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="flex items-center space-x-2">
-                        <User className="w-4 h-4" />
-                        <span>{user.username}</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem asChild>
-                        <Link href="/credits" className="flex items-center space-x-2">
-                          <CreditCard className="w-4 h-4" />
-                          <span>Buy Credits</span>
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => logoutMutation.mutate()}
-                        className="flex items-center space-x-2 text-red-600"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span>Sign Out</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-2">
-                  <Badge variant="outline" className="text-xs">
-                    Guest Mode - Limited Access
-                  </Badge>
-                  <Button asChild variant="default" size="sm">
-                    <Link href="/auth" className="flex items-center space-x-2">
-                      <LogIn className="w-4 h-4" />
-                      <span>Sign In</span>
-                    </Link>
-                  </Button>
-                </div>
-              )}
             </div>
           </div>
         </div>
