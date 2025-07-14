@@ -445,7 +445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Passage explanation and discussion endpoints
-  app.post("/api/passage-explanation", async (req, res) => {
+  app.post("/api/passage-explanation", optionalAuth, async (req, res) => {
     try {
       const { passage, model } = req.body;
       
@@ -457,7 +457,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let explanation = await generatePassageExplanation(model, passage);
       
       // For unregistered users, truncate response and add upgrade prompt
-      if (!req.isAuthenticated()) {
+      if (!req.userId) {
         const words = explanation.split(' ');
         if (words.length > 200) {
           explanation = words.slice(0, 200).join(' ') + '... [Response truncated - register for full access and unlimited AI features]';
@@ -471,7 +471,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/passage-discussion", async (req, res) => {
+  app.post("/api/passage-discussion", optionalAuth, async (req, res) => {
     try {
       const { message, passage, model, conversationHistory } = req.body;
       
@@ -480,8 +480,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check authentication and credits for registered users
-      if (req.isAuthenticated()) {
-        const user = req.user;
+      if (req.userId) {
+        const user = await storage.getUser(req.userId);
         const tokensNeeded = Math.ceil((message.length + passage.length) / 4);
         
         if (user.credits < tokensNeeded) {
@@ -500,7 +500,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let response = await generatePassageDiscussionResponse(model, message, passage, conversationHistory || []);
       
       // For unregistered users, truncate response and add upgrade prompt
-      if (!req.isAuthenticated()) {
+      if (!req.userId) {
         const words = response.split(' ');
         if (words.length > 200) {
           response = words.slice(0, 200).join(' ') + '... [Response truncated - register for full access and unlimited AI features]';
