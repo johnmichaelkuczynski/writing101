@@ -117,22 +117,24 @@ export default function NavigationSidebar() {
 
   return (
     <aside className="w-64 bg-card shadow-sm border-r border-border sticky top-16 h-[calc(100vh-280px)]">
-      <div className="p-4">
-        <h3 className="font-inter font-semibold text-sm text-foreground mb-3">
+      <div className="p-4 h-full flex flex-col">
+        <h3 className="font-inter font-semibold text-sm text-foreground mb-3 flex-shrink-0">
           Dictionary Navigation
         </h3>
-        <ScrollArea className="sidebar-scroll">
-          <nav className="space-y-1">
-            {dictionaryEntries.map((entry) => (
-              <button
-                key={entry.id}
-                onClick={() => handleNavClick(entry.id)}
-                className="block w-full text-left px-3 py-2 text-xs text-muted-foreground hover:bg-accent hover:text-primary rounded-md transition-colors"
-              >
-                {entry.term}
-              </button>
-            ))}
-          </nav>
+        <ScrollArea className="flex-1 h-full">
+          <div className="pr-4">
+            <nav className="space-y-1">
+              {dictionaryEntries.map((entry) => (
+                <button
+                  key={entry.id}
+                  onClick={() => handleNavClick(entry.id)}
+                  className="block w-full text-left px-3 py-2 text-xs text-muted-foreground hover:bg-accent hover:text-primary rounded-md transition-colors"
+                >
+                  {entry.term}
+                </button>
+              ))}
+            </nav>
+          </div>
         </ScrollArea>
       </div>
     </aside>

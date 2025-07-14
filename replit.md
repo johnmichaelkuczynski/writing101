@@ -363,3 +363,5 @@ Preferred communication style: Simple, everyday language.
   - Reduced font size to text-xs for better fit of extensive entry list in sidebar
   - Each entry link enables smooth scrolling directly to specific dictionary definitions
   - Complete alphabetical listing provides instant access to any philosophical term or concept
+  - FIXED navigation panel scrolling issue with proper flexbox layout and ScrollArea height constraints
+  - Users can now scroll through entire dictionary entry list beyond "Causal series" to access all terms
