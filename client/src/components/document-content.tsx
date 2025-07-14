@@ -189,46 +189,48 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
             </header>
 
             {/* Dynamic Content Sections */}
-            {tractatusContent.sections.map((section, sectionIndex) => (
-              <section key={section.id} id={section.id} className="mb-12">
-                {sectionIndex === 0 && !user ? (
-                  // For unregistered users, show content up to and including "The axiom of comprehension", then paywall
-                  <>
-                    <div 
-                      className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
-                      dangerouslySetInnerHTML={{ 
-                        __html: processContentForMathMode(section.content.split('<p class="dictionary-entry"><strong>Axiom of extensionality:</strong>')[0])
-                      }}
-                    />
-                    
-                    {/* Freemium Paywall - Positioned after "The axiom of comprehension" */}
-                    <div className="bg-gradient-to-t from-background via-background/90 to-transparent p-8 border border-border rounded-lg shadow-lg text-center mb-12">
-                      <Lock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                      <h3 className="text-xl font-semibold mb-3">Unlock Full Access</h3>
-                      <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                        You've seen the first 5 pages. Register now to access the complete Dictionary of Analytic Philosophy with full AI features and unlimited content.
-                      </p>
-                      <div className="space-y-3">
-                        <Button asChild size="lg" className="w-48">
-                          <Link href="/auth">Sign Up for Free</Link>
-                        </Button>
-                        <p className="text-sm text-muted-foreground">
-                          Already have an account? <Link href="/auth" className="text-primary hover:underline">Sign in</Link>
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                ) : user || sectionIndex > 0 ? (
-                  // For registered users or sections after the first, show full content
+            {user ? (
+              // Registered users see all content
+              tractatusContent.sections.map((section) => (
+                <section key={section.id} id={section.id} className="mb-12">
                   <div 
                     className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
                     dangerouslySetInnerHTML={{ 
                       __html: processContentForMathMode(section.content) 
                     }}
                   />
-                ) : null}
-              </section>
-            ))}
+                </section>
+              ))
+            ) : (
+              // Unregistered users see only content up to "The axiom of comprehension", then paywall
+              <>
+                <section key="fundamentals-preview" id="fundamentals" className="mb-12">
+                  <div 
+                    className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
+                    dangerouslySetInnerHTML={{ 
+                      __html: processContentForMathMode(tractatusContent.sections[0].content.split('<p class="dictionary-entry"><strong>Axiom of extensionality:</strong>')[0])
+                    }}
+                  />
+                  
+                  {/* Freemium Paywall - Positioned after "The axiom of comprehension" */}
+                  <div className="bg-gradient-to-t from-background via-background/90 to-transparent p-8 border border-border rounded-lg shadow-lg text-center mb-12">
+                    <Lock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="text-xl font-semibold mb-3">Unlock Full Access</h3>
+                    <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                      You've seen the first 5 pages. Register now to access the complete Dictionary of Analytic Philosophy with full AI features and unlimited content.
+                    </p>
+                    <div className="space-y-3">
+                      <Button asChild size="lg" className="w-48">
+                        <Link href="/auth">Sign Up for Free</Link>
+                      </Button>
+                      <p className="text-sm text-muted-foreground">
+                        Already have an account? <Link href="/auth" className="text-primary hover:underline">Sign in</Link>
+                      </p>
+                    </div>
+                  </div>
+                </section>
+              </>
+            )}
           </article>
         </div>
       </ScrollArea>
