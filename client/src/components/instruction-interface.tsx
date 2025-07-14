@@ -17,6 +17,8 @@ interface InstructionInterfaceProps {
 
 export default function InstructionInterface({ selectedModel, mathMode = true, initialQuestion, onQuestionProcessed }: InstructionInterfaceProps) {
   const [instruction, setInstruction] = useState("");
+  const [response, setResponse] = useState("");
+  const [showResponse, setShowResponse] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -39,38 +41,15 @@ export default function InstructionInterface({ selectedModel, mathMode = true, i
       return response.json();
     },
     onSuccess: async (data) => {
-      // Add the instruction and response to chat history as a fake chat message
-      const fakeMessage = {
-        id: Date.now(),
-        message: instruction,
-        response: data.response,
-        model: selectedModel,
-        timestamp: new Date(),
-        context: null
-      };
-      
-      // Add to chat history by calling the backend
-      try {
-        await apiRequest("/api/chat", {
-          method: "POST",
-          body: JSON.stringify({
-            message: instruction,
-            model: selectedModel
-          })
-        });
-      } catch (error) {
-        // If that fails, at least show a toast
-        console.log("AI Response:", data.response);
-      }
+      // Show the response directly in the instruction interface
+      setResponse(data.response);
+      setShowResponse(true);
+      setInstruction("");
       
       toast({
         title: "Response Ready",
-        description: "Check the chat panel for your answer",
+        description: "Your AI response is displayed below",
       });
-      setInstruction("");
-      
-      // Force refresh chat history
-      queryClient.invalidateQueries({ queryKey: ["/api/chat/history"] });
     },
     onError: (error) => {
       toast({
@@ -130,6 +109,26 @@ export default function InstructionInterface({ selectedModel, mathMode = true, i
             </Button>
           </div>
         </form>
+        
+        {/* AI Response Display */}
+        {showResponse && (
+          <div className="mt-6 p-4 bg-muted rounded-lg border">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="font-semibold text-foreground">AI Response:</h3>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowResponse(false)}
+                className="text-xs"
+              >
+                Close
+              </Button>
+            </div>
+            <div className="text-sm text-muted-foreground whitespace-pre-wrap">
+              {response}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
