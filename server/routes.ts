@@ -66,18 +66,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { instruction, model } = instructionRequestSchema.parse(req.body);
       
+      // Check user authentication and token status
+      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
+      const isPreviewMode = !user || user.tokens === 0;
+      
       const documentContext = getFullDocumentContent();
       const fullPrompt = `Document Content: ${documentContext}\n\nInstruction: ${instruction}`;
       
-      const response = await generateAIResponse(model, fullPrompt, true);
+      const fullResponse = await generateAIResponse(model, fullPrompt, true);
+      
+      // For preview users, truncate response to first 150 words
+      let displayResponse = fullResponse;
+      if (isPreviewMode) {
+        const words = fullResponse.split(' ');
+        const previewWords = words.slice(0, 150);
+        displayResponse = previewWords.join(' ') + '...\n\n[PREVIEW - Purchase tokens for complete AI responses]';
+      }
       
       await storage.createInstruction({
         instruction,
-        response,
+        response: fullResponse, // Store full response
         model
       });
       
-      res.json({ response });
+      res.json({ 
+        response: displayResponse,
+        isPreview: isPreviewMode
+      });
     } catch (error) {
       console.error("Instruction error:", error);
       res.status(500).json({ error: error.message });
@@ -217,10 +232,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Missing required fields: passage, model" });
       }
 
+      // Check user authentication and token status
+      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
+      const isPreviewMode = !user || user.tokens === 0;
+
       const { generatePassageExplanation } = await import("./services/ai-models");
-      const explanation = await generatePassageExplanation(model, passage);
+      const fullExplanation = await generatePassageExplanation(model, passage);
       
-      res.json({ explanation });
+      // For preview users, truncate explanation to first 100 words
+      let displayExplanation = fullExplanation;
+      if (isPreviewMode) {
+        const words = fullExplanation.split(' ');
+        const previewWords = words.slice(0, 100);
+        displayExplanation = previewWords.join(' ') + '...\n\n[PREVIEW - Purchase tokens for complete explanations]';
+      }
+      
+      res.json({ 
+        explanation: displayExplanation,
+        isPreview: isPreviewMode
+      });
     } catch (error) {
       console.error("Passage explanation error:", error);
       res.status(500).json({ error: "Failed to generate passage explanation" });

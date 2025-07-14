@@ -375,3 +375,10 @@ Preferred communication style: Simple, everyday language.
   - Document access: Limited to 20% of content (2 sections out of ~10 total) for users without tokens
   - Users see quality of AI generation to encourage token purchases for full access
   - All premium features generate real content but show truncated versions as previews
+- July 14, 2025: CRITICAL FREEMIUM FIX - Universal preview enforcement across all AI endpoints
+  - FIXED instruction interface to show responses directly instead of routing through blocked chat
+  - Applied 150-word preview limit to instruction responses for users without tokens
+  - Applied 100-word preview limit to passage explanations for users without tokens
+  - Enforced consistent "[PREVIEW - Purchase tokens...]" messaging across all AI features
+  - No user receives complete AI functionality without tokens - STRICT preview-only mode
+  - All AI endpoints now properly check user token status and truncate responses accordingly
