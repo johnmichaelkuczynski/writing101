@@ -23,6 +23,16 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY_ENV_VAR || "",
 });
 
+function getModelDisplayName(model: AIModel): string {
+  const modelNames = {
+    deepseek: "AI1",
+    openai: "AI2", 
+    anthropic: "AI3",
+    perplexity: "AI4"
+  };
+  return modelNames[model] || model;
+}
+
 function getPaperContext(): string {
   const fullContent = getFullDocumentContent();
   
@@ -133,8 +143,9 @@ Please rewrite the text according to these instructions:`;
     // Clean the result to remove markdown and improve formatting
     return cleanRewriteText(result);
   } catch (error) {
-    console.error(`Error generating rewrite with ${model}:`, error);
-    throw new Error(`Failed to generate rewrite with ${model}: ${error.message}`);
+    const modelName = getModelDisplayName(model);
+    console.error(`Error generating rewrite with ${modelName}:`, error);
+    throw new Error(`Failed to generate rewrite with ${modelName}: ${error.message}`);
   }
 }
 
@@ -184,17 +195,18 @@ Provide a brief, enlightening explanation that helps the user understand Wittgen
     // Clean the result to remove any markdown formatting
     return cleanRewriteText(result);
   } catch (error) {
-    console.error(`Error in passage explanation with ${model}:`, error);
+    const modelName = getModelDisplayName(model);
+    console.error(`Error in passage explanation with ${modelName}:`, error);
     
-    // If current model fails, try OpenAI as fallback
+    // If current model fails, try AI2 as fallback
     if (model !== "openai") {
-      console.log(`Attempting OpenAI fallback for passage explanation due to ${model} failure`);
+      console.log(`Attempting AI2 fallback for passage explanation due to ${modelName} failure`);
       try {
         const fallbackResult = await generateOpenAIResponse(prompt, systemPrompt);
         return cleanRewriteText(fallbackResult);
       } catch (fallbackError) {
-        console.error("OpenAI fallback also failed:", fallbackError);
-        return "I'm sorry, but I'm having trouble connecting to the AI service right now. Please try again in a moment, or switch to the OpenAI model in the settings.";
+        console.error("AI2 fallback also failed:", fallbackError);
+        return "I'm sorry, but I'm having trouble connecting to the AI service right now. Please try again in a moment, or switch to AI2 in the settings.";
       }
     }
     
@@ -257,17 +269,18 @@ Respond thoughtfully to continue our discussion about this passage from the Trac
     // Clean the result to remove any markdown formatting
     return cleanRewriteText(result);
   } catch (error) {
-    console.error(`Error in passage discussion with ${model}:`, error);
+    const modelName = getModelDisplayName(model);
+    console.error(`Error in passage discussion with ${modelName}:`, error);
     
-    // If current model fails, try OpenAI as fallback
+    // If current model fails, try AI2 as fallback
     if (model !== "openai") {
-      console.log(`Attempting OpenAI fallback for passage discussion due to ${model} failure`);
+      console.log(`Attempting AI2 fallback for passage discussion due to ${modelName} failure`);
       try {
         const fallbackResult = await generateOpenAIResponse(prompt, systemPrompt);
         return cleanRewriteText(fallbackResult);
       } catch (fallbackError) {
-        console.error("OpenAI fallback also failed:", fallbackError);
-        return "I'm sorry, but I'm having trouble connecting to the AI service right now. Please try again in a moment, or switch to the OpenAI model in the settings.";
+        console.error("AI2 fallback also failed:", fallbackError);
+        return "I'm sorry, but I'm having trouble connecting to the AI service right now. Please try again in a moment, or switch to AI2 in the settings.";
       }
     }
     
@@ -326,20 +339,21 @@ CRITICAL FORMATTING RULES:
     // Clean the result to remove any markdown formatting
     return cleanRewriteText(result);
   } catch (error) {
-    console.error(`Error generating AI response with ${model}:`, error);
+    const modelName = getModelDisplayName(model);
+    console.error(`Error generating AI response with ${modelName}:`, error);
     
-    // If current model fails, try OpenAI as fallback
+    // If current model fails, try AI2 as fallback
     if (model !== "openai") {
-      console.log(`Attempting fallback to OpenAI due to ${model} failure`);
+      console.log(`Attempting fallback to AI2 due to ${modelName} failure`);
       try {
         const fallbackResult = await generateOpenAIResponse(prompt, systemPrompt);
         return cleanRewriteText(fallbackResult);
       } catch (fallbackError) {
-        console.error("Fallback to OpenAI also failed:", fallbackError);
+        console.error("Fallback to AI2 also failed:", fallbackError);
       }
     }
     
-    throw new Error(`Failed to generate response using ${model}: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(`Failed to generate response using ${modelName}: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -391,7 +405,7 @@ async function generatePerplexityResponse(prompt: string, systemPrompt: string):
   });
 
   if (!response.ok) {
-    throw new Error(`Perplexity API error: ${response.status} ${response.statusText}`);
+    throw new Error(`AI4 API error: ${response.status} ${response.statusText}`);
   }
 
   const data = await response.json();
@@ -464,11 +478,12 @@ ${includeAnswerKey ? 'Please provide both the test questions AND a separate answ
     
     return { testContent: cleanedResult };
   } catch (error) {
-    console.error(`Error generating quiz with ${model}:`, error);
+    const modelName = getModelDisplayName(model);
+    console.error(`Error generating quiz with ${modelName}:`, error);
     
-    // Fallback to OpenAI
+    // Fallback to AI2
     if (model !== "openai") {
-      console.log(`Attempting fallback to OpenAI due to ${model} failure`);
+      console.log(`Attempting fallback to AI2 due to ${modelName} failure`);
       try {
         const fallbackResult = await generateOpenAIResponse(fullPrompt, systemPrompt);
         const cleanedResult = cleanRewriteText(fallbackResult);
@@ -484,11 +499,11 @@ ${includeAnswerKey ? 'Please provide both the test questions AND a separate answ
         
         return { testContent: cleanedResult };
       } catch (fallbackError) {
-        console.error("Fallback to OpenAI also failed:", fallbackError);
+        console.error("AI2 fallback also failed:", fallbackError);
       }
     }
     
-    throw new Error(`Failed to generate quiz using ${model}: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(`Failed to generate quiz using ${modelName}: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -548,17 +563,18 @@ Please provide a well-structured study guide that helps students understand and 
     const cleanedResult = cleanRewriteText(result);
     return { guideContent: cleanedResult };
   } catch (error) {
-    console.error(`Error generating study guide with ${model}:`, error);
+    const modelName = getModelDisplayName(model);
+    console.error(`Error generating study guide with ${modelName}:`, error);
     
-    // Fallback to OpenAI
+    // Fallback to AI2
     if (model !== "openai") {
-      console.log(`Attempting fallback to OpenAI due to ${model} failure`);
+      console.log(`Attempting fallback to AI2 due to ${modelName} failure`);
       try {
         const fallbackResult = await generateOpenAIResponse(fullPrompt, systemPrompt);
         const cleanedResult = cleanRewriteText(fallbackResult);
         return { guideContent: cleanedResult };
       } catch (fallbackError) {
-        console.error("OpenAI fallback also failed:", fallbackError);
+        console.error("AI2 fallback also failed:", fallbackError);
         throw new Error("Unable to generate study guide. Please try again with a different model.");
       }
     }
@@ -594,7 +610,7 @@ async function generateDeepSeekResponse(prompt: string, systemPrompt: string): P
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      throw new Error(`DeepSeek API error: ${response.status} ${response.statusText}`);
+      throw new Error(`AI1 API error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();

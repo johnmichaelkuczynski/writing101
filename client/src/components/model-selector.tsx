@@ -8,10 +8,10 @@ interface ModelSelectorProps {
 }
 
 const modelOptions = [
-  { value: "deepseek", label: "DeepSeek" },
-  { value: "openai", label: "OpenAI GPT-4" },
-  { value: "anthropic", label: "Claude 3" },
-  { value: "perplexity", label: "Perplexity" },
+  { value: "deepseek", label: "AI1" },
+  { value: "openai", label: "AI2" },
+  { value: "anthropic", label: "AI3" },
+  { value: "perplexity", label: "AI4" },
 ] as const;
 
 export default function ModelSelector({ selectedModel, onModelChange }: ModelSelectorProps) {
