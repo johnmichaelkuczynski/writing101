@@ -209,7 +209,7 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
                     className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
                     dangerouslySetInnerHTML={{ 
                       __html: processContentForMathMode(
-                        tractatusContent.sections[0].content.split('</p>\n\n<p class="dictionary-entry"><strong>Axiom of extensionality:</strong>')[0] + '</p>'
+                        tractatusContent.sections[0].content.split('<p class="document-paragraph">A priori:')[0]
                       )
                     }}
                   />
