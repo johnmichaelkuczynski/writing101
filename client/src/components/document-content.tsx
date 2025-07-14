@@ -189,40 +189,73 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
               </p>
             </header>
 
-            {/* Dynamic Content Sections with Paywall */}
+            {/* Single Section with Mid-Content Paywall */}
             {tractatusContent.sections.map((section, index) => {
-              // Show paywall after first 2 sections (early middle of document)
-              const freeContentLimit = 2;
               const hasTokens = user?.tokens > 0;
+              let displayContent = section.content;
               
-              // Show upgrade wall after free content (always show for now)
-              if (index === freeContentLimit) {
+              // For the main section, insert paywall in the middle
+              if (index === 0) {
+                // Split content roughly in half (20% through)
+                const contentLength = section.content.length;
+                const paywallPosition = Math.floor(contentLength * 0.2);
+                
+                // Find a good break point near 20% (look for paragraph end)
+                let breakPoint = paywallPosition;
+                while (breakPoint < contentLength && section.content[breakPoint] !== '>' && section.content[breakPoint - 1] !== 'p') {
+                  breakPoint++;
+                }
+                
+                const freeContent = section.content.substring(0, breakPoint);
+                const paidContent = section.content.substring(breakPoint);
+                
                 return (
-                  <div key="upgrade-wall" className="mt-16 text-center py-12 px-8 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg border-2 border-dashed border-blue-300">
-                    <div className="max-w-md mx-auto">
-                      <Lock className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-                      <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                        Continue Reading
-                      </h3>
-                      <p className="text-gray-700 mb-6">
-                        You've reached the 20% preview limit. Purchase tokens to access the complete Dictionary of Analytic Philosophy plus premium AI features.
-                      </p>
-                      <Button 
-                        onClick={() => setShowUpgradeWall(true)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold"
-                      >
-                        Unlock Full Access
-                      </Button>
-                      <p className="text-sm text-gray-600 mt-3">
-                        Purchase tokens for complete access and AI-powered features
-                      </p>
+                  <section key={section.id} id={section.id} className="mb-12">
+                    {/* Free content (first 20%) */}
+                    <div 
+                      className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
+                      dangerouslySetInnerHTML={{ 
+                        __html: processContentForMathMode(freeContent) 
+                      }}
+                    />
+                    
+                    {/* Paywall barrier */}
+                    <div className="mt-16 text-center py-12 px-8 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg border-2 border-dashed border-blue-300">
+                      <div className="max-w-md mx-auto">
+                        <Lock className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+                        <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                          Continue Reading
+                        </h3>
+                        <p className="text-gray-700 mb-6">
+                          You've reached the 20% preview limit. Purchase tokens to access the complete Dictionary of Analytic Philosophy plus premium AI features.
+                        </p>
+                        <Button 
+                          onClick={() => setShowUpgradeWall(true)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold"
+                        >
+                          Unlock Full Access
+                        </Button>
+                        <p className="text-sm text-gray-600 mt-3">
+                          Purchase tokens for complete access and AI-powered features
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                    
+                    {/* Paid content (remaining 80%) - only show if user has tokens */}
+                    {hasTokens && (
+                      <div 
+                        className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
+                        dangerouslySetInnerHTML={{ 
+                          __html: processContentForMathMode(paidContent) 
+                        }}
+                      />
+                    )}
+                  </section>
                 );
               }
               
-              // Don't render sections beyond free limit
-              if (index >= freeContentLimit) {
+              // For other sections, only show if user has tokens
+              if (!hasTokens) {
                 return null;
               }
               
