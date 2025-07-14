@@ -1,4 +1,4 @@
-import { tractatusContent } from "@shared/tractatus-content";
+import { tractatusContent } from "@shared/dictionary-content";
 
 export interface DocumentSection {
   id: string;
