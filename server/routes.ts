@@ -544,14 +544,14 @@ Answer the questions based on your understanding of the provided content.`,
         return res.status(500).json({ error: "Stripe not configured" });
       }
 
-      const { amount = 1 } = req.body; // Default to 1 cent for testing
+      const { amount = 0.50 } = req.body; // Default to 50 cents for testing (Stripe minimum)
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(amount * 100), // Convert to cents
         currency: "usd",
         metadata: {
           type: "token_purchase",
           userId: req.session?.userId || "anonymous",
-          tokens: amount === 1 ? "10" : "100" // 1 cent = 10 tokens, $1 = 100 tokens
+          tokens: amount === 0.50 ? "25" : amount === 1.00 ? "100" : "500" // 50¢ = 25 tokens, $1 = 100 tokens, $5 = 500 tokens
         }
       });
       
@@ -573,9 +573,14 @@ Answer the questions based on your understanding of the provided content.`,
       let event;
 
       try {
-        // For development, we'll skip signature verification
-        // In production, you'd use: stripe.webhooks.constructEvent(req.body, sig, endpointSecret)
-        event = req.body;
+        const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+        if (endpointSecret && sig) {
+          // Verify webhook signature with secret
+          event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+        } else {
+          // For development without webhook endpoint setup
+          event = req.body;
+        }
       } catch (err) {
         console.error('Webhook signature verification failed:', err);
         return res.status(400).send(`Webhook Error: ${err.message}`);
@@ -611,10 +616,10 @@ Answer the questions based on your understanding of the provided content.`,
       const options = [
         {
           id: "test",
-          name: "Test Upgrade (1¢)",
-          price: 0.01,
-          tokens: 10,
-          description: "Perfect for testing - get 10 tokens for just 1 cent"
+          name: "Test Upgrade (50¢)",
+          price: 0.50,
+          tokens: 25,
+          description: "Perfect for testing - get 25 tokens for just 50 cents"
         },
         {
           id: "basic",

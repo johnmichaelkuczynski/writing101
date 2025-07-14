@@ -382,3 +382,10 @@ Preferred communication style: Simple, everyday language.
   - Enforced consistent "[PREVIEW - Purchase tokens...]" messaging across all AI features
   - No user receives complete AI functionality without tokens - STRICT preview-only mode
   - All AI endpoints now properly check user token status and truncate responses accordingly
+- July 14, 2025: STRIPE PAYMENT INTEGRATION - Complete payment processing configuration
+  - Configured Stripe with STRIPE_SECRET_KEY, VITE_STRIPE_PUBLIC_KEY, and STRIPE_WEBHOOK_SECRET
+  - Updated minimum payment amount to 50¢ (Stripe requirement) for 25 tokens
+  - Implemented secure webhook signature verification for production payment processing
+  - Payment options: Test (50¢/25 tokens), Basic ($1/100 tokens), Premium ($5/600 tokens)
+  - Webhook automatically adds tokens to user accounts after successful payments
+  - Complete end-to-end payment flow from checkout to token allocation functional
