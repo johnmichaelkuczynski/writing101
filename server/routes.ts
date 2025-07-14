@@ -30,6 +30,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { message, model } = chatRequestSchema.parse(req.body);
       
+      // Check user authentication and token status
+      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
+      
+      // Block chat completely for users without tokens (freemium model)
+      if (!user || user.tokens === 0) {
+        return res.status(403).json({ 
+          error: "Chat requires tokens",
+          needsUpgrade: true,
+          message: "Purchase tokens to access AI chat functionality"
+        });
+      }
+      
       // Get conversation history for context
       const chatHistory = await storage.getChatMessages();
       
