@@ -70,17 +70,24 @@ export default function Checkout() {
 
   useEffect(() => {
     // Get upgrade options
-    apiRequest("GET", "/api/upgrade-options")
+    apiRequest("/api/upgrade-options", { method: "GET" })
       .then((res) => res.json())
       .then((data) => {
-        setUpgradeOptions(data.options);
+        console.log("Upgrade options loaded:", data);
+        setUpgradeOptions(data.options || []);
       })
-      .catch(console.error);
+      .catch((error) => {
+        console.error("Failed to load upgrade options:", error);
+        setUpgradeOptions([]);
+      });
   }, []);
 
   const createPaymentIntent = async (amount: number) => {
     try {
-      const response = await apiRequest("POST", "/api/create-payment-intent", { amount });
+      const response = await apiRequest("/api/create-payment-intent", { 
+        method: "POST", 
+        body: JSON.stringify({ amount }) 
+      });
       const data = await response.json();
       setClientSecret(data.clientSecret);
     } catch (error) {
@@ -124,19 +131,27 @@ export default function Checkout() {
             <p className="text-sm text-muted-foreground">
               Choose your upgrade package:
             </p>
-            {upgradeOptions.map((option: any) => (
-              <div
-                key={option.id}
-                className={`p-3 border rounded-lg cursor-pointer ${
-                  selectedAmount === option.price ? 'border-primary bg-primary/5' : 'border-border'
-                }`}
-                onClick={() => setSelectedAmount(option.price)}
-              >
-                <div className="font-medium">{option.name}</div>
-                <div className="text-sm text-muted-foreground">{option.description}</div>
-                <div className="text-sm font-medium">${option.price.toFixed(2)} for {option.tokens} tokens</div>
+            {upgradeOptions.length === 0 ? (
+              <div className="p-3 border rounded-lg">
+                <div className="text-center text-muted-foreground">
+                  Loading upgrade options...
+                </div>
               </div>
-            ))}
+            ) : (
+              upgradeOptions.map((option: any) => (
+                <div
+                  key={option.id}
+                  className={`p-3 border rounded-lg cursor-pointer ${
+                    selectedAmount === option.price ? 'border-primary bg-primary/5' : 'border-border'
+                  }`}
+                  onClick={() => setSelectedAmount(option.price)}
+                >
+                  <div className="font-medium">{option.name}</div>
+                  <div className="text-sm text-muted-foreground">{option.description}</div>
+                  <div className="text-sm font-medium">${option.price.toFixed(2)} for {option.tokens} tokens</div>
+                </div>
+              ))
+            )}
           </div>
           
           {clientSecret && (
