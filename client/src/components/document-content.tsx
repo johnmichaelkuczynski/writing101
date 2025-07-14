@@ -192,17 +192,16 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
             {tractatusContent.sections.map((section, sectionIndex) => (
               <section key={section.id} id={section.id} className="mb-12">
                 {sectionIndex === 0 && !user ? (
-                  // For unregistered users, show content up to axiom of comprehension, then paywall
+                  // For unregistered users, show content up to and including "The axiom of comprehension", then paywall
                   <>
                     <div 
                       className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
                       dangerouslySetInnerHTML={{ 
-                        __html: processContentForMathMode(section.content.split('<p class="dictionary-entry"><strong>Axiom of extensionality:</strong>')[0] + 
-                        '<p class="dictionary-entry"><strong>The axiom of comprehension:</strong> This is the principle that, given any property, there is a set containing all and only those objects that have that property. There is a set containing all and only those things that are people (i.e., that have the property of being a person). There\'s a set containing all and only those things that are acorns (i.e., that have the property of being an acorn). And so on. The axiom of comprehension seems self-evident. But Bertrand Russell discovered that it has self-contradictory consequences and is therefore false. The set of people is not a member of itself, since no person is a set. But some sets do seem to be members of themselves. The set of sets would seem to be such a set.</p>')
+                        __html: processContentForMathMode(section.content.split('<p class="dictionary-entry"><strong>Axiom of extensionality:</strong>')[0])
                       }}
                     />
                     
-                    {/* Freemium Paywall - Positioned after axiom of comprehension */}
+                    {/* Freemium Paywall - Positioned after "The axiom of comprehension" */}
                     <div className="bg-gradient-to-t from-background via-background/90 to-transparent p-8 border border-border rounded-lg shadow-lg text-center mb-12">
                       <Lock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
                       <h3 className="text-xl font-semibold mb-3">Unlock Full Access</h3>
