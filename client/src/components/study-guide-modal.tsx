@@ -163,8 +163,6 @@ export default function StudyGuideModal({ isOpen, onClose, sourceText, chunkInde
 
   const textPreview = currentStudyGuide?.guideContent.substring(0, 300) + (currentStudyGuide?.guideContent.length > 300 ? "..." : "");
 
-
-
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleClose}>

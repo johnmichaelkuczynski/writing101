@@ -161,8 +161,6 @@ export default function QuizModal({ isOpen, onClose, sourceText, chunkIndex, sel
     setShowFullText(false);
   };
 
-
-
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>

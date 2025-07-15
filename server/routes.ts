@@ -212,9 +212,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let isPreview = false;
       
       if (!canAccessFeature(user)) {
-        // Simple truncation without registration prompts
-        const words = fullResponse.split(' ');
-        response = words.slice(0, 200).join(' ') + '...';
+        response = getPreviewResponse(fullResponse, !user);
         isPreview = true;
       } else {
         // Deduct 1 credit for full response (skip for admin)
@@ -253,9 +251,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let isPreview = false;
       
       if (!canAccessFeature(user)) {
-        // Simple truncation without registration prompts
-        const words = fullResponse.split(' ');
-        response = words.slice(0, 200).join(' ') + '...';
+        response = getPreviewResponse(fullResponse, !user);
         isPreview = true;
       } else {
         // Deduct 1 credit for full response (skip for admin)
@@ -301,9 +297,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let isPreview = false;
       
       if (!canAccessFeature(user)) {
-        // Simple truncation without registration prompts
-        const words = fullRewrittenText.split(' ');
-        rewrittenText = words.slice(0, 200).join(' ') + '...';
+        rewrittenText = getPreviewResponse(fullRewrittenText, !user);
         isPreview = true;
       } else {
         // Deduct 1 credit for full response (skip for admin)
@@ -405,9 +399,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let isPreview = false;
       
       if (!canAccessFeature(user)) {
-        // Simple truncation without registration prompts
-        const words = fullExplanation.split(' ');
-        explanation = words.slice(0, 200).join(' ') + '...';
+        explanation = getPreviewResponse(fullExplanation, !user);
         isPreview = true;
       } else {
         // Deduct 1 credit for full response
@@ -437,9 +429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let isPreview = false;
       
       if (!canAccessFeature(user)) {
-        // Simple truncation without registration prompts
-        const words = fullResponse.split(' ');
-        response = words.slice(0, 200).join(' ') + '...';
+        response = getPreviewResponse(fullResponse, !user);
         isPreview = true;
       } else {
         // Deduct 1 credit for full response (skip for admin)
@@ -469,7 +459,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!canAccessFeature(user)) {
         quiz = {
-          testContent: fullQuiz.testContent.split(' ').slice(0, 200).join(' ') + '...',
+          testContent: getPreviewResponse(fullQuiz.testContent, !user),
           answerKey: fullQuiz.answerKey
         };
         isPreview = true;
@@ -527,9 +517,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let isPreview = false;
       
       if (!canAccessFeature(user)) {
-        // Simple truncation without registration prompts
-        const words = fullStudyGuide.guideContent.split(' ');
-        studyGuide = words.slice(0, 200).join(' ') + '...';
+        studyGuide = getPreviewResponse(fullStudyGuide.guideContent, !user);
         isPreview = true;
       } else {
         studyGuide = fullStudyGuide.guideContent;
