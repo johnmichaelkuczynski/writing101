@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BookOpen, Edit3, FileText } from "lucide-react";
+import { BookOpen, Edit3, FileText, User, CreditCard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NavigationSidebar from "@/components/navigation-sidebar";
 import DocumentContent from "@/components/document-content";
@@ -12,13 +12,17 @@ import PassageDiscussionModal from "@/components/passage-discussion-modal";
 import QuizModal from "@/components/quiz-modal";
 import StudyGuideModal from "@/components/study-guide-modal";
 import ChunkingModal from "@/components/chunking-modal";
+import AuthModal from "@/components/auth-modal";
+import PaymentModal from "@/components/payment-modal";
 
 import { initializeMathRenderer } from "@/lib/math-renderer";
 import { tractatusContent, getFullDocumentContent } from "@shared/tractatus-content";
+import { useAuth } from "@/hooks/use-auth";
 import type { AIModel } from "@shared/schema";
 
 export default function LivingBook() {
-  const [selectedModel, setSelectedModel] = useState<AIModel>("openai");
+  const { user, logout, isAuthenticated } = useAuth();
+  const [selectedModel, setSelectedModel] = useState<AIModel>("ai1");
   const [mathMode, setMathMode] = useState<boolean>(true);
   const [questionFromSelection, setQuestionFromSelection] = useState<string>("");
   const [selectedTextForChat, setSelectedTextForChat] = useState<string>("");
@@ -35,6 +39,9 @@ export default function LivingBook() {
   const [studyGuideChunkIndex, setStudyGuideChunkIndex] = useState<number | null>(null);
   const [chunkingModalOpen, setChunkingModalOpen] = useState(false);
   const [pendingChunkText, setPendingChunkText] = useState<string>("");
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authModalTab, setAuthModalTab] = useState<"login" | "register">("login");
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
 
   useEffect(() => {
@@ -145,6 +152,11 @@ export default function LivingBook() {
     setPendingChunkText("");
   };
 
+  const openAuthModal = (tab: "login" | "register") => {
+    setAuthModalTab(tab);
+    setAuthModalOpen(true);
+  };
+
 
 
 
@@ -219,11 +231,59 @@ export default function LivingBook() {
                 <span>Study Guide</span>
               </Button>
 
-
               <ModelSelector 
                 selectedModel={selectedModel} 
                 onModelChange={setSelectedModel} 
               />
+
+              {/* Authentication section */}
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-2 border-l pl-2 ml-2">
+                  <div className="text-sm">
+                    <span className="font-medium">{user?.username}</span>
+                    <div className="text-xs text-muted-foreground">
+                      {user?.credits.toLocaleString()} credits
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPaymentModalOpen(true)}
+                    className="flex items-center space-x-1"
+                  >
+                    <CreditCard className="h-4 w-4" />
+                    <span>Buy Credits</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={logout}
+                    className="flex items-center space-x-1"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2 border-l pl-2 ml-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openAuthModal("login")}
+                    className="flex items-center space-x-1"
+                  >
+                    <User className="h-4 w-4" />
+                    <span>Login</span>
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() => openAuthModal("register")}
+                    className="flex items-center space-x-1"
+                  >
+                    <User className="h-4 w-4" />
+                    <span>Register</span>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -312,7 +372,19 @@ export default function LivingBook() {
         text={pendingChunkText}
         onChunkAction={handleChunkAction}
       />
-      
+
+      {/* Authentication Modal */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        defaultTab={authModalTab}
+      />
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={paymentModalOpen}
+        onClose={() => setPaymentModalOpen(false)}
+      />
 
     </div>
   );
