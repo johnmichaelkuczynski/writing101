@@ -52,8 +52,8 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
       return;
     }
 
-    if (registerData.password.length < 6) {
-      toast({ title: "Error", description: "Password must be at least 6 characters", variant: "destructive" });
+    if (registerData.password.length < 3) {
+      toast({ title: "Error", description: "Password must be at least 3 characters", variant: "destructive" });
       return;
     }
 
@@ -67,6 +67,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
       if (result.success) {
         onClose();
         setRegisterData({ username: "", password: "", email: "" });
+        toast({ title: "Success!", description: `Account created! Credits: ${result.user?.credits || 0}` });
       } else {
         toast({ title: "Registration Failed", description: result.error, variant: "destructive" });
       }
