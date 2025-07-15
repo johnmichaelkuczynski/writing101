@@ -71,6 +71,7 @@ export default function StudyGuideModal({ isOpen, onClose, sourceText, chunkInde
       });
     },
     onError: (error) => {
+      console.error("Study guide generation error:", error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Failed to generate study guide",

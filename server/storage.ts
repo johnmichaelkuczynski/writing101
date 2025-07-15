@@ -165,9 +165,12 @@ export class MemStorage implements IStorage {
   // User management methods
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
+    // Give admin unlimited credits
+    const credits = insertUser.username === 'jmkuczynski' ? 999999999 : insertUser.credits;
     const user: User = {
       ...insertUser,
       id,
+      credits,
       createdAt: new Date(),
       lastLogin: null,
     };
