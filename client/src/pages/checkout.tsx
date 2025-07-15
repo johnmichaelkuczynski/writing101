@@ -66,7 +66,7 @@ const CheckoutForm = ({ onSuccess }: { onSuccess: () => void }) => {
 export default function Checkout() {
   const [clientSecret, setClientSecret] = useState("");
   const [upgradeOptions, setUpgradeOptions] = useState([]);
-  const [selectedAmount, setSelectedAmount] = useState(0.50);
+  const [selectedAmount, setSelectedAmount] = useState(5.00);
 
   useEffect(() => {
     // Get upgrade options

@@ -75,12 +75,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const fullResponse = await generateAIResponse(model, fullPrompt, true);
       
-      // For preview users, truncate response to first 150 words
+      // For preview users, truncate response to first 200 words
       let displayResponse = fullResponse;
       if (isPreviewMode) {
         const words = fullResponse.split(' ');
-        const previewWords = words.slice(0, 150);
-        displayResponse = previewWords.join(' ') + '...\n\n[PREVIEW - Purchase tokens for complete AI responses]';
+        const previewWords = words.slice(0, 200);
+        displayResponse = previewWords.join(' ') + '...\n\nIf you want to enjoy this app\'s services, kindly register and buy credits.';
       }
       
       await storage.createInstruction({
@@ -127,8 +127,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (isPreviewMode) {
         const words = fullRewrittenText.split(' ');
-        const previewWords = words.slice(0, 150); // Show first 150 words
-        displayText = previewWords.join(' ') + '...\n\n[PREVIEW - Purchase tokens to see complete rewrite]';
+        const previewWords = words.slice(0, 200); // Show first 200 words
+        displayText = previewWords.join(' ') + '...\n\nIf you want to enjoy this app\'s services, kindly register and buy credits.';
       }
       
       const rewrite = await storage.createRewrite({
@@ -239,12 +239,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { generatePassageExplanation } = await import("./services/ai-models");
       const fullExplanation = await generatePassageExplanation(model, passage);
       
-      // For preview users, truncate explanation to first 100 words
+      // For preview users, truncate explanation to first 200 words
       let displayExplanation = fullExplanation;
       if (isPreviewMode) {
         const words = fullExplanation.split(' ');
-        const previewWords = words.slice(0, 100);
-        displayExplanation = previewWords.join(' ') + '...\n\n[PREVIEW - Purchase tokens for complete explanations]';
+        const previewWords = words.slice(0, 200);
+        displayExplanation = previewWords.join(' ') + '...\n\nIf you want to enjoy this app\'s services, kindly register and buy credits.';
       }
       
       res.json({ 
@@ -544,14 +544,14 @@ Answer the questions based on your understanding of the provided content.`,
         return res.status(500).json({ error: "Stripe not configured" });
       }
 
-      const { amount = 0.50 } = req.body; // Default to 50 cents for testing (Stripe minimum)
+      const { amount = 5.00 } = req.body; // Default to $5 starter package
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(amount * 100), // Convert to cents
         currency: "usd",
         metadata: {
           type: "token_purchase",
           userId: req.session?.userId || "anonymous",
-          tokens: amount === 0.50 ? "25" : amount === 1.00 ? "100" : "500" // 50¢ = 25 tokens, $1 = 100 tokens, $5 = 500 tokens
+          tokens: amount === 5.00 ? "5000" : amount === 10.00 ? "20000" : amount === 100.00 ? "500000" : amount === 1000.00 ? "10000000" : "5000"
         }
       });
       
@@ -615,25 +615,32 @@ Answer the questions based on your understanding of the provided content.`,
     try {
       const options = [
         {
-          id: "test",
-          name: "Test Upgrade (50¢)",
-          price: 0.50,
-          tokens: 25,
-          description: "Perfect for testing - get 25 tokens for just 50 cents"
+          id: "starter",
+          name: "Starter Package",
+          price: 5.00,
+          tokens: 5000,
+          description: "5,000 tokens for getting started with full access"
         },
         {
           id: "basic",
-          name: "Basic Package",
-          price: 1.00,
-          tokens: 100,
-          description: "100 tokens for full access to all features"
+          name: "Basic Package", 
+          price: 10.00,
+          tokens: 20000,
+          description: "20,000 tokens for regular usage"
         },
         {
           id: "premium",
           name: "Premium Package",
-          price: 5.00,
-          tokens: 600,
-          description: "600 tokens - best value for heavy usage"
+          price: 100.00,
+          tokens: 500000,
+          description: "500,000 tokens - best value for heavy usage"
+        },
+        {
+          id: "enterprise",
+          name: "Enterprise Package",
+          price: 1000.00,
+          tokens: 10000000,
+          description: "10,000,000 tokens for enterprise-level usage"
         }
       ];
       

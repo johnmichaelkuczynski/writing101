@@ -389,3 +389,11 @@ Preferred communication style: Simple, everyday language.
   - Payment options: Test (50¢/25 tokens), Basic ($1/100 tokens), Premium ($5/600 tokens)
   - Webhook automatically adds tokens to user accounts after successful payments
   - Complete end-to-end payment flow from checkout to token allocation functional
+- July 15, 2025: FREEMIUM MODEL RESTRUCTURE - Updated user access and pricing according to requirements
+  - REMOVED document content paywall - all users now have full access to Dictionary of Analytic Philosophy
+  - Updated AI preview limits to 200 words (from 150/100) for unregistered users with "kindly register and buy credits" messaging
+  - Updated Stripe pricing tiers: $5→5,000 tokens, $10→20,000 tokens, $100→500,000 tokens, $1,000→10,000,000 tokens
+  - Unregistered users can upload documents, ask questions, get real AI-generated previews (~200 words max)
+  - Registration requires only username/password (no email verification needed)
+  - All AI activities (chat, rewrite, grading, essay writing) consume user credits
+  - Storage fees: 500 tokens/month for 50,000 words (for stored assignments between sessions)
