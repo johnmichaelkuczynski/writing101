@@ -517,9 +517,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let isPreview = false;
       
       if (!canAccessFeature(user)) {
-        studyGuide = getPreviewResponse(fullStudyGuide, !user);
+        studyGuide = getPreviewResponse(fullStudyGuide.guideContent, !user);
         isPreview = true;
       } else {
+        studyGuide = fullStudyGuide.guideContent;
         // Deduct 1 credit for full response (skip for admin)
         if (!isAdmin(user)) {
           await storage.updateUserCredits(user!.id, user!.credits - 1);
@@ -528,7 +529,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const savedStudyGuide = await storage.createStudyGuide({
         sourceText,
-        studyGuide: fullStudyGuide,
+        studyGuide: fullStudyGuide.guideContent,
         instructions: instructions || "Generate a comprehensive study guide",
         model,
         chunkIndex
