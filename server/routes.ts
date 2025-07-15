@@ -9,7 +9,8 @@ import { sendEmail } from "./services/email-service";
 import { generatePDF } from "./services/pdf-generator";
 import { transcribeAudio } from "./services/speech-service";
 import { register, login, createSession, getUserFromSession, canAccessFeature, getPreviewResponse } from "./auth";
-import { chatRequestSchema, instructionRequestSchema, emailRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, registerRequestSchema, loginRequestSchema, type AIModel } from "@shared/schema";
+import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } from "./paypal";
+import { chatRequestSchema, instructionRequestSchema, emailRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, registerRequestSchema, loginRequestSchema, purchaseRequestSchema, type AIModel } from "@shared/schema";
 import multer from "multer";
 
 declare module 'express-session' {
@@ -131,7 +132,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PayPal routes
+  app.get("/paypal/setup", async (req, res) => {
+    await loadPaypalDefault(req, res);
+  });
 
+  app.post("/paypal/order", async (req, res) => {
+    // Request body should contain: { intent, amount, currency }
+    await createPaypalOrder(req, res);
+  });
+
+  app.post("/paypal/order/:orderID/capture", async (req, res) => {
+    await capturePaypalOrder(req, res);
+  });
 
   // Chat endpoint with authentication
   app.post("/api/chat", async (req, res) => {

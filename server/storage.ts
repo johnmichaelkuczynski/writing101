@@ -1,4 +1,4 @@
-import { chatMessages, instructions, rewrites, quizzes, studyGuides, users, sessions, type ChatMessage, type InsertChatMessage, type Instruction, type InsertInstruction, type Rewrite, type InsertRewrite, type Quiz, type InsertQuiz, type StudyGuide, type InsertStudyGuide, type User, type InsertUser, type Session, type InsertSession } from "@shared/schema";
+import { chatMessages, instructions, rewrites, quizzes, studyGuides, users, sessions, purchases, type ChatMessage, type InsertChatMessage, type Instruction, type InsertInstruction, type Rewrite, type InsertRewrite, type Quiz, type InsertQuiz, type StudyGuide, type InsertStudyGuide, type User, type InsertUser, type Session, type InsertSession, type Purchase, type InsertPurchase } from "@shared/schema";
 
 export interface IStorage {
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
@@ -27,7 +27,10 @@ export interface IStorage {
   getSession(sessionId: string): Promise<Session | null>;
   deleteSession(sessionId: string): Promise<void>;
   
-
+  // Purchase management
+  createPurchase(purchase: InsertPurchase): Promise<Purchase>;
+  getPurchasesByUserId(userId: number): Promise<Purchase[]>;
+  updatePurchaseStatus(purchaseId: number, status: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -39,12 +42,14 @@ export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private usersByUsername: Map<string, User>;
   private sessions: Map<string, Session>;
+  private purchases: Map<number, Purchase>;
   private currentChatId: number;
   private currentInstructionId: number;
   private currentRewriteId: number;
   private currentQuizId: number;
   private currentStudyGuideId: number;
   private currentUserId: number;
+  private currentPurchaseId: number;
 
   constructor() {
     this.chatMessages = new Map();
@@ -55,12 +60,14 @@ export class MemStorage implements IStorage {
     this.users = new Map();
     this.usersByUsername = new Map();
     this.sessions = new Map();
+    this.purchases = new Map();
     this.currentChatId = 1;
     this.currentInstructionId = 1;
     this.currentRewriteId = 1;
     this.currentQuizId = 1;
     this.currentStudyGuideId = 1;
     this.currentUserId = 1;
+    this.currentPurchaseId = 1;
   }
 
   async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
@@ -222,7 +229,31 @@ export class MemStorage implements IStorage {
     this.sessions.delete(sessionId);
   }
 
+  // Purchase management methods
+  async createPurchase(insertPurchase: InsertPurchase): Promise<Purchase> {
+    const id = this.currentPurchaseId++;
+    const purchase: Purchase = {
+      ...insertPurchase,
+      id,
+      createdAt: new Date(),
+    };
+    this.purchases.set(id, purchase);
+    return purchase;
+  }
 
+  async getPurchasesByUserId(userId: number): Promise<Purchase[]> {
+    return Array.from(this.purchases.values())
+      .filter(purchase => purchase.userId === userId)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async updatePurchaseStatus(purchaseId: number, status: string): Promise<void> {
+    const purchase = this.purchases.get(purchaseId);
+    if (purchase) {
+      const updatedPurchase = { ...purchase, status };
+      this.purchases.set(purchaseId, updatedPurchase);
+    }
+  }
 }
 
 export const storage = new MemStorage();

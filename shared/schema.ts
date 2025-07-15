@@ -67,6 +67,16 @@ export const sessions = pgTable("sessions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const purchases = pgTable("purchases", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  amount: text("amount").notNull(), // PayPal amount as string
+  credits: integer("credits").notNull(),
+  paypalOrderId: text("paypal_order_id"),
+  status: text("status").default("pending").notNull(), // pending, completed, failed
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 
 
 // Insert schemas
@@ -121,6 +131,14 @@ export const insertSessionSchema = createInsertSchema(sessions).pick({
   expiresAt: true,
 });
 
+export const insertPurchaseSchema = createInsertSchema(purchases).pick({
+  userId: true,
+  amount: true,
+  credits: true,
+  paypalOrderId: true,
+  status: true,
+});
+
 
 
 // Types
@@ -138,6 +156,8 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Session = typeof sessions.$inferSelect;
 export type InsertSession = z.infer<typeof insertSessionSchema>;
+export type Purchase = typeof purchases.$inferSelect;
+export type InsertPurchase = z.infer<typeof insertPurchaseSchema>;
 
 
 // AI Models
@@ -193,6 +213,12 @@ export const loginRequestSchema = z.object({
   password: z.string(),
 });
 
+export const purchaseRequestSchema = z.object({
+  amount: z.string(), // PayPal amount as string
+  credits: z.number().min(1),
+  currency: z.string().default("USD"),
+});
+
 
 
 // Export request types
@@ -204,3 +230,4 @@ export type StudyGuideRequest = z.infer<typeof studyGuideRequestSchema>;
 export type EmailRequest = z.infer<typeof emailRequestSchema>;
 export type RegisterRequest = z.infer<typeof registerRequestSchema>;
 export type LoginRequest = z.infer<typeof loginRequestSchema>;
+export type PurchaseRequest = z.infer<typeof purchaseRequestSchema>;
