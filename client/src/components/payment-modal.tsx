@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PayPalButton from "./PayPalButton";
@@ -38,13 +38,16 @@ export default function PaymentModal({ isOpen, onClose }: PaymentModalProps) {
             <CreditCard className="h-5 w-5" />
             <span>Purchase Credits</span>
           </DialogTitle>
+          <DialogDescription>
+            Select a credit package and complete your purchase securely through PayPal. No email required from our app.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4">
           {!selectedOption ? (
             <>
               <p className="text-sm text-muted-foreground">
-                Choose a credit package to unlock full AI features:
+                Choose a credit package to unlock full AI features. PayPal handles payment securely - no email required from our app:
               </p>
               
               <div className="grid grid-cols-1 gap-3">
@@ -82,7 +85,7 @@ export default function PaymentModal({ isOpen, onClose }: PaymentModalProps) {
                   ${selectedOption.price} - {selectedOption.credits.toLocaleString()} Credits
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  Complete your purchase with PayPal
+                  Complete your purchase with PayPal - login to PayPal or pay as guest with card
                 </p>
               </div>
               
