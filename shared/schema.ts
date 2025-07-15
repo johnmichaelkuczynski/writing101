@@ -196,11 +196,7 @@ export const studyGuideRequestSchema = z.object({
   chunkIndex: z.number().optional(),
 });
 
-export const emailRequestSchema = z.object({
-  content: z.string(),
-  email: z.string().email(),
-  subject: z.string(),
-});
+
 
 export const registerRequestSchema = z.object({
   username: z.string().min(3).max(50),
@@ -227,7 +223,7 @@ export type InstructionRequest = z.infer<typeof instructionRequestSchema>;
 export type RewriteRequest = z.infer<typeof rewriteRequestSchema>;
 export type QuizRequest = z.infer<typeof quizRequestSchema>;
 export type StudyGuideRequest = z.infer<typeof studyGuideRequestSchema>;
-export type EmailRequest = z.infer<typeof emailRequestSchema>;
+
 export type RegisterRequest = z.infer<typeof registerRequestSchema>;
 export type LoginRequest = z.infer<typeof loginRequestSchema>;
 export type PurchaseRequest = z.infer<typeof purchaseRequestSchema>;

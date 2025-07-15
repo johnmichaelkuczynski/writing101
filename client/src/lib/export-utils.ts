@@ -177,18 +177,7 @@ export async function downloadPDF(content: string, filename: string = 'ai-respon
   });
 }
 
+// Email functionality removed
 export async function emailContent(content: string, email: string, subject: string): Promise<void> {
-  try {
-    await apiRequest("/api/email", {
-      method: "POST",
-      body: JSON.stringify({
-        content,
-        email,
-        subject,
-      })
-    });
-  } catch (error) {
-    console.error('Failed to send email:', error);
-    throw error;
-  }
+  throw new Error("Email functionality disabled");
 }

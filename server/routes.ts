@@ -5,12 +5,12 @@ import session from "express-session";
 import { storage } from "./storage";
 import { generateAIResponse, generateRewrite, generatePassageExplanation, generatePassageDiscussionResponse, generateQuiz, generateStudyGuide } from "./services/ai-models";
 import { getFullDocumentContent } from "./services/document-processor";
-import { sendEmail } from "./services/email-service";
+
 import { generatePDF } from "./services/pdf-generator";
 import { transcribeAudio } from "./services/speech-service";
 import { register, login, createSession, getUserFromSession, canAccessFeature, getPreviewResponse } from "./auth";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalTransaction, ordersController } from "./paypal";
-import { chatRequestSchema, instructionRequestSchema, emailRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, registerRequestSchema, loginRequestSchema, purchaseRequestSchema, type AIModel } from "@shared/schema";
+import { chatRequestSchema, instructionRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, registerRequestSchema, loginRequestSchema, purchaseRequestSchema, type AIModel } from "@shared/schema";
 import multer from "multer";
 
 declare module 'express-session' {
@@ -335,24 +335,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Email endpoint
-  app.post("/api/email", async (req, res) => {
-    try {
-      const { content, email, subject } = emailRequestSchema.parse(req.body);
-      
-      await sendEmail({
-        to: email,
-        from: "noreply@livingbook.com",
-        subject,
-        text: content,
-        html: content.replace(/\n/g, '<br>')
-      });
-      
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Email error:", error);
-      res.status(500).json({ error: error.message });
-    }
-  });
+
 
   // PDF generation endpoint
   app.post("/api/pdf", async (req, res) => {
