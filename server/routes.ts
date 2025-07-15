@@ -536,8 +536,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ 
         studyGuide: {
-          ...savedStudyGuide,
-          studyGuide // Return preview or full study guide based on user status
+          id: savedStudyGuide.id,
+          guideContent: studyGuide, // Return preview or full study guide based on user status
+          timestamp: savedStudyGuide.timestamp
         },
         isPreview 
       });

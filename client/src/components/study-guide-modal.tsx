@@ -63,7 +63,9 @@ export default function StudyGuideModal({ isOpen, onClose, sourceText, chunkInde
       return response.json();
     },
     onSuccess: (data) => {
-      setCurrentStudyGuide(data);
+      // Handle the API response structure
+      const studyGuide = data.studyGuide || data;
+      setCurrentStudyGuide(studyGuide);
       queryClient.invalidateQueries({ queryKey: ["/api/study-guides"] });
       toast({
         title: "Study Guide Created",

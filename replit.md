@@ -524,3 +524,8 @@ Preferred communication style: Simple, everyday language.
   - CONFIRMED: Quiz generation working perfectly - 34-second generation time with proper content display
   - CONFIRMED: Study guide generation working properly with corrected model validation
   - All AI features (chat, quiz, study guide, rewrite) now use consistent model naming across entire application
+- July 15, 2025: STUDY GUIDE MODAL CRASH FIX - Fixed critical property access error
+  - FIXED "can't access property 'substring', currentStudyGuide.guideContent is undefined" error
+  - Fixed API response structure mismatch - server now returns guideContent property instead of studyGuide
+  - Fixed frontend response handling to properly extract study guide data from API response
+  - Study guide generation now works without crashes and displays content properly
