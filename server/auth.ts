@@ -109,9 +109,6 @@ export function getPreviewResponse(fullResponse: string, isUnregistered: boolean
   const previewWords = words.slice(0, 200);
   const previewText = previewWords.join(' ') + '...';
   
-  if (isUnregistered) {
-    return previewText + '\n\n[PREVIEW - Please register and purchase credits to see the complete response. Click here to register and buy credits.]';
-  } else {
-    return previewText + '\n\n[PREVIEW - Purchase credits to see the complete response. Click here to buy credits.]';
-  }
+  // Return clean preview without registration prompts
+  return previewText;
 }

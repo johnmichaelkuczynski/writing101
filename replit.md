@@ -535,3 +535,8 @@ Preferred communication style: Simple, everyday language.
   - Preview messages now contain proper clickable links that redirect to registration/payment pages
   - Enhanced user experience by making call-to-action text actually functional
   - Applied consistent link styling with blue color and hover effects
+- July 15, 2025: REMOVED PREVIEW REGISTRATION PROMPTS - Cleaned up modal previews
+  - REMOVED all "Click here to register and buy credits" text from preview responses
+  - Preview responses now show clean truncated content without registration prompts
+  - Simplified getPreviewResponse function to return only content preview without call-to-action text
+  - Enhanced user experience by removing intrusive registration messaging from modal previews

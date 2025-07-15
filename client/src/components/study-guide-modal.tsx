@@ -163,48 +163,7 @@ export default function StudyGuideModal({ isOpen, onClose, sourceText, chunkInde
 
   const textPreview = currentStudyGuide?.guideContent.substring(0, 300) + (currentStudyGuide?.guideContent.length > 300 ? "..." : "");
 
-  // Function to render text with clickable links for preview messages
-  const renderContentWithLinks = (content: string) => {
-    if (content.includes('[PREVIEW - Please register')) {
-      const parts = content.split('Click here to register and buy credits.');
-      return (
-        <div>
-          {parts[0]}
-          <a 
-            href="/register" 
-            className="text-blue-600 hover:text-blue-800 underline cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault();
-              window.location.href = '/register';
-            }}
-          >
-            Click here to register and buy credits.
-          </a>
-          {parts[1]}
-        </div>
-      );
-    } else if (content.includes('[PREVIEW - Purchase credits')) {
-      const parts = content.split('Click here to buy credits.');
-      return (
-        <div>
-          {parts[0]}
-          <a 
-            href="/buy-credits" 
-            className="text-blue-600 hover:text-blue-800 underline cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault();
-              // Open payment modal or redirect to payment page
-              window.location.href = '/buy-credits';
-            }}
-          >
-            Click here to buy credits.
-          </a>
-          {parts[1]}
-        </div>
-      );
-    }
-    return <div className="whitespace-pre-wrap">{content}</div>;
-  };
+
 
   return (
     <>
@@ -261,7 +220,7 @@ export default function StudyGuideModal({ isOpen, onClose, sourceText, chunkInde
                 <div>
                   <Label className="text-sm font-medium">Study Guide Content</Label>
                   <ScrollArea className="h-64 mt-2 border rounded-lg p-4 bg-muted/50">
-                    <div className="text-sm">{renderContentWithLinks(textPreview)}</div>
+                    <div className="text-sm whitespace-pre-wrap">{textPreview}</div>
                   </ScrollArea>
                 </div>
                 

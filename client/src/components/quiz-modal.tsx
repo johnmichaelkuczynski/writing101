@@ -161,47 +161,7 @@ export default function QuizModal({ isOpen, onClose, sourceText, chunkIndex, sel
     setShowFullText(false);
   };
 
-  // Function to render text with clickable links for preview messages
-  const renderContentWithLinks = (content: string) => {
-    if (content?.includes('[PREVIEW - Please register')) {
-      const parts = content.split('Click here to register and buy credits.');
-      return (
-        <div>
-          {parts[0]}
-          <a 
-            href="/register" 
-            className="text-blue-600 hover:text-blue-800 underline cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault();
-              window.location.href = '/register';
-            }}
-          >
-            Click here to register and buy credits.
-          </a>
-          {parts[1]}
-        </div>
-      );
-    } else if (content?.includes('[PREVIEW - Purchase credits')) {
-      const parts = content.split('Click here to buy credits.');
-      return (
-        <div>
-          {parts[0]}
-          <a 
-            href="/buy-credits" 
-            className="text-blue-600 hover:text-blue-800 underline cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault();
-              window.location.href = '/buy-credits';
-            }}
-          >
-            Click here to buy credits.
-          </a>
-          {parts[1]}
-        </div>
-      );
-    }
-    return <div className="whitespace-pre-wrap">{content || ''}</div>;
-  };
+
 
   return (
     <>
@@ -322,8 +282,9 @@ export default function QuizModal({ isOpen, onClose, sourceText, chunkIndex, sel
                       <div>{new Date(currentQuiz.timestamp).toLocaleString()}</div>
                     </div>
                     
-                    <div className="text-sm leading-relaxed">
-                      {renderContentWithLinks(currentQuiz.testContent.substring(0, 1000) + (currentQuiz.testContent.length > 1000 ? "..." : ""))}
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                      {currentQuiz.testContent.substring(0, 1000)}
+                      {currentQuiz.testContent.length > 1000 && "..."}
                     </div>
                     
                     {currentQuiz.answerKey && (
