@@ -56,7 +56,7 @@ if (PAYPAL_CLIENT_ID && PAYPAL_CLIENT_SECRET) {
   console.warn("PayPal not initialized - credentials missing");
 }
 
-// Export the orders controller for use in other files
+// Export the orders controller for use in other files (can be null if not configured)
 export { ordersController };
 
 /* Token generation helpers */
