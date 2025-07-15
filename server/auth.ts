@@ -88,7 +88,7 @@ export async function getUserFromSession(sessionId: string): Promise<User | null
 }
 
 export function isAdmin(user: User | null): boolean {
-  return user?.email === 'jmkuczynski@yahoo.com';
+  return user?.username === 'jmkuczynski' || user?.email === 'jmkuczynski@yahoo.com';
 }
 
 export function canAccessFeature(user: User | null): boolean {
