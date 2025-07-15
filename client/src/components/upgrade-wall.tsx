@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Lock, Crown, Zap, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/auth-context";
+import { useQueryClient } from "@tanstack/react-query";
 import { PRICING_TIERS } from "@shared/schema";
 
 interface UpgradeWallProps {
@@ -25,7 +26,8 @@ export default function UpgradeWall({ isOpen, onClose, trigger }: UpgradeWallPro
   });
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, login } = useAuth();
+  const queryClient = useQueryClient();
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,9 +51,17 @@ export default function UpgradeWall({ isOpen, onClose, trigger }: UpgradeWallPro
           title: "Success!",
           description: `${authMode === "register" ? "Account created" : "Logged in"} successfully`,
         });
-        // Update auth context and close modal
-        const userData = data.user;
-        window.location.reload(); // Refresh to update auth state
+        
+        // Update auth context immediately
+        login(data.user);
+        
+        // Invalidate and refetch auth query
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+        
+        // Close modal and reset form
+        setShowAuth(false);
+        setFormData({ username: "", email: "", password: "" });
+        onClose();
       } else {
         const error = await response.json();
         toast({
