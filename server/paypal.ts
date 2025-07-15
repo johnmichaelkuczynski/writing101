@@ -20,10 +20,12 @@ import { Request, Response } from "express";
 const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
 
 if (!PAYPAL_CLIENT_ID) {
-  throw new Error("Missing PAYPAL_CLIENT_ID");
+  console.error("PAYPAL_CLIENT_ID environment variable is missing");
+  throw new Error("Missing PAYPAL_CLIENT_ID environment variable - please configure it in deployment settings");
 }
 if (!PAYPAL_CLIENT_SECRET) {
-  throw new Error("Missing PAYPAL_CLIENT_SECRET");
+  console.error("PAYPAL_CLIENT_SECRET environment variable is missing");
+  throw new Error("Missing PAYPAL_CLIENT_SECRET environment variable - please configure it in deployment settings");
 }
 
 console.log("PayPal Client ID:", PAYPAL_CLIENT_ID?.substring(0, 10) + "...");
