@@ -496,3 +496,9 @@ Preferred communication style: Simple, everyday language.
   - Login system confirmed functional with proper session management
   - Username 'jmkuczynski' successfully authenticates and receives 999,999,999 credits
   - Payment system ready for production deployment with bulletproof error handling
+- July 15, 2025: TEXT SELECTION PERSISTENCE - Fixed toolbar clearing issue for better UX
+  - FIXED irritating selection clearing behavior when clicking toolbar buttons
+  - Text selection now persists after clicking Chat, Discuss, Rewrite, Create Test, or Study Guide buttons
+  - Users can now highlight text once and try multiple actions without re-selecting
+  - Only the X button or clicking elsewhere clears the selection
+  - Dramatically improved user experience for exploring different AI features on same text selection

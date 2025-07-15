@@ -31,27 +31,27 @@ export default function SelectionToolbar({
 
   const handleAskQuestion = () => {
     onAskQuestion(selectedText);
-    setIsVisible(false);
+    // Keep toolbar visible so user can try other actions
   };
 
   const handleSendToChat = () => {
     onSendToChat(selectedText);
-    setIsVisible(false);
+    // Keep toolbar visible so user can try other actions
   };
 
   const handleRewrite = () => {
     onRewrite(selectedText);
-    setIsVisible(false);
+    // Keep toolbar visible so user can try other actions
   };
 
   const handleCreateTest = () => {
     onCreateTest(selectedText);
-    setIsVisible(false);
+    // Keep toolbar visible so user can try other actions
   };
 
   const handleCreateStudyGuide = () => {
     onCreateStudyGuide(selectedText);
-    setIsVisible(false);
+    // Keep toolbar visible so user can try other actions
   };
 
 
