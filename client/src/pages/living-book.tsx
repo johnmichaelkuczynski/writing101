@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BookOpen, Edit3, Network, FileText, User, LogOut } from "lucide-react";
+import { BookOpen, Edit3, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NavigationSidebar from "@/components/navigation-sidebar";
 import DocumentContent from "@/components/document-content";
@@ -12,8 +12,6 @@ import PassageDiscussionModal from "@/components/passage-discussion-modal";
 import QuizModal from "@/components/quiz-modal";
 import StudyGuideModal from "@/components/study-guide-modal";
 import ChunkingModal from "@/components/chunking-modal";
-import UpgradeWall from "@/components/upgrade-wall";
-import { useAuth } from "@/contexts/auth-context";
 
 import { initializeMathRenderer } from "@/lib/math-renderer";
 import { tractatusContent, getFullDocumentContent } from "@shared/tractatus-content";
@@ -37,9 +35,6 @@ export default function LivingBook() {
   const [studyGuideChunkIndex, setStudyGuideChunkIndex] = useState<number | null>(null);
   const [chunkingModalOpen, setChunkingModalOpen] = useState(false);
   const [pendingChunkText, setPendingChunkText] = useState<string>("");
-  const [showUpgradeWall, setShowUpgradeWall] = useState(false);
-  
-  const { user, isAuthenticated, canAccessFeature, logout } = useAuth();
 
 
   useEffect(() => {
@@ -188,95 +183,43 @@ export default function LivingBook() {
                 onToggle={setMathMode} 
               />
 
-              {/* Premium Features - Show upgrade wall for non-authenticated users */}
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => {
-                  if (!canAccessFeature("rewrite")) {
-                    setShowUpgradeWall(true);
-                  } else {
-                    handleChunkRewrite();
-                  }
-                }}
+                onClick={handleChunkRewrite}
                 className="flex items-center space-x-2"
               >
                 <Edit3 className="w-4 h-4" />
                 <span>Rewrite Document</span>
-                {!isAuthenticated && <span className="text-xs text-orange-500">(Premium)</span>}
               </Button>
               
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  if (!canAccessFeature("quiz")) {
-                    setShowUpgradeWall(true);
-                  } else {
-                    const fullText = getFullDocumentContent();
-                    handleCreateTestFromSelection(fullText);
-                  }
+                  const fullText = getFullDocumentContent();
+                  handleCreateTestFromSelection(fullText);
                 }}
                 className="flex items-center space-x-2 text-orange-600 border-orange-200 hover:bg-orange-50"
               >
                 <FileText className="w-4 h-4" />
                 <span>Create Test</span>
-                {!isAuthenticated && <span className="text-xs text-orange-500">(Premium)</span>}
               </Button>
               
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  if (!canAccessFeature("study_guide")) {
-                    setShowUpgradeWall(true);
-                  } else {
-                    const fullText = getFullDocumentContent();
-                    handleCreateStudyGuideFromSelection(fullText);
-                  }
+                  const fullText = getFullDocumentContent();
+                  handleCreateStudyGuideFromSelection(fullText);
                 }}
                 className="flex items-center space-x-2 text-blue-600 border-blue-200 hover:bg-blue-50"
               >
                 <BookOpen className="w-4 h-4" />
                 <span>Study Guide</span>
-                {!isAuthenticated && <span className="text-xs text-blue-500">(Premium)</span>}
               </Button>
 
-              {/* Authentication Status */}
-              {isAuthenticated ? (
-                <div className="flex items-center space-x-3">
-                  <div className="flex items-center space-x-2 px-3 py-1 bg-green-50 rounded-lg border border-green-200">
-                    <User className="w-4 h-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-700">{user?.username}</span>
-                    <span className="text-xs text-green-600">({user?.tokens || 0} tokens)</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={logout}
-                      className="h-6 w-6 p-0 text-green-600 hover:text-green-800"
-                    >
-                      <LogOut className="w-3 h-3" />
-                    </Button>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.location.href = '/checkout'}
-                    className="bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
-                  >
-                    Buy Credits
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => setShowUpgradeWall(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  Sign In / Register
-                </Button>
-              )}
+
               <ModelSelector 
                 selectedModel={selectedModel} 
                 onModelChange={setSelectedModel} 
@@ -313,7 +256,6 @@ export default function LivingBook() {
             mathMode={mathMode}
             selectedText={selectedTextForChat}
             onSelectedTextUsed={() => setSelectedTextForChat("")}
-            onUpgradeWallTrigger={() => setShowUpgradeWall(true)}
           />
         </div>
       </div>
@@ -371,12 +313,7 @@ export default function LivingBook() {
         onChunkAction={handleChunkAction}
       />
       
-      {/* Upgrade Wall Modal */}
-      <UpgradeWall
-        isOpen={showUpgradeWall}
-        onClose={() => setShowUpgradeWall(false)}
-        trigger="feature_access"
-      />
+
     </div>
   );
 }

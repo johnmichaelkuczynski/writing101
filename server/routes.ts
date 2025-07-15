@@ -6,18 +6,8 @@ import { getFullDocumentContent } from "./services/document-processor";
 import { sendEmail } from "./services/email-service";
 import { generatePDF } from "./services/pdf-generator";
 import { transcribeAudio } from "./services/speech-service";
-import { chatRequestSchema, instructionRequestSchema, emailRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, registerRequestSchema, loginRequestSchema, type AIModel } from "@shared/schema";
-import { AuthService } from "./services/auth-service";
+import { chatRequestSchema, instructionRequestSchema, emailRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, type AIModel } from "@shared/schema";
 import multer from "multer";
-import Stripe from "stripe";
-
-// Initialize Stripe (will be conditional based on keys)
-let stripe: Stripe | null = null;
-if (process.env.STRIPE_SECRET_KEY) {
-  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: "2023-10-16",
-  });
-}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Configure multer for audio file uploads
@@ -25,22 +15,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     storage: multer.memoryStorage(),
     limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
   });
+
   // Chat endpoint
   app.post("/api/chat", async (req, res) => {
     try {
       const { message, model } = chatRequestSchema.parse(req.body);
-      
-      // Check user authentication and token status
-      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
-      
-      // Block chat completely for users without tokens (freemium model)
-      if (!user || user.tokens === 0) {
-        return res.status(403).json({ 
-          error: "Chat requires tokens",
-          needsUpgrade: true,
-          message: "Purchase tokens to access AI chat functionality"
-        });
-      }
       
       // Get conversation history for context
       const chatHistory = await storage.getChatMessages();
@@ -66,33 +45,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { instruction, model } = instructionRequestSchema.parse(req.body);
       
-      // Check user authentication and token status
-      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
-      const isPreviewMode = !user || user.tokens === 0;
-      
       const documentContext = getFullDocumentContent();
       const fullPrompt = `Document Content: ${documentContext}\n\nInstruction: ${instruction}`;
       
-      const fullResponse = await generateAIResponse(model, fullPrompt, true);
-      
-      // For preview users, truncate response to first 200 words
-      let displayResponse = fullResponse;
-      if (isPreviewMode) {
-        const words = fullResponse.split(' ');
-        const previewWords = words.slice(0, 200);
-        displayResponse = previewWords.join(' ') + '...\n\nIf you want to enjoy this app\'s services, kindly register and buy credits.';
-      }
+      const response = await generateAIResponse(model, fullPrompt, true);
       
       await storage.createInstruction({
         instruction,
-        response: fullResponse, // Store full response
+        response,
         model
       });
       
-      res.json({ 
-        response: displayResponse,
-        isPreview: isPreviewMode
-      });
+      res.json({ response });
     } catch (error) {
       console.error("Instruction error:", error);
       res.status(500).json({ error: error.message });
@@ -115,37 +79,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { originalText, instructions, model, chunkIndex, parentRewriteId } = rewriteRequestSchema.parse(req.body);
       
-      // Check user authentication and token status
-      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
-      const isPreviewMode = !user || user.tokens === 0;
-      
-      // Generate the full rewrite
-      const fullRewrittenText = await generateRewrite(model, originalText, instructions);
-      
-      // For preview users, truncate the rewrite content
-      let displayText = fullRewrittenText;
-      
-      if (isPreviewMode) {
-        const words = fullRewrittenText.split(' ');
-        const previewWords = words.slice(0, 200); // Show first 200 words
-        displayText = previewWords.join(' ') + '...\n\nIf you want to enjoy this app\'s services, kindly register and buy credits.';
-      }
+      const rewrittenText = await generateRewrite(model, originalText, instructions);
       
       const rewrite = await storage.createRewrite({
         originalText,
-        rewrittenText: displayText,
+        rewrittenText,
         instructions,
         model,
         chunkIndex,
         parentRewriteId,
       });
       
-      res.json({ 
-        rewrite: {
-          ...rewrite,
-          isPreview: isPreviewMode
-        }
-      });
+      res.json({ rewrite });
     } catch (error) {
       console.error("Rewrite error:", error);
       res.status(500).json({ error: error.message });
@@ -195,7 +140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const pdfBuffer = await generatePDF(content);
       
       res.setHeader('Content-Type', 'application/pdf');
-      res.setHeader('Content-Disposition', 'attachment; filename="document.pdf"');
+      res.setHeader('Content-Disposition', 'attachment; filename="download.pdf"');
       res.send(pdfBuffer);
     } catch (error) {
       console.error("PDF generation error:", error);
@@ -232,25 +177,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Missing required fields: passage, model" });
       }
 
-      // Check user authentication and token status
-      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
-      const isPreviewMode = !user || user.tokens === 0;
-
-      const { generatePassageExplanation } = await import("./services/ai-models");
-      const fullExplanation = await generatePassageExplanation(model, passage);
+      const explanation = await generatePassageExplanation(model, passage);
       
-      // For preview users, truncate explanation to first 200 words
-      let displayExplanation = fullExplanation;
-      if (isPreviewMode) {
-        const words = fullExplanation.split(' ');
-        const previewWords = words.slice(0, 200);
-        displayExplanation = previewWords.join(' ') + '...\n\nIf you want to enjoy this app\'s services, kindly register and buy credits.';
-      }
-      
-      res.json({ 
-        explanation: displayExplanation,
-        isPreview: isPreviewMode
-      });
+      res.json({ explanation });
     } catch (error) {
       console.error("Passage explanation error:", error);
       res.status(500).json({ error: "Failed to generate passage explanation" });
@@ -265,26 +194,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Missing required fields: message, passage, model" });
       }
 
-      // Check user authentication and token status
-      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
-      const isPreviewMode = !user || user.tokens === 0;
-
-      const { generatePassageDiscussionResponse } = await import("./services/ai-models");
-      const fullResponse = await generatePassageDiscussionResponse(model, message, passage, conversationHistory || []);
+      const response = await generatePassageDiscussionResponse(model, message, passage, conversationHistory || []);
       
-      // For preview users, truncate after 3 exchanges
-      let displayResponse = fullResponse;
-      
-      if (isPreviewMode && conversationHistory && conversationHistory.length >= 6) {
-        const sentences = fullResponse.split('. ');
-        const previewSentences = sentences.slice(0, 2);
-        displayResponse = previewSentences.join('. ') + '...\n\n[PREVIEW - Purchase tokens for unlimited discussion]';
-      }
-      
-      res.json({ 
-        response: displayResponse,
-        isPreview: isPreviewMode && conversationHistory && conversationHistory.length >= 6
-      });
+      res.json({ response });
     } catch (error) {
       console.error("Passage discussion error:", error);
       res.status(500).json({ error: "Failed to generate discussion response" });
@@ -292,362 +204,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Quiz generation endpoint
-  app.post("/api/quiz", async (req, res) => {
+  app.post("/api/generate-quiz", async (req, res) => {
     try {
-      const { sourceText, instructions, model, includeAnswerKey, chunkIndex } = quizRequestSchema.parse(req.body);
+      const { sourceText, instructions, chunkIndex, model } = quizRequestSchema.parse(req.body);
       
-      // Check user authentication and token status
-      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
-      const isPreviewMode = !user || user.tokens === 0;
+      const quiz = await generateQuiz(model, sourceText, instructions);
       
-      console.log(`Quiz request - User: ${user?.id || 'none'}, Tokens: ${user?.tokens || 0}, Preview mode: ${isPreviewMode}`);
-      
-      // For testing - generate simple quiz content
-      let result;
-      try {
-        result = await generateQuiz(model, sourceText, instructions, includeAnswerKey);
-      } catch (error) {
-        console.log('Using fallback quiz generation due to AI timeout');
-        // Fallback quiz content for testing
-        result = {
-          testContent: `Test on Selected Content
-
-1. What is the main concept discussed in the selected text?
-   a) Algorithm
-   b) Philosophy
-   c) Dictionary
-   d) All of the above
-
-2. Short Answer: Explain the key definition provided in the text.
-
-3. Essay Question: Discuss the philosophical implications of the concepts presented.
-
-4. Multiple Choice: Which field does this content primarily relate to?
-   a) Mathematics
-   b) Computer Science
-   c) Analytic Philosophy
-   d) Literature
-
-5. True/False: The selected text provides comprehensive definitions.
-
-Answer the questions based on your understanding of the provided content.`,
-          answerKey: includeAnswerKey ? `Answer Key:
-1. d) All of the above
-2. Varies based on selected text
-3. Student should demonstrate understanding of philosophical concepts
-4. c) Analytic Philosophy
-5. True` : undefined
-        };
-      }
-      
-      // For preview users, truncate the quiz content to show first few questions
-      let displayContent = result.testContent;
-      let displayAnswerKey = result.answerKey;
-      
-      if (isPreviewMode) {
-        const lines = result.testContent.split('\n');
-        const previewLines = lines.slice(0, 10); // Show first 10 lines
-        displayContent = previewLines.join('\n') + '\n\n[PREVIEW - Purchase tokens to see complete quiz with all questions]';
-        displayAnswerKey = null; // No answer key in preview
-        console.log('Generated preview quiz content');
-      } else {
-        console.log('Generated full quiz content');
-      }
-      
-      const quiz = await storage.createQuiz({
+      const savedQuiz = await storage.createQuiz({
         sourceText,
-        instructions,
-        testContent: displayContent,
-        answerKey: displayAnswerKey,
+        quiz,
+        instructions: instructions || "Generate a comprehensive quiz",
         model,
-        chunkIndex: chunkIndex || null
+        chunkIndex
       });
       
-      res.json({ 
-        id: quiz.id,
-        testContent: quiz.testContent,
-        answerKey: quiz.answerKey,
-        timestamp: quiz.timestamp,
-        isPreview: isPreviewMode
-      });
+      res.json({ quiz: savedQuiz });
     } catch (error) {
       console.error("Quiz generation error:", error);
-      res.status(500).json({ error: error.message || "Failed to generate quiz" });
+      res.status(500).json({ error: error.message });
     }
   });
 
-  // Get quizzes
+  // Get quizzes endpoint
   app.get("/api/quizzes", async (req, res) => {
     try {
       const quizzes = await storage.getQuizzes();
       res.json(quizzes);
     } catch (error) {
-      console.error("Get quizzes error:", error);
+      console.error("Error fetching quizzes:", error);
       res.status(500).json({ error: error.message });
     }
   });
 
   // Study guide generation endpoint
-  app.post("/api/study-guide", async (req, res) => {
+  app.post("/api/generate-study-guide", async (req, res) => {
     try {
-      const { sourceText, instructions, model, chunkIndex } = studyGuideRequestSchema.parse(req.body);
+      const { sourceText, instructions, chunkIndex, model } = studyGuideRequestSchema.parse(req.body);
       
-      // Check user authentication and token status
-      const user = req.session?.userId ? await storage.getUserById(req.session.userId) : null;
-      const isPreviewMode = !user || user.tokens === 0;
+      const studyGuide = await generateStudyGuide(model, sourceText, instructions);
       
-      // Generate the full study guide content
-      const result = await generateStudyGuide(model, sourceText, instructions);
-      
-      // For preview users, truncate the study guide content
-      let displayContent = result.guideContent;
-      
-      if (isPreviewMode) {
-        const lines = result.guideContent.split('\n');
-        const previewLines = lines.slice(0, 15); // Show first 15 lines
-        displayContent = previewLines.join('\n') + '\n\n[PREVIEW - Purchase tokens to see complete study guide with all sections]';
-      }
-      
-      const studyGuide = await storage.createStudyGuide({
+      const savedStudyGuide = await storage.createStudyGuide({
         sourceText,
-        instructions,
-        guideContent: displayContent,
+        studyGuide,
+        instructions: instructions || "Generate a comprehensive study guide",
         model,
-        chunkIndex: chunkIndex || null
+        chunkIndex
       });
       
-      res.json({ 
-        id: studyGuide.id,
-        guideContent: studyGuide.guideContent,
-        timestamp: studyGuide.timestamp,
-        isPreview: isPreviewMode
-      });
+      res.json({ studyGuide: savedStudyGuide });
     } catch (error) {
       console.error("Study guide generation error:", error);
       res.status(500).json({ error: error.message });
     }
   });
 
-  // Get study guides
+  // Get study guides endpoint
   app.get("/api/study-guides", async (req, res) => {
     try {
       const studyGuides = await storage.getStudyGuides();
       res.json(studyGuides);
     } catch (error) {
-      console.error("Get study guides error:", error);
+      console.error("Error fetching study guides:", error);
       res.status(500).json({ error: error.message });
-    }
-  });
-
-  // Get quiz by ID
-  app.get("/api/quiz/:id", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const quiz = await storage.getQuizById(id);
-      
-      if (!quiz) {
-        return res.status(404).json({ error: "Quiz not found" });
-      }
-      
-      res.json(quiz);
-    } catch (error) {
-      console.error("Get quiz error:", error);
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  // Authentication routes
-  app.post("/api/auth/register", async (req, res) => {
-    try {
-      const request = registerRequestSchema.parse(req.body);
-      const result = await AuthService.register(request);
-      
-      if (!result.success) {
-        return res.status(400).json({ error: result.error });
-      }
-      
-      // Set session cookie
-      res.cookie('sessionId', result.session.id, { 
-        httpOnly: true, 
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
-      });
-      
-      res.json({ user: { id: result.user.id, username: result.user.username, tokens: result.user.tokens } });
-    } catch (error) {
-      console.error("Registration error:", error);
-      res.status(500).json({ error: "Registration failed" });
-    }
-  });
-
-  app.post("/api/auth/login", async (req, res) => {
-    try {
-      const request = loginRequestSchema.parse(req.body);
-      const result = await AuthService.login(request);
-      
-      if (!result.success) {
-        return res.status(400).json({ error: result.error });
-      }
-      
-      // Set session cookie
-      res.cookie('sessionId', result.session.id, { 
-        httpOnly: true, 
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
-      });
-      
-      res.json({ user: { id: result.user.id, username: result.user.username, tokens: result.user.tokens } });
-    } catch (error) {
-      console.error("Login error:", error);
-      res.status(500).json({ error: "Login failed" });
-    }
-  });
-
-  app.post("/api/auth/logout", async (req, res) => {
-    try {
-      const sessionId = req.cookies.sessionId;
-      if (sessionId) {
-        await AuthService.logout(sessionId);
-      }
-      res.clearCookie('sessionId');
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Logout error:", error);
-      res.status(500).json({ error: "Logout failed" });
-    }
-  });
-
-  app.get("/api/auth/me", async (req, res) => {
-    try {
-      const sessionId = req.cookies?.sessionId;
-      if (!sessionId) {
-        return res.status(401).json({ error: "Not authenticated" });
-      }
-      
-      const user = await AuthService.validateSession(sessionId);
-      
-      if (!user) {
-        return res.status(401).json({ error: "Not authenticated" });
-      }
-      
-      res.json({ user: { id: user.id, username: user.username, tokens: user.tokens } });
-    } catch (error) {
-      console.error("Auth check error:", error);
-      res.status(500).json({ error: "Authentication check failed" });
-    }
-  });
-
-  // Stripe payment endpoint for one-cent upgrade testing
-  app.post("/api/create-payment-intent", async (req, res) => {
-    try {
-      if (!stripe) {
-        return res.status(500).json({ error: "Stripe not configured" });
-      }
-
-      const { amount = 5.00 } = req.body; // Default to $5 starter package
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(amount * 100), // Convert to cents
-        currency: "usd",
-        metadata: {
-          type: "token_purchase",
-          userId: req.session?.userId || "anonymous",
-          tokens: amount === 5.00 ? "5000" : amount === 10.00 ? "20000" : amount === 100.00 ? "500000" : amount === 1000.00 ? "10000000" : "5000"
-        }
-      });
-      
-      res.json({ clientSecret: paymentIntent.client_secret });
-    } catch (error) {
-      console.error("Payment intent creation error:", error);
-      res.status(500).json({ error: "Failed to create payment intent" });
-    }
-  });
-
-  // Stripe webhook endpoint for processing successful payments
-  app.post("/api/stripe-webhook", async (req, res) => {
-    try {
-      if (!stripe) {
-        return res.status(400).json({ error: "Stripe not configured" });
-      }
-
-      const sig = req.headers['stripe-signature'];
-      let event;
-
-      try {
-        const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-        if (endpointSecret && sig) {
-          // Verify webhook signature with secret
-          event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-        } else {
-          // For development without webhook endpoint setup
-          event = req.body;
-        }
-      } catch (err) {
-        console.error('Webhook signature verification failed:', err);
-        return res.status(400).send(`Webhook Error: ${err.message}`);
-      }
-
-      // Handle the event
-      if (event.type === 'payment_intent.succeeded') {
-        const paymentIntent = event.data.object;
-        const userId = paymentIntent.metadata.userId;
-        const tokens = parseInt(paymentIntent.metadata.tokens || "10");
-
-        if (userId && userId !== "anonymous") {
-          // Add tokens to user account
-          const user = await storage.getUserById(userId);
-          if (user) {
-            const newTokenCount = (user.tokens || 0) + tokens;
-            await storage.updateUserTokens(userId, newTokenCount);
-            console.log(`Added ${tokens} tokens to user ${userId}. New total: ${newTokenCount}`);
-          }
-        }
-      }
-
-      res.json({ received: true });
-    } catch (error) {
-      console.error("Webhook error:", error);
-      res.status(500).json({ error: "Webhook processing failed" });
-    }
-  });
-
-  // Get upgrade options endpoint
-  app.get("/api/upgrade-options", async (req, res) => {
-    try {
-      const options = [
-        {
-          id: "starter",
-          name: "Starter Package",
-          price: 5.00,
-          tokens: 5000,
-          description: "5,000 tokens for getting started with full access"
-        },
-        {
-          id: "basic",
-          name: "Basic Package", 
-          price: 10.00,
-          tokens: 20000,
-          description: "20,000 tokens for regular usage"
-        },
-        {
-          id: "premium",
-          name: "Premium Package",
-          price: 100.00,
-          tokens: 500000,
-          description: "500,000 tokens - best value for heavy usage"
-        },
-        {
-          id: "enterprise",
-          name: "Enterprise Package",
-          price: 1000.00,
-          tokens: 10000000,
-          description: "10,000,000 tokens for enterprise-level usage"
-        }
-      ];
-      
-      res.json({ options });
-    } catch (error) {
-      console.error("Upgrade options error:", error);
-      res.status(500).json({ error: "Failed to get upgrade options" });
     }
   });
 

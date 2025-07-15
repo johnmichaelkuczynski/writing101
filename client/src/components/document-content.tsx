@@ -5,8 +5,7 @@ import { renderMathInElement, renderMathString } from "@/lib/math-renderer";
 import { useTextSelection } from "@/hooks/use-text-selection";
 import SelectionToolbar from "@/components/selection-toolbar";
 import ChunkingModal from "@/components/chunking-modal";
-import UpgradeWall from "@/components/upgrade-wall";
-import { useAuth } from "@/contexts/auth-context";
+
 import { tractatusContent } from "@shared/tractatus-content";
 import { Copy, Lock } from "lucide-react";
 
@@ -24,8 +23,7 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
   const { selection, isSelecting, clearSelection, highlightSelection, removeHighlights } = useTextSelection();
   const [showChunkingModal, setShowChunkingModal] = useState(false);
   const [selectedTextForChunking, setSelectedTextForChunking] = useState("");
-  const [showUpgradeWall, setShowUpgradeWall] = useState(false);
-  const { user, isAuthenticated, canAccessContent } = useAuth();
+
 
   // Math rendering is handled in processContentForMathMode function
 
@@ -240,12 +238,7 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
         }}
       />
       
-      {/* Upgrade Wall Modal */}
-      <UpgradeWall
-        isOpen={showUpgradeWall}
-        onClose={() => setShowUpgradeWall(false)}
-        trigger="page_limit"
-      />
+
     </div>
   );
 }
