@@ -97,8 +97,8 @@ export function getPreviewResponse(fullResponse: string, isUnregistered: boolean
   const previewText = previewWords.join(' ') + '...';
   
   if (isUnregistered) {
-    return previewText + '\n\n[Register to get full responses and access all features]';
+    return previewText + '\n\n[PREVIEW - Please register and purchase credits to see the complete response. Click here to register and buy credits.]';
   } else {
-    return previewText + '\n\n[Purchase credits to get full responses and access all features]';
+    return previewText + '\n\n[PREVIEW - Purchase credits to see the complete response. Click here to buy credits.]';
   }
 }
