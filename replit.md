@@ -521,3 +521,6 @@ Preferred communication style: Simple, everyday language.
   - Updated living-book.tsx default model from "ai1" to "deepseek" for consistency
   - Quiz generation now works perfectly with proper text content display and no validation errors
   - Admin user jmkuczynski receives unlimited credits (999,999,999) automatically upon registration
+  - CONFIRMED: Quiz generation working perfectly - 34-second generation time with proper content display
+  - CONFIRMED: Study guide generation working properly with corrected model validation
+  - All AI features (chat, quiz, study guide, rewrite) now use consistent model naming across entire application
