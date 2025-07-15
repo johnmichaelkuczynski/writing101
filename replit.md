@@ -540,3 +540,9 @@ Preferred communication style: Simple, everyday language.
   - Preview responses now show clean truncated content without registration prompts
   - Simplified getPreviewResponse function to return only content preview without call-to-action text
   - Enhanced user experience by removing intrusive registration messaging from modal previews
+- July 15, 2025: COMPLETE PREVIEW SYSTEM OVERHAUL - Eliminated all registration prompts from AI responses
+  - REMOVED all getPreviewResponse calls that added "Click here to register and buy credits" text
+  - Replaced with simple word truncation (200 words + "...") for preview responses
+  - Fixed all AI endpoints: chat, instruction, rewrite, passage explanation, passage discussion, quiz, study guide
+  - Users now see clean truncated content without any registration messaging
+  - Preview responses are clean and professional without intrusive call-to-action text
