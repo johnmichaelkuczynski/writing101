@@ -62,9 +62,28 @@ export default function PayPalButton({
     const orderData = await captureOrder(data.orderId);
     console.log("Capture result", orderData);
     
-    // Refresh the page to update credits
+    // Only credit user after payment verification
     if (orderData.status === "COMPLETED") {
-      window.location.reload();
+      try {
+        const verifyResponse = await fetch("/api/verify-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderID: data.orderId })
+        });
+        
+        const verifyData = await verifyResponse.json();
+        
+        if (verifyData.success) {
+          console.log("Payment verified, credits added:", verifyData.credits_added);
+          window.location.reload();
+        } else {
+          console.error("Payment verification failed:", verifyData.error);
+          alert("Payment verification failed. Please contact support.");
+        }
+      } catch (error) {
+        console.error("Verification error:", error);
+        alert("Payment verification failed. Please contact support.");
+      }
     }
   };
 
@@ -77,40 +96,25 @@ export default function PayPalButton({
   };
 
   useEffect(() => {
-    // For demo: create a simple button that simulates PayPal
-    const initSimplePayPal = () => {
-      const paypalButton = document.getElementById("paypal-button");
-      if (paypalButton) {
-        paypalButton.innerHTML = `
-          <button style="
-            background: #0070ba;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-          ">
-            Pay with PayPal
-          </button>
-        `;
-        
-        const button = paypalButton.querySelector('button');
-        if (button) {
-          button.onclick = async () => {
-            try {
-              const order = await createOrder();
-              await onApprove({ orderId: order.orderId });
-            } catch (e) {
-              console.error("Payment error:", e);
-            }
-          };
+    const loadPayPalSDK = async () => {
+      try {
+        if (!(window as any).paypal) {
+          const script = document.createElement("script");
+          script.src = import.meta.env.PROD
+            ? "https://www.paypal.com/web-sdk/v6/core"
+            : "https://www.sandbox.paypal.com/web-sdk/v6/core";
+          script.async = true;
+          script.onload = () => initPayPal();
+          document.body.appendChild(script);
+        } else {
+          await initPayPal();
         }
+      } catch (e) {
+        console.error("Failed to load PayPal SDK", e);
       }
     };
 
-    initSimplePayPal();
+    loadPayPalSDK();
   }, []);
   const initPayPal = async () => {
     try {

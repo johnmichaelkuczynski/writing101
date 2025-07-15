@@ -25,6 +25,9 @@ if (!PAYPAL_CLIENT_ID) {
 if (!PAYPAL_CLIENT_SECRET) {
   throw new Error("Missing PAYPAL_CLIENT_SECRET");
 }
+
+console.log("PayPal Client ID:", PAYPAL_CLIENT_ID?.substring(0, 10) + "...");
+console.log("PayPal Client Secret:", PAYPAL_CLIENT_SECRET?.substring(0, 10) + "...");
 const client = new Client({
   clientCredentialsAuthCredentials: {
     oAuthClientId: PAYPAL_CLIENT_ID,
@@ -48,14 +51,24 @@ const client = new Client({
 const ordersController = new OrdersController(client);
 const oAuthAuthorizationController = new OAuthAuthorizationController(client);
 
+// Export the orders controller for use in other files
+export { ordersController };
+
 /* Token generation helpers */
 
 export async function getClientToken() {
   try {
+    const auth = Buffer.from(
+      `${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`,
+    ).toString("base64");
+
     const { result } = await oAuthAuthorizationController.requestToken(
-      {},
+      {
+        authorization: `Basic ${auth}`,
+      },
       { intent: "sdk_init", response_type: "client_token" },
     );
+
     return result.accessToken;
   } catch (error) {
     console.error("PayPal token generation failed:", error);
@@ -131,10 +144,25 @@ export async function capturePaypalOrder(req: Request, res: Response) {
     const jsonResponse = JSON.parse(String(body));
     const httpStatusCode = httpResponse.statusCode;
 
+    // Only return the PayPal response - do NOT credit user here
     res.status(httpStatusCode).json(jsonResponse);
   } catch (error) {
-    console.error("Failed to create order:", error);
+    console.error("Failed to capture order:", error);
     res.status(500).json({ error: "Failed to capture order." });
+  }
+}
+
+export async function verifyPaypalTransaction(orderID: string) {
+  try {
+    const { body } = await ordersController.getOrder({ id: orderID });
+    const orderData = JSON.parse(String(body));
+    
+    // Verify the order is actually completed and paid
+    return orderData.status === 'COMPLETED' && 
+           orderData.purchase_units?.[0]?.payments?.captures?.[0]?.status === 'COMPLETED';
+  } catch (error) {
+    console.error("Failed to verify PayPal transaction:", error);
+    return false;
   }
 }
 
