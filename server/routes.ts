@@ -8,7 +8,7 @@ import { getFullDocumentContent } from "./services/document-processor";
 
 import { generatePDF } from "./services/pdf-generator";
 import { transcribeAudio } from "./services/speech-service";
-import { register, login, createSession, getUserFromSession, canAccessFeature, getPreviewResponse } from "./auth";
+import { register, login, createSession, getUserFromSession, canAccessFeature, getPreviewResponse, isAdmin } from "./auth";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalTransaction, ordersController } from "./paypal";
 import { chatRequestSchema, instructionRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, registerRequestSchema, loginRequestSchema, purchaseRequestSchema, type AIModel } from "@shared/schema";
 import multer from "multer";
@@ -216,8 +216,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         response = getPreviewResponse(fullResponse, !user);
         isPreview = true;
       } else {
-        // Deduct 1 credit for full response
-        await storage.updateUserCredits(user!.id, user!.credits - 1);
+        // Deduct 1 credit for full response (skip for admin)
+        if (!isAdmin(user)) {
+          await storage.updateUserCredits(user!.id, user!.credits - 1);
+        }
       }
       
       await storage.createChatMessage({
@@ -253,8 +255,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         response = getPreviewResponse(fullResponse, !user);
         isPreview = true;
       } else {
-        // Deduct 1 credit for full response
-        await storage.updateUserCredits(user!.id, user!.credits - 1);
+        // Deduct 1 credit for full response (skip for admin)
+        if (!isAdmin(user)) {
+          await storage.updateUserCredits(user!.id, user!.credits - 1);
+        }
       }
       
       await storage.createInstruction({
@@ -297,8 +301,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         rewrittenText = getPreviewResponse(fullRewrittenText, !user);
         isPreview = true;
       } else {
-        // Deduct 1 credit for full response
-        await storage.updateUserCredits(user!.id, user!.credits - 1);
+        // Deduct 1 credit for full response (skip for admin)
+        if (!isAdmin(user)) {
+          await storage.updateUserCredits(user!.id, user!.credits - 1);
+        }
       }
       
       const rewrite = await storage.createRewrite({
@@ -427,8 +433,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         response = getPreviewResponse(fullResponse, !user);
         isPreview = true;
       } else {
-        // Deduct 1 credit for full response
-        await storage.updateUserCredits(user!.id, user!.credits - 1);
+        // Deduct 1 credit for full response (skip for admin)
+        if (!isAdmin(user)) {
+          await storage.updateUserCredits(user!.id, user!.credits - 1);
+        }
       }
       
       res.json({ response, isPreview });
@@ -454,8 +462,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         quiz = getPreviewResponse(fullQuiz, !user);
         isPreview = true;
       } else {
-        // Deduct 1 credit for full response
-        await storage.updateUserCredits(user!.id, user!.credits - 1);
+        // Deduct 1 credit for full response (skip for admin)
+        if (!isAdmin(user)) {
+          await storage.updateUserCredits(user!.id, user!.credits - 1);
+        }
       }
       
       const savedQuiz = await storage.createQuiz({
@@ -506,8 +516,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         studyGuide = getPreviewResponse(fullStudyGuide, !user);
         isPreview = true;
       } else {
-        // Deduct 1 credit for full response
-        await storage.updateUserCredits(user!.id, user!.credits - 1);
+        // Deduct 1 credit for full response (skip for admin)
+        if (!isAdmin(user)) {
+          await storage.updateUserCredits(user!.id, user!.credits - 1);
+        }
       }
       
       const savedStudyGuide = await storage.createStudyGuide({

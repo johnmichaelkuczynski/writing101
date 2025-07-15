@@ -87,8 +87,19 @@ export async function getUserFromSession(sessionId: string): Promise<User | null
   return storage.getUserById(session.userId);
 }
 
+export function isAdmin(user: User | null): boolean {
+  return user?.email === 'jmkuczynski@yahoo.com';
+}
+
 export function canAccessFeature(user: User | null): boolean {
-  return user !== null && user.credits > 0;
+  if (!user) return false;
+  
+  // Admin bypass: jmkuczynski@yahoo.com gets unlimited access
+  if (isAdmin(user)) {
+    return true;
+  }
+  
+  return user.credits > 0;
 }
 
 export function getPreviewResponse(fullResponse: string, isUnregistered: boolean): string {
