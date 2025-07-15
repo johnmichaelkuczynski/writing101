@@ -49,6 +49,8 @@ export default function UpgradeWall({ isOpen, onClose, trigger }: UpgradeWallPro
           title: "Success!",
           description: `${authMode === "register" ? "Account created" : "Logged in"} successfully`,
         });
+        // Update auth context and close modal
+        const userData = data.user;
         window.location.reload(); // Refresh to update auth state
       } else {
         const error = await response.json();
