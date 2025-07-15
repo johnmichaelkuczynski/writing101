@@ -237,12 +237,12 @@ export default function LivingBook() {
               />
 
               {/* Authentication section */}
-              {isAuthenticated ? (
+              {isAuthenticated && user ? (
                 <div className="flex items-center space-x-2 border-l pl-2 ml-2">
                   <div className="text-sm">
-                    <span className="font-medium">{user?.username}</span>
+                    <span className="font-medium">{user.username}</span>
                     <div className="text-xs text-muted-foreground">
-                      {user?.credits.toLocaleString()} credits
+                      {(user.credits || 0).toLocaleString()} credits
                     </div>
                   </div>
                   <Button

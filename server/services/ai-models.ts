@@ -25,10 +25,10 @@ const anthropic = new Anthropic({
 
 function getModelDisplayName(model: AIModel): string {
   const modelNames = {
-    deepseek: "AI1",
-    openai: "AI2", 
-    anthropic: "AI3",
-    perplexity: "AI4"
+    ai1: "AI1",
+    ai2: "AI2", 
+    ai3: "AI3",
+    ai4: "AI4"
   };
   return modelNames[model] || model;
 }
@@ -67,6 +67,10 @@ Answer questions about this philosophical dictionary, referencing specific defin
 
 // Helper function to clean markdown and improve formatting
 function cleanRewriteText(text: string): string {
+  if (!text || typeof text !== 'string') {
+    return '';
+  }
+  
   return text
     // Remove markdown bold/italic formatting
     .replace(/\*\*([^*]+)\*\*/g, '$1')
@@ -124,16 +128,16 @@ Please rewrite the text according to these instructions:`;
   try {
     let result: string;
     switch (model) {
-      case "openai":
+      case "ai2":
         result = await generateOpenAIResponse(prompt, systemPrompt);
         break;
-      case "anthropic":
+      case "ai3":
         result = await generateAnthropicResponse(prompt, systemPrompt);
         break;
-      case "perplexity":
+      case "ai4":
         result = await generatePerplexityResponse(prompt, systemPrompt);
         break;
-      case "deepseek":
+      case "ai1":
         result = await generateDeepSeekResponse(prompt, systemPrompt);
         break;
       default:
@@ -177,16 +181,16 @@ Provide a brief, enlightening explanation that helps the user understand Wittgen
   try {
     let result: string;
     switch (model) {
-      case "openai":
+      case "ai2":
         result = await generateOpenAIResponse(prompt, systemPrompt);
         break;
-      case "anthropic":
+      case "ai3":
         result = await generateAnthropicResponse(prompt, systemPrompt);
         break;
-      case "perplexity":
+      case "ai4":
         result = await generatePerplexityResponse(prompt, systemPrompt);
         break;
-      case "deepseek":
+      case "ai1":
       default:
         result = await generateDeepSeekResponse(prompt, systemPrompt);
         break;
@@ -199,7 +203,7 @@ Provide a brief, enlightening explanation that helps the user understand Wittgen
     console.error(`Error in passage explanation with ${modelName}:`, error);
     
     // If current model fails, try AI2 as fallback
-    if (model !== "openai") {
+    if (model !== "ai2") {
       console.log(`Attempting AI2 fallback for passage explanation due to ${modelName} failure`);
       try {
         const fallbackResult = await generateOpenAIResponse(prompt, systemPrompt);
@@ -273,7 +277,7 @@ Respond thoughtfully to continue our discussion about this passage from the Trac
     console.error(`Error in passage discussion with ${modelName}:`, error);
     
     // If current model fails, try AI2 as fallback
-    if (model !== "openai") {
+    if (model !== "ai2") {
       console.log(`Attempting AI2 fallback for passage discussion due to ${modelName} failure`);
       try {
         const fallbackResult = await generateOpenAIResponse(prompt, systemPrompt);
@@ -320,16 +324,16 @@ CRITICAL FORMATTING RULES:
   try {
     let result: string;
     switch (model) {
-      case "openai":
+      case "ai2":
         result = await generateOpenAIResponse(prompt, systemPrompt);
         break;
-      case "anthropic":
+      case "ai3":
         result = await generateAnthropicResponse(prompt, systemPrompt);
         break;
-      case "perplexity":
+      case "ai4":
         result = await generatePerplexityResponse(prompt, systemPrompt);
         break;
-      case "deepseek":
+      case "ai1":
         result = await generateDeepSeekResponse(prompt, systemPrompt);
         break;
       default:
@@ -343,7 +347,7 @@ CRITICAL FORMATTING RULES:
     console.error(`Error generating AI response with ${modelName}:`, error);
     
     // If current model fails, try AI2 as fallback
-    if (model !== "openai") {
+    if (model !== "ai2") {
       console.log(`Attempting fallback to AI2 due to ${modelName} failure`);
       try {
         const fallbackResult = await generateOpenAIResponse(prompt, systemPrompt);
@@ -447,16 +451,16 @@ ${includeAnswerKey ? 'Please provide both the test questions AND a separate answ
   try {
     let result: string;
     switch (model) {
-      case "openai":
+      case "ai2":
         result = await generateOpenAIResponse(fullPrompt, systemPrompt);
         break;
-      case "anthropic":
+      case "ai3":
         result = await generateAnthropicResponse(fullPrompt, systemPrompt);
         break;
-      case "perplexity":
+      case "ai4":
         result = await generatePerplexityResponse(fullPrompt, systemPrompt);
         break;
-      case "deepseek":
+      case "ai1":
         result = await generateDeepSeekResponse(fullPrompt, systemPrompt);
         break;
       default:
@@ -466,7 +470,7 @@ ${includeAnswerKey ? 'Please provide both the test questions AND a separate answ
     // Clean the result
     const cleanedResult = cleanRewriteText(result);
     
-    if (includeAnswerKey) {
+    if (includeAnswerKey && cleanedResult) {
       // Try to split test and answer key
       const answerKeyMatch = cleanedResult.match(/(answer\s*key|answers?)\s*:?\s*([\s\S]+)$/i);
       if (answerKeyMatch) {
@@ -488,7 +492,7 @@ ${includeAnswerKey ? 'Please provide both the test questions AND a separate answ
         const fallbackResult = await generateOpenAIResponse(fullPrompt, systemPrompt);
         const cleanedResult = cleanRewriteText(fallbackResult);
         
-        if (includeAnswerKey) {
+        if (includeAnswerKey && cleanedResult) {
           const answerKeyMatch = cleanedResult.match(/(answer\s*key|answers?)\s*:?\s*([\s\S]+)$/i);
           if (answerKeyMatch) {
             const testContent = cleanedResult.replace(answerKeyMatch[0], '').trim();
@@ -543,16 +547,16 @@ Please provide a well-structured study guide that helps students understand and 
   try {
     let result: string;
     switch (model) {
-      case "openai":
+      case "ai2":
         result = await generateOpenAIResponse(fullPrompt, systemPrompt);
         break;
-      case "anthropic":
+      case "ai3":
         result = await generateAnthropicResponse(fullPrompt, systemPrompt);
         break;
-      case "perplexity":
+      case "ai4":
         result = await generatePerplexityResponse(fullPrompt, systemPrompt);
         break;
-      case "deepseek":
+      case "ai1":
         result = await generateDeepSeekResponse(fullPrompt, systemPrompt);
         break;
       default:
@@ -567,7 +571,7 @@ Please provide a well-structured study guide that helps students understand and 
     console.error(`Error generating study guide with ${modelName}:`, error);
     
     // Fallback to AI2
-    if (model !== "openai") {
+    if (model !== "ai2") {
       console.log(`Attempting fallback to AI2 due to ${modelName} failure`);
       try {
         const fallbackResult = await generateOpenAIResponse(fullPrompt, systemPrompt);

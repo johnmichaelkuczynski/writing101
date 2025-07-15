@@ -40,12 +40,15 @@ export function renderMathInElement(element?: HTMLElement) {
 
 export function renderMathString(latex: string, displayMode: boolean = false): string {
   try {
+    if (!latex || typeof latex !== 'string') {
+      return latex || '';
+    }
     return katex.renderToString(latex, {
       throwOnError: false,
       displayMode: displayMode
     });
   } catch (error) {
     console.warn('KaTeX string rendering failed:', error);
-    return latex;
+    return latex || '';
   }
 }

@@ -46,6 +46,7 @@ export async function downloadPDF(content: string, filename: string = 'ai-respon
         .replace(/^# (.*$)/gm, '<h1 style="font-size: 1.6em; font-weight: bold; margin: 1em 0 0.5em 0;">$1</h1>')
         // Convert code blocks
         .replace(/```[\s\S]*?```/g, (match) => {
+          if (!match) return '';
           const codeContent = match.replace(/```/g, '');
           return `<pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 0.9em; margin: 1em 0; white-space: pre-wrap;">${codeContent}</pre>`;
         })

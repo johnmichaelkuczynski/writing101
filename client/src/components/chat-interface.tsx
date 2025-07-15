@@ -65,10 +65,12 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
     if (mathMode) {
       // Replace display math blocks
       mathProcessedContent = mathProcessedContent.replace(/\$\$([^$]+)\$\$/g, (match, latex) => {
+        if (!match || !latex) return match || '';
         return renderMathString(latex, true);
       });
       // Replace inline math
       mathProcessedContent = mathProcessedContent.replace(/\$([^$]+)\$/g, (match, latex) => {
+        if (!match || !latex) return match || '';
         return renderMathString(latex, false);
       });
     }
@@ -83,6 +85,7 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
       .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mt-4 mb-2">$1</h1>')
       // Code blocks (multiline)
       .replace(/```[\s\S]*?```/g, (match) => {
+        if (!match) return '';
         const codeContent = match.replace(/```/g, '');
         return `<pre class="bg-gray-100 p-2 rounded text-sm my-2 overflow-x-auto"><code>${codeContent}</code></pre>`;
       })

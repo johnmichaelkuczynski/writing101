@@ -131,31 +131,42 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
 
   // Function to convert math content based on mode
   const processContentForMathMode = (content: string) => {
-    if (!mathMode) {
-      // Remove LaTeX notation when math mode is off
-      return content
-        .replace(/\$\$([^$]+)\$\$/g, '$1') // Remove display math delimiters
-        .replace(/\$([^$]+)\$/g, '$1') // Remove inline math delimiters
-        .replace(/\\sqrt\{([^}]+)\}/g, 'sqrt($1)') // Convert sqrt notation
-        .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)') // Convert fractions
-        .replace(/\\text\{([^}]+)\}/g, '$1') // Remove text commands
-        .replace(/\\mathbb\{([^}]+)\}/g, '$1') // Remove mathbb
-        .replace(/\\forall/g, 'for all') // Convert universal quantifier
-        .replace(/\\Rightarrow/g, 'implies') // Convert implication
-        .replace(/\\ldots/g, '...') // Convert ellipsis
-        .replace(/\\times/g, '×'); // Convert multiplication
-    } else {
-      // Process LaTeX notation for rendering
-      let processed = content;
-      // Replace display math blocks
-      processed = processed.replace(/\$\$([^$]+)\$\$/g, (match, latex) => {
-        return renderMathString(latex, true);
-      });
-      // Replace inline math
-      processed = processed.replace(/\$([^$]+)\$/g, (match, latex) => {
-        return renderMathString(latex, false);
-      });
-      return processed;
+    try {
+      if (!content || typeof content !== 'string') {
+        return content || '';
+      }
+      
+      if (!mathMode) {
+        // Remove LaTeX notation when math mode is off
+        return content
+          .replace(/\$\$([^$]+)\$\$/g, '$1') // Remove display math delimiters
+          .replace(/\$([^$]+)\$/g, '$1') // Remove inline math delimiters
+          .replace(/\\sqrt\{([^}]+)\}/g, 'sqrt($1)') // Convert sqrt notation
+          .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)') // Convert fractions
+          .replace(/\\text\{([^}]+)\}/g, '$1') // Remove text commands
+          .replace(/\\mathbb\{([^}]+)\}/g, '$1') // Remove mathbb
+          .replace(/\\forall/g, 'for all') // Convert universal quantifier
+          .replace(/\\Rightarrow/g, 'implies') // Convert implication
+          .replace(/\\ldots/g, '...') // Convert ellipsis
+          .replace(/\\times/g, '×'); // Convert multiplication
+      } else {
+        // Process LaTeX notation for rendering
+        let processed = content;
+        // Replace display math blocks
+        processed = processed.replace(/\$\$([^$]+)\$\$/g, (match, latex) => {
+          if (!match || !latex) return match || '';
+          return renderMathString(latex, true);
+        });
+        // Replace inline math
+        processed = processed.replace(/\$([^$]+)\$/g, (match, latex) => {
+          if (!match || !latex) return match || '';
+          return renderMathString(latex, false);
+        });
+        return processed;
+      }
+    } catch (error) {
+      console.error('Error processing content for math mode:', error);
+      return content || '';
     }
   };
 
