@@ -5,6 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/contexts/auth-context";
 
 // Make sure to call `loadStripe` outside of a component's render to avoid
 // recreating the `Stripe` object on every render.
@@ -67,20 +68,36 @@ export default function Checkout() {
   const [clientSecret, setClientSecret] = useState("");
   const [upgradeOptions, setUpgradeOptions] = useState([]);
   const [selectedAmount, setSelectedAmount] = useState(5.00);
+  const { isAuthenticated, loading } = useAuth();
+  const { toast } = useToast();
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      toast({
+        title: "Authentication Required",
+        description: "Please register or log in before purchasing tokens.",
+        variant: "destructive",
+      });
+      window.location.href = "/";
+    }
+  }, [isAuthenticated, loading, toast]);
 
   useEffect(() => {
-    // Get upgrade options
-    apiRequest("/api/upgrade-options", { method: "GET" })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Upgrade options loaded:", data);
-        setUpgradeOptions(data.options || []);
-      })
-      .catch((error) => {
-        console.error("Failed to load upgrade options:", error);
-        setUpgradeOptions([]);
-      });
-  }, []);
+    // Only load upgrade options if authenticated
+    if (isAuthenticated) {
+      apiRequest("/api/upgrade-options", { method: "GET" })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("Upgrade options loaded:", data);
+          setUpgradeOptions(data.options || []);
+        })
+        .catch((error) => {
+          console.error("Failed to load upgrade options:", error);
+          setUpgradeOptions([]);
+        });
+    }
+  }, [isAuthenticated]);
 
   const createPaymentIntent = async (amount: number) => {
     try {
@@ -96,14 +113,35 @@ export default function Checkout() {
   };
 
   useEffect(() => {
-    if (selectedAmount > 0) {
+    if (selectedAmount > 0 && isAuthenticated) {
       createPaymentIntent(selectedAmount);
     }
-  }, [selectedAmount]);
+  }, [selectedAmount, isAuthenticated]);
 
   const handleSuccess = () => {
     window.location.href = "/";
   };
+
+  // Show loading while authentication is being checked
+  if (loading) {
+    return (
+      <div className="max-w-md mx-auto mt-8 p-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Loading...</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Checking authentication status...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // If not authenticated, this should not render (redirected in useEffect)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
     return (

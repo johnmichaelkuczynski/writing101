@@ -68,8 +68,20 @@ export default function UpgradeWall({ isOpen, onClose, trigger }: UpgradeWallPro
   };
 
   const handlePurchase = async (tierId: string) => {
-    // Redirect to checkout page
-    window.location.href = '/checkout';
+    // Check if user is authenticated first
+    try {
+      const response = await fetch('/api/auth/me');
+      if (response.ok) {
+        // User is authenticated, proceed to checkout
+        window.location.href = '/checkout';
+      } else {
+        // User not authenticated, show auth form
+        setShowAuth(true);
+      }
+    } catch (error) {
+      // Show auth form on error
+      setShowAuth(true);
+    }
   };
 
   if (showAuth) {
@@ -196,7 +208,7 @@ export default function UpgradeWall({ isOpen, onClose, trigger }: UpgradeWallPro
                     variant={tierId === "tier2" ? "default" : "outline"}
                   >
                     <Zap className="w-4 h-4 mr-2" />
-                    Purchase
+                    Register & Purchase
                   </Button>
                 </CardContent>
               </Card>
@@ -205,9 +217,9 @@ export default function UpgradeWall({ isOpen, onClose, trigger }: UpgradeWallPro
         </div>
 
         <div className="flex gap-4 pt-6 border-t">
-          <Button onClick={() => window.location.href = '/checkout'} className="flex-1 bg-green-600 hover:bg-green-700">
+          <Button onClick={() => handlePurchase('starter')} className="flex-1 bg-green-600 hover:bg-green-700">
             <Zap className="w-4 h-4 mr-2" />
-            Upgrade for 1¢
+            Register & Upgrade
           </Button>
           <Button onClick={() => setShowAuth(true)} variant="outline" className="flex-1">
             <Crown className="w-4 h-4 mr-2" />

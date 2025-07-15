@@ -397,3 +397,9 @@ Preferred communication style: Simple, everyday language.
   - Registration requires only username/password (no email verification needed)
   - All AI activities (chat, rewrite, grading, essay writing) consume user credits
   - Storage fees: 500 tokens/month for 50,000 words (for stored assignments between sessions)
+- July 15, 2025: AUTHENTICATION FLOW FIX - Fixed checkout access for unregistered users
+  - Added authentication checks to prevent unregistered users from accessing checkout page
+  - Upgrade wall now prompts users to register first before attempting payment
+  - Fixed infinite loading wheel issue when unregistered users tried to pay
+  - Checkout page redirects unregistered users back to main page with clear messaging
+  - All purchase buttons now indicate "Register & Purchase" to set clear expectations
