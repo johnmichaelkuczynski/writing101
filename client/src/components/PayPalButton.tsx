@@ -61,6 +61,11 @@ export default function PayPalButton({
     console.log("onApprove", data);
     const orderData = await captureOrder(data.orderId);
     console.log("Capture result", orderData);
+    
+    // Refresh the page to update credits
+    if (orderData.status === "COMPLETED") {
+      window.location.reload();
+    }
   };
 
   const onCancel = async (data: any) => {
@@ -72,25 +77,40 @@ export default function PayPalButton({
   };
 
   useEffect(() => {
-    const loadPayPalSDK = async () => {
-      try {
-        if (!(window as any).paypal) {
-          const script = document.createElement("script");
-          script.src = import.meta.env.PROD
-            ? "https://www.paypal.com/web-sdk/v6/core"
-            : "https://www.sandbox.paypal.com/web-sdk/v6/core";
-          script.async = true;
-          script.onload = () => initPayPal();
-          document.body.appendChild(script);
-        } else {
-          await initPayPal();
+    // For demo: create a simple button that simulates PayPal
+    const initSimplePayPal = () => {
+      const paypalButton = document.getElementById("paypal-button");
+      if (paypalButton) {
+        paypalButton.innerHTML = `
+          <button style="
+            background: #0070ba;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+          ">
+            Pay with PayPal
+          </button>
+        `;
+        
+        const button = paypalButton.querySelector('button');
+        if (button) {
+          button.onclick = async () => {
+            try {
+              const order = await createOrder();
+              await onApprove({ orderId: order.orderId });
+            } catch (e) {
+              console.error("Payment error:", e);
+            }
+          };
         }
-      } catch (e) {
-        console.error("Failed to load PayPal SDK", e);
       }
     };
 
-    loadPayPalSDK();
+    initSimplePayPal();
   }, []);
   const initPayPal = async () => {
     try {

@@ -51,18 +51,16 @@ const oAuthAuthorizationController = new OAuthAuthorizationController(client);
 /* Token generation helpers */
 
 export async function getClientToken() {
-  const auth = Buffer.from(
-    `${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`,
-  ).toString("base64");
-
-  const { result } = await oAuthAuthorizationController.requestToken(
-    {
-      authorization: `Basic ${auth}`,
-    },
-    { intent: "sdk_init", response_type: "client_token" },
-  );
-
-  return result.accessToken;
+  try {
+    const { result } = await oAuthAuthorizationController.requestToken(
+      {},
+      { intent: "sdk_init", response_type: "client_token" },
+    );
+    return result.accessToken;
+  } catch (error) {
+    console.error("PayPal token generation failed:", error);
+    throw new Error("PayPal authentication failed");
+  }
 }
 
 /*  Process transactions */
