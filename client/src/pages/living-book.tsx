@@ -177,11 +177,11 @@ export default function LivingBook() {
       <header className="bg-card shadow-sm border-b border-border sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <BookOpen className="text-primary text-xl" />
+            <div className="flex items-center space-x-3">
+              <BookOpen className="text-primary text-lg" />
               <div className="flex flex-col">
-                <h1 className="font-inter font-semibold text-lg text-foreground">
-                  Living Book: Dictionary of Analytic Philosophy
+                <h1 className="font-inter font-semibold text-base text-foreground">
+                  Dictionary of Analytic Philosophy
                 </h1>
                 <a 
                   href="mailto:contact@zhisystems.ai"
