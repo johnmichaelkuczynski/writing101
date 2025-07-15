@@ -146,24 +146,37 @@ export default function PaymentModal({ isOpen, onClose }: PaymentModalProps) {
 
   const createPaymentMutation = useMutation({
     mutationFn: async (option: CreditOption) => {
+      console.log("Creating payment for option:", option);
+      
       const response = await apiRequest("/api/create-payment-intent", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           amount: option.price,
           credits: option.credits,
         }),
+        credentials: "include", // Ensure cookies are sent
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP ${response.status}`);
+      }
+      
       return response.json();
     },
     onSuccess: (data) => {
+      console.log("Payment creation successful:", data);
       setClientSecret(data.clientSecret);
       setIsCreatingPayment(false);
     },
     onError: (error) => {
       console.error("Payment creation error:", error);
       toast({
-        title: "Error",
-        description: "Failed to create payment. Please try again.",
+        title: "Payment Error",
+        description: error.message || "Failed to create payment. Please try again.",
         variant: "destructive",
       });
       setIsCreatingPayment(false);

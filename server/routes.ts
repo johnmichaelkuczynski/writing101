@@ -135,13 +135,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Payment routes
   app.post("/api/create-payment-intent", async (req, res) => {
     try {
+      console.log("Payment request received");
+      console.log("Session data:", req.session);
+      
       const user = await getCurrentUser(req);
+      console.log("Current user:", user ? `${user.username} (ID: ${user.id})` : "Not authenticated");
+      
       if (!user) {
         return res.status(401).json({ error: "Authentication required" });
       }
 
       const purchaseData = purchaseRequestSchema.parse(req.body);
+      console.log("Purchase data:", purchaseData);
+      
       const result = await createPaymentIntent(user.id, purchaseData);
+      console.log("Payment intent created successfully");
       
       res.json(result);
     } catch (error) {
