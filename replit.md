@@ -508,3 +508,8 @@ Preferred communication style: Simple, everyday language.
   - Fixed API response handling to properly extract quiz data from server response
   - Enhanced error handling in download, print, and view functions
   - App no longer crashes when quiz generation completes
+- July 15, 2025: CRITICAL API SCHEMA FIX - Fixed model enum validation that was blocking all AI features
+  - FIXED critical schema validation error where AI models were defined as 'ai1' | 'ai2' | 'ai3' | 'ai4' instead of actual model names
+  - Updated AIModel type and all request schemas to use proper model names: 'deepseek' | 'openai' | 'anthropic' | 'perplexity'
+  - Fixed quiz generation, study guide, chat, and rewrite functionality that was failing due to schema validation errors
+  - All AI features now work properly with correct model name validation

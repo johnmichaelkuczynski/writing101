@@ -161,23 +161,23 @@ export type InsertPurchase = z.infer<typeof insertPurchaseSchema>;
 
 
 // AI Models
-export type AIModel = "ai1" | "ai2" | "ai3" | "ai4";
+export type AIModel = "deepseek" | "openai" | "anthropic" | "perplexity";
 
 // Request schemas
 export const chatRequestSchema = z.object({
   message: z.string(),
-  model: z.enum(["ai1", "ai2", "ai3", "ai4"]),
+  model: z.enum(["deepseek", "openai", "anthropic", "perplexity"]),
 });
 
 export const instructionRequestSchema = z.object({
   instruction: z.string(),
-  model: z.enum(["ai1", "ai2", "ai3", "ai4"]),
+  model: z.enum(["deepseek", "openai", "anthropic", "perplexity"]),
 });
 
 export const rewriteRequestSchema = z.object({
   originalText: z.string(),
   instructions: z.string(),
-  model: z.enum(["ai1", "ai2", "ai3", "ai4"]),
+  model: z.enum(["deepseek", "openai", "anthropic", "perplexity"]),
   chunkIndex: z.number().optional(),
   parentRewriteId: z.number().optional(),
 });
@@ -185,14 +185,14 @@ export const rewriteRequestSchema = z.object({
 export const quizRequestSchema = z.object({
   sourceText: z.string(),
   instructions: z.string().optional(),
-  model: z.enum(["ai1", "ai2", "ai3", "ai4"]),
+  model: z.enum(["deepseek", "openai", "anthropic", "perplexity"]),
   chunkIndex: z.number().optional(),
 });
 
 export const studyGuideRequestSchema = z.object({
   sourceText: z.string(),
   instructions: z.string().optional(),
-  model: z.enum(["ai1", "ai2", "ai3", "ai4"]),
+  model: z.enum(["deepseek", "openai", "anthropic", "perplexity"]),
   chunkIndex: z.number().optional(),
 });
 
