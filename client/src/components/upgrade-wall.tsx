@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Lock, Crown, Zap, Star } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/auth-context";
 import { PRICING_TIERS } from "@shared/schema";
 
 interface UpgradeWallProps {
@@ -24,6 +25,7 @@ export default function UpgradeWall({ isOpen, onClose, trigger }: UpgradeWallPro
   });
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,17 +71,11 @@ export default function UpgradeWall({ isOpen, onClose, trigger }: UpgradeWallPro
 
   const handlePurchase = async (tierId: string) => {
     // Check if user is authenticated first
-    try {
-      const response = await fetch('/api/auth/me');
-      if (response.ok) {
-        // User is authenticated, proceed to checkout
-        window.location.href = '/checkout';
-      } else {
-        // User not authenticated, show auth form
-        setShowAuth(true);
-      }
-    } catch (error) {
-      // Show auth form on error
+    if (isAuthenticated) {
+      // User is authenticated, proceed to checkout
+      window.location.href = '/checkout';
+    } else {
+      // User not authenticated, show auth form
       setShowAuth(true);
     }
   };
