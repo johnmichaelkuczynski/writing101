@@ -128,16 +128,16 @@ Please rewrite the text according to these instructions:`;
   try {
     let result: string;
     switch (model) {
-      case "ai2":
+      case "openai":
         result = await generateOpenAIResponse(prompt, systemPrompt);
         break;
-      case "ai3":
+      case "anthropic":
         result = await generateAnthropicResponse(prompt, systemPrompt);
         break;
-      case "ai4":
+      case "perplexity":
         result = await generatePerplexityResponse(prompt, systemPrompt);
         break;
-      case "ai1":
+      case "deepseek":
         result = await generateDeepSeekResponse(prompt, systemPrompt);
         break;
       default:
@@ -181,16 +181,16 @@ Provide a brief, enlightening explanation that helps the user understand Wittgen
   try {
     let result: string;
     switch (model) {
-      case "ai2":
+      case "openai":
         result = await generateOpenAIResponse(prompt, systemPrompt);
         break;
-      case "ai3":
+      case "anthropic":
         result = await generateAnthropicResponse(prompt, systemPrompt);
         break;
-      case "ai4":
+      case "perplexity":
         result = await generatePerplexityResponse(prompt, systemPrompt);
         break;
-      case "ai1":
+      case "deepseek":
       default:
         result = await generateDeepSeekResponse(prompt, systemPrompt);
         break;
@@ -203,7 +203,7 @@ Provide a brief, enlightening explanation that helps the user understand Wittgen
     console.error(`Error in passage explanation with ${modelName}:`, error);
     
     // If current model fails, try AI2 as fallback
-    if (model !== "ai2") {
+    if (model !== "openai") {
       console.log(`Attempting AI2 fallback for passage explanation due to ${modelName} failure`);
       try {
         const fallbackResult = await generateOpenAIResponse(prompt, systemPrompt);
@@ -277,7 +277,7 @@ Respond thoughtfully to continue our discussion about this passage from the Trac
     console.error(`Error in passage discussion with ${modelName}:`, error);
     
     // If current model fails, try AI2 as fallback
-    if (model !== "ai2") {
+    if (model !== "openai") {
       console.log(`Attempting AI2 fallback for passage discussion due to ${modelName} failure`);
       try {
         const fallbackResult = await generateOpenAIResponse(prompt, systemPrompt);
@@ -324,16 +324,16 @@ CRITICAL FORMATTING RULES:
   try {
     let result: string;
     switch (model) {
-      case "ai2":
+      case "openai":
         result = await generateOpenAIResponse(prompt, systemPrompt);
         break;
-      case "ai3":
+      case "anthropic":
         result = await generateAnthropicResponse(prompt, systemPrompt);
         break;
-      case "ai4":
+      case "perplexity":
         result = await generatePerplexityResponse(prompt, systemPrompt);
         break;
-      case "ai1":
+      case "deepseek":
         result = await generateDeepSeekResponse(prompt, systemPrompt);
         break;
       default:
@@ -347,7 +347,7 @@ CRITICAL FORMATTING RULES:
     console.error(`Error generating AI response with ${modelName}:`, error);
     
     // If current model fails, try AI2 as fallback
-    if (model !== "ai2") {
+    if (model !== "openai") {
       console.log(`Attempting fallback to AI2 due to ${modelName} failure`);
       try {
         const fallbackResult = await generateOpenAIResponse(prompt, systemPrompt);
@@ -451,16 +451,16 @@ ${includeAnswerKey ? 'Please provide both the test questions AND a separate answ
   try {
     let result: string;
     switch (model) {
-      case "ai2":
+      case "openai":
         result = await generateOpenAIResponse(fullPrompt, systemPrompt);
         break;
-      case "ai3":
+      case "anthropic":
         result = await generateAnthropicResponse(fullPrompt, systemPrompt);
         break;
-      case "ai4":
+      case "perplexity":
         result = await generatePerplexityResponse(fullPrompt, systemPrompt);
         break;
-      case "ai1":
+      case "deepseek":
         result = await generateDeepSeekResponse(fullPrompt, systemPrompt);
         break;
       default:
@@ -547,16 +547,16 @@ Please provide a well-structured study guide that helps students understand and 
   try {
     let result: string;
     switch (model) {
-      case "ai2":
+      case "openai":
         result = await generateOpenAIResponse(fullPrompt, systemPrompt);
         break;
-      case "ai3":
+      case "anthropic":
         result = await generateAnthropicResponse(fullPrompt, systemPrompt);
         break;
-      case "ai4":
+      case "perplexity":
         result = await generatePerplexityResponse(fullPrompt, systemPrompt);
         break;
-      case "ai1":
+      case "deepseek":
         result = await generateDeepSeekResponse(fullPrompt, systemPrompt);
         break;
       default:
@@ -571,7 +571,7 @@ Please provide a well-structured study guide that helps students understand and 
     console.error(`Error generating study guide with ${modelName}:`, error);
     
     // Fallback to AI2
-    if (model !== "ai2") {
+    if (model !== "openai") {
       console.log(`Attempting fallback to AI2 due to ${modelName} failure`);
       try {
         const fallbackResult = await generateOpenAIResponse(fullPrompt, systemPrompt);

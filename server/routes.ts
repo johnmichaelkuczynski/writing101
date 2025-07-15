@@ -458,7 +458,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let isPreview = false;
       
       if (!canAccessFeature(user)) {
-        quiz = getPreviewResponse(fullQuiz, !user);
+        quiz = {
+          testContent: getPreviewResponse(fullQuiz.testContent, !user),
+          answerKey: fullQuiz.answerKey
+        };
         isPreview = true;
       } else {
         // Deduct 1 credit for full response (skip for admin)
@@ -469,7 +472,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const savedQuiz = await storage.createQuiz({
         sourceText,
-        quiz: fullQuiz,
+        quiz: fullQuiz.testContent || "",
         instructions: instructions || "Generate a comprehensive quiz",
         model,
         chunkIndex
@@ -478,8 +481,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ 
         quiz: {
           id: savedQuiz.id,
-          testContent: quiz, // Return preview or full quiz based on user status
-          answerKey: null, // TODO: Add answer key support
+          testContent: typeof quiz.testContent === 'string' ? quiz.testContent : JSON.stringify(quiz.testContent),
+          answerKey: quiz.answerKey,
           timestamp: savedQuiz.timestamp
         },
         isPreview 
