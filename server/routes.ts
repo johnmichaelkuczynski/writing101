@@ -477,8 +477,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ 
         quiz: {
-          ...savedQuiz,
-          testContent: quiz // Return preview or full quiz based on user status
+          id: savedQuiz.id,
+          testContent: quiz, // Return preview or full quiz based on user status
+          answerKey: null, // TODO: Add answer key support
+          timestamp: savedQuiz.timestamp
         },
         isPreview 
       });
