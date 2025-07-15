@@ -10,8 +10,12 @@ import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 
-// Load Stripe
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+// Load Stripe - check for valid public key
+const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+if (!stripePublicKey) {
+  console.error('Missing VITE_STRIPE_PUBLIC_KEY environment variable');
+}
+const stripePromise = stripePublicKey ? loadStripe(stripePublicKey) : null;
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -242,7 +246,7 @@ export default function PaymentModal({ isOpen, onClose }: PaymentModalProps) {
                 <Loader2 className="h-8 w-8 animate-spin" />
                 <span className="ml-2">Setting up payment...</span>
               </div>
-            ) : clientSecret ? (
+            ) : clientSecret && stripePromise ? (
               <Elements 
                 stripe={stripePromise} 
                 options={{ 
@@ -257,6 +261,13 @@ export default function PaymentModal({ isOpen, onClose }: PaymentModalProps) {
                   onSuccess={handlePaymentSuccess}
                 />
               </Elements>
+            ) : !stripePromise ? (
+              <div className="text-center py-8">
+                <p className="text-red-500 mb-4">Payment system not available</p>
+                <p className="text-sm text-muted-foreground">
+                  Stripe configuration is missing. Please contact support.
+                </p>
+              </div>
             ) : null}
             
             <Button variant="outline" onClick={handleBack} className="w-full">
