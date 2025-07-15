@@ -184,6 +184,17 @@ export default function PaymentModal({ isOpen, onClose }: PaymentModalProps) {
   });
 
   const handleSelectOption = async (option: CreditOption) => {
+    console.log("handleSelectOption called", { option, user, isAuthenticated: !!user });
+    
+    if (!user) {
+      toast({
+        title: "Authentication Required", 
+        description: "Please log in to purchase credits.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setSelectedOption(option);
     setIsCreatingPayment(true);
     createPaymentMutation.mutate(option);
@@ -218,11 +229,18 @@ export default function PaymentModal({ isOpen, onClose }: PaymentModalProps) {
 
         {!selectedOption ? (
           <div className="space-y-4">
+            {!user && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-yellow-800">
+                  ⚠️ You must be logged in to purchase credits. Please log in first.
+                </p>
+              </div>
+            )}
             <div className="grid gap-4 md:grid-cols-2">
               {creditOptions.map((option) => (
                 <Card
                   key={option.id}
-                  className="cursor-pointer transition-all hover:shadow-md border-2"
+                  className={`cursor-pointer transition-all hover:shadow-md border-2 ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
                   onClick={() => handleSelectOption(option)}
                 >
                   <CardHeader className="pb-2">
