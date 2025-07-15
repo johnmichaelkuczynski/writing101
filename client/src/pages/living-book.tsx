@@ -244,16 +244,27 @@ export default function LivingBook() {
 
               {/* Authentication Status */}
               {isAuthenticated ? (
-                <div className="flex items-center space-x-2 px-3 py-1 bg-green-50 rounded-lg border border-green-200">
-                  <User className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-medium text-green-700">{user?.username}</span>
+                <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2 px-3 py-1 bg-green-50 rounded-lg border border-green-200">
+                    <User className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-medium text-green-700">{user?.username}</span>
+                    <span className="text-xs text-green-600">({user?.tokens || 0} tokens)</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={logout}
+                      className="h-6 w-6 p-0 text-green-600 hover:text-green-800"
+                    >
+                      <LogOut className="w-3 h-3" />
+                    </Button>
+                  </div>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    onClick={logout}
-                    className="h-6 w-6 p-0 text-green-600 hover:text-green-800"
+                    onClick={() => window.location.href = '/checkout'}
+                    className="bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
                   >
-                    <LogOut className="w-3 h-3" />
+                    Buy Credits
                   </Button>
                 </div>
               ) : (

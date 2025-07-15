@@ -403,3 +403,5 @@ Preferred communication style: Simple, everyday language.
   - Fixed infinite loading wheel issue when unregistered users tried to pay
   - Checkout page redirects unregistered users back to main page with clear messaging
   - All purchase buttons now indicate "Register & Purchase" to set clear expectations
+  - Added "Buy Credits" button in header for authenticated users with token count display
+  - Authenticated users can now easily access credit purchase from any page
