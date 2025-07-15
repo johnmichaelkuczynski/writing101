@@ -50,7 +50,7 @@ export default function StudyGuideModal({ isOpen, onClose, sourceText, chunkInde
         requestData.chunkIndex = data.chunkIndex;
       }
       
-      const response = await apiRequest("/api/study-guide", {
+      const response = await apiRequest("/api/generate-study-guide", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestData),

@@ -472,3 +472,10 @@ Preferred communication style: Simple, everyday language.
   - Verified PayPal integration works in both development and production environments
   - Complete payment processing workflow now functional for live deployment
   - Application successfully boots in production with working PayPal payment system
+- July 15, 2025: CRITICAL API ENDPOINT MISMATCH FIXED - Quiz and Study Guide functionality restored
+  - FIXED major JSON parse error in quiz generation caused by API endpoint mismatch
+  - Changed frontend quiz endpoint from "/api/quiz" to "/api/generate-quiz" to match backend
+  - Changed frontend study guide endpoint from "/api/study-guide" to "/api/generate-study-guide" to match backend
+  - Resolved deployment error: "JSON.parse: unexpected character at line 1 column 1"
+  - Quiz and study guide creation now works properly in both development and production
+  - All AI-powered features (quiz, study guide, rewrite, chat) now have correct API connectivity

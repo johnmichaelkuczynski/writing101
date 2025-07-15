@@ -43,7 +43,7 @@ export default function QuizModal({ isOpen, onClose, sourceText, chunkIndex, sel
       includeAnswerKey: boolean;
       chunkIndex?: number | null;
     }) => {
-      const response = await apiRequest("/api/quiz", {
+      const response = await apiRequest("/api/generate-quiz", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

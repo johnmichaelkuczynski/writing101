@@ -92,7 +92,9 @@ export function canAccessFeature(user: User | null): boolean {
 }
 
 export function getPreviewResponse(fullResponse: string, isUnregistered: boolean): string {
-  const words = fullResponse.split(' ');
+  // Ensure fullResponse is a string
+  const responseString = String(fullResponse || '');
+  const words = responseString.split(' ');
   const previewWords = words.slice(0, 200);
   const previewText = previewWords.join(' ') + '...';
   
