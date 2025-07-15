@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { BookOpen, Edit3, FileText, User, LogOut, CreditCard } from "lucide-react";
+import { BookOpen, Edit3, FileText, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NavigationSidebar from "@/components/navigation-sidebar";
 import DocumentContent from "@/components/document-content";
@@ -13,7 +13,7 @@ import QuizModal from "@/components/quiz-modal";
 import StudyGuideModal from "@/components/study-guide-modal";
 import ChunkingModal from "@/components/chunking-modal";
 import AuthModal from "@/components/auth-modal";
-import PaymentModal from "@/components/payment-modal";
+
 
 import { initializeMathRenderer } from "@/lib/math-renderer";
 import { tractatusContent, getFullDocumentContent } from "@shared/tractatus-content";
@@ -41,7 +41,7 @@ export default function LivingBook() {
   const [pendingChunkText, setPendingChunkText] = useState<string>("");
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authModalTab, setAuthModalTab] = useState<"login" | "register">("login");
-  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+
 
 
   useEffect(() => {
@@ -245,15 +245,7 @@ export default function LivingBook() {
                       {(user.credits || 0).toLocaleString()} credits
                     </div>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPaymentModalOpen(true)}
-                    className="flex items-center space-x-1"
-                  >
-                    <CreditCard className="h-4 w-4" />
-                    <span>Buy Credits</span>
-                  </Button>
+
                   <Button
                     variant="ghost"
                     size="sm"
@@ -380,11 +372,7 @@ export default function LivingBook() {
         defaultTab={authModalTab}
       />
 
-      {/* Payment Modal */}
-      <PaymentModal
-        isOpen={paymentModalOpen}
-        onClose={() => setPaymentModalOpen(false)}
-      />
+
 
     </div>
   );

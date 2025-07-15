@@ -9,8 +9,7 @@ import { sendEmail } from "./services/email-service";
 import { generatePDF } from "./services/pdf-generator";
 import { transcribeAudio } from "./services/speech-service";
 import { register, login, createSession, getUserFromSession, canAccessFeature, getPreviewResponse } from "./auth";
-import { createPaymentIntent, handleWebhook } from "./stripe";
-import { chatRequestSchema, instructionRequestSchema, emailRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, registerRequestSchema, loginRequestSchema, purchaseRequestSchema, type AIModel } from "@shared/schema";
+import { chatRequestSchema, instructionRequestSchema, emailRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, registerRequestSchema, loginRequestSchema, type AIModel } from "@shared/schema";
 import multer from "multer";
 
 declare module 'express-session' {
@@ -132,46 +131,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Payment routes
-  app.post("/api/create-payment-intent", async (req, res) => {
-    try {
-      console.log("Payment request received");
-      console.log("Session data:", req.session);
-      
-      const user = await getCurrentUser(req);
-      console.log("Current user:", user ? `${user.username} (ID: ${user.id})` : "Not authenticated");
-      
-      if (!user) {
-        return res.status(401).json({ error: "Authentication required" });
-      }
 
-      const purchaseData = purchaseRequestSchema.parse(req.body);
-      console.log("Purchase data:", purchaseData);
-      
-      const result = await createPaymentIntent(user.id, purchaseData);
-      console.log("Payment intent created successfully");
-      
-      res.json(result);
-    } catch (error) {
-      console.error("Payment intent error:", error);
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.post("/webhook", express.raw({ type: 'application/json' }), async (req, res) => {
-    try {
-      const signature = req.get('stripe-signature');
-      if (!signature) {
-        return res.status(400).json({ error: 'Missing stripe signature' });
-      }
-
-      await handleWebhook(req.body, signature);
-      res.json({ received: true });
-    } catch (error) {
-      console.error("Webhook error:", error);
-      res.status(400).json({ error: error.message });
-    }
-  });
 
   // Chat endpoint with authentication
   app.post("/api/chat", async (req, res) => {

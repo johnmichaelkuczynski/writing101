@@ -5,14 +5,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/use-auth";
 import LivingBook from "@/pages/living-book";
-import SuccessPage from "@/pages/success";
+
 import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={LivingBook} />
-      <Route path="/success" component={SuccessPage} />
+
       <Route component={NotFound} />
     </Switch>
   );
