@@ -67,15 +67,7 @@ export const sessions = pgTable("sessions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const purchases = pgTable("purchases", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull(),
-  amount: integer("amount").notNull(), // amount in cents
-  credits: integer("credits").notNull(),
-  stripePaymentIntentId: text("stripe_payment_intent_id"),
-  status: text("status").default("pending").notNull(), // pending, completed, failed
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+// Purchase table removed
 
 // Insert schemas
 export const insertChatMessageSchema = createInsertSchema(chatMessages).pick({
@@ -129,13 +121,7 @@ export const insertSessionSchema = createInsertSchema(sessions).pick({
   expiresAt: true,
 });
 
-export const insertPurchaseSchema = createInsertSchema(purchases).pick({
-  userId: true,
-  amount: true,
-  credits: true,
-  stripePaymentIntentId: true,
-  status: true,
-});
+// Purchase schema removed
 
 // Types
 export type ChatMessage = typeof chatMessages.$inferSelect;
@@ -152,8 +138,7 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Session = typeof sessions.$inferSelect;
 export type InsertSession = z.infer<typeof insertSessionSchema>;
-export type Purchase = typeof purchases.$inferSelect;
-export type InsertPurchase = z.infer<typeof insertPurchaseSchema>;
+// Purchase types removed
 
 // AI Models
 export type AIModel = "ai1" | "ai2" | "ai3" | "ai4";
@@ -208,10 +193,7 @@ export const loginRequestSchema = z.object({
   password: z.string(),
 });
 
-export const purchaseRequestSchema = z.object({
-  amount: z.number().min(50), // minimum 50 cents
-  credits: z.number().min(1),
-});
+// Payment schema removed
 
 // Export request types
 export type ChatRequest = z.infer<typeof chatRequestSchema>;
@@ -222,4 +204,3 @@ export type StudyGuideRequest = z.infer<typeof studyGuideRequestSchema>;
 export type EmailRequest = z.infer<typeof emailRequestSchema>;
 export type RegisterRequest = z.infer<typeof registerRequestSchema>;
 export type LoginRequest = z.infer<typeof loginRequestSchema>;
-export type PurchaseRequest = z.infer<typeof purchaseRequestSchema>;
