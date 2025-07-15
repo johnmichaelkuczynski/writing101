@@ -56,7 +56,9 @@ export default function QuizModal({ isOpen, onClose, sourceText, chunkIndex, sel
       return response.json();
     },
     onSuccess: (data) => {
-      setCurrentQuiz(data);
+      // Handle the API response structure
+      const quiz = data.quiz || data;
+      setCurrentQuiz(quiz);
       queryClient.invalidateQueries({ queryKey: ["/api/quizzes"] });
       toast({
         title: "Test Created",
@@ -89,7 +91,7 @@ export default function QuizModal({ isOpen, onClose, sourceText, chunkIndex, sel
   };
 
   const handleDownloadTxt = () => {
-    if (!currentQuiz) return;
+    if (!currentQuiz || !currentQuiz.testContent) return;
     
     let content = `Test - Generated on ${new Date(currentQuiz.timestamp).toLocaleString()}\n\n`;
     content += `Instructions: ${instructions}\n\n`;
@@ -111,7 +113,7 @@ export default function QuizModal({ isOpen, onClose, sourceText, chunkIndex, sel
   };
 
   const handlePrintPdf = () => {
-    if (!currentQuiz) return;
+    if (!currentQuiz || !currentQuiz.testContent) return;
     
     let content = `
       <html>
@@ -271,7 +273,7 @@ export default function QuizModal({ isOpen, onClose, sourceText, chunkIndex, sel
             <div className="w-1/2 border-l pl-6">
               <div className="font-medium mb-3">Test Preview</div>
               <ScrollArea className="h-full">
-                {currentQuiz ? (
+                {currentQuiz && currentQuiz.testContent ? (
                   <div className="space-y-4">
                     <div className="bg-gray-50 p-3 rounded text-sm">
                       <div className="font-medium">Generated on:</div>
@@ -305,7 +307,7 @@ export default function QuizModal({ isOpen, onClose, sourceText, chunkIndex, sel
       </Dialog>
 
       {/* Full Text Viewer Modal */}
-      {showFullText && currentQuiz && (
+      {showFullText && currentQuiz && currentQuiz.testContent && (
         <Dialog open={showFullText} onOpenChange={() => setShowFullText(false)}>
           <DialogContent className="max-w-5xl h-[90vh]">
             <DialogHeader>

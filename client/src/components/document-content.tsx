@@ -41,7 +41,7 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
         onPassageDiscussion(text);
       }
     }
-    clearSelection();
+    // Don't clear selection - let user choose other actions if needed
   };
 
   const handleSendToChat = (text: string) => {
@@ -58,7 +58,7 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
         onTextSelectedForChat(text);
       }
     }
-    clearSelection();
+    // Don't clear selection - let user choose other actions if needed
   };
 
   const handleRewrite = (text: string) => {
@@ -75,21 +75,21 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
         onRewriteFromSelection(text);
       }
     }
-    clearSelection();
+    // Don't clear selection - let user choose other actions if needed
   };
 
   const handleCreateTest = (text: string) => {
     if (onCreateTest) {
       onCreateTest(text);
     }
-    clearSelection();
+    // Don't clear selection - let user choose other actions if needed
   };
 
   const handleCreateStudyGuide = (text: string) => {
     if (onCreateStudyGuide) {
       onCreateStudyGuide(text);
     }
-    clearSelection();
+    // Don't clear selection - let user choose other actions if needed
   };
 
 
