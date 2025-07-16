@@ -1,4 +1,6 @@
 import { chatMessages, instructions, rewrites, quizzes, studyGuides, users, sessions, purchases, type ChatMessage, type InsertChatMessage, type Instruction, type InsertInstruction, type Rewrite, type InsertRewrite, type Quiz, type InsertQuiz, type StudyGuide, type InsertStudyGuide, type User, type InsertUser, type Session, type InsertSession, type Purchase, type InsertPurchase } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
@@ -259,4 +261,158 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Database Storage Implementation
+export class DatabaseStorage implements IStorage {
+  async createChatMessage(insertMessage: InsertChatMessage): Promise<ChatMessage> {
+    const [message] = await db.insert(chatMessages).values({
+      ...insertMessage,
+      context: insertMessage.context || null
+    }).returning();
+    return message;
+  }
+
+  async getChatMessages(): Promise<ChatMessage[]> {
+    return await db.select().from(chatMessages).orderBy(desc(chatMessages.timestamp));
+  }
+
+  async createInstruction(insertInstruction: InsertInstruction): Promise<Instruction> {
+    const [instruction] = await db.insert(instructions).values(insertInstruction).returning();
+    return instruction;
+  }
+
+  async getInstructions(): Promise<Instruction[]> {
+    return await db.select().from(instructions).orderBy(desc(instructions.timestamp));
+  }
+
+  async createRewrite(insertRewrite: InsertRewrite): Promise<Rewrite> {
+    const [rewrite] = await db.insert(rewrites).values({
+      ...insertRewrite,
+      chunkIndex: insertRewrite.chunkIndex ?? null,
+      parentRewriteId: insertRewrite.parentRewriteId ?? null
+    }).returning();
+    return rewrite;
+  }
+
+  async getRewrites(): Promise<Rewrite[]> {
+    return await db.select().from(rewrites).orderBy(desc(rewrites.timestamp));
+  }
+
+  async getRewriteById(id: number): Promise<Rewrite | null> {
+    const [rewrite] = await db.select().from(rewrites).where(eq(rewrites.id, id));
+    return rewrite || null;
+  }
+
+  async createQuiz(insertQuiz: InsertQuiz): Promise<Quiz> {
+    const [quiz] = await db.insert(quizzes).values({
+      ...insertQuiz,
+      chunkIndex: insertQuiz.chunkIndex ?? null
+    }).returning();
+    return quiz;
+  }
+
+  async getQuizzes(): Promise<Quiz[]> {
+    return await db.select().from(quizzes).orderBy(desc(quizzes.timestamp));
+  }
+
+  async getQuizById(id: number): Promise<Quiz | null> {
+    const [quiz] = await db.select().from(quizzes).where(eq(quizzes.id, id));
+    return quiz || null;
+  }
+
+  async createStudyGuide(insertStudyGuide: InsertStudyGuide): Promise<StudyGuide> {
+    const [studyGuide] = await db.insert(studyGuides).values({
+      ...insertStudyGuide,
+      chunkIndex: insertStudyGuide.chunkIndex ?? null
+    }).returning();
+    return studyGuide;
+  }
+
+  async getStudyGuides(): Promise<StudyGuide[]> {
+    return await db.select().from(studyGuides).orderBy(desc(studyGuides.timestamp));
+  }
+
+  async getStudyGuideById(id: number): Promise<StudyGuide | null> {
+    const [studyGuide] = await db.select().from(studyGuides).where(eq(studyGuides.id, id));
+    return studyGuide || null;
+  }
+
+  // User management methods with admin support
+  async createUser(insertUser: InsertUser): Promise<User> {
+    // Give admin unlimited credits
+    const credits = insertUser.username === 'jmkuczynski' ? 999999999 : (insertUser.credits || 0);
+    const [user] = await db.insert(users).values({
+      ...insertUser,
+      credits
+    }).returning();
+    return user;
+  }
+
+  async getUserById(id: number): Promise<User | null> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || null;
+  }
+
+  async getUserByUsername(username: string): Promise<User | null> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || null;
+  }
+
+  async updateUserCredits(userId: number, credits: number): Promise<User | null> {
+    const [user] = await db.update(users)
+      .set({ credits })
+      .where(eq(users.id, userId))
+      .returning();
+    return user || null;
+  }
+
+  async updateUserLastLogin(userId: number): Promise<void> {
+    await db.update(users)
+      .set({ lastLogin: new Date() })
+      .where(eq(users.id, userId));
+  }
+
+  // Session management methods
+  async createSession(insertSession: InsertSession): Promise<Session> {
+    const [session] = await db.insert(sessions).values(insertSession).returning();
+    return session;
+  }
+
+  async getSession(sessionId: string): Promise<Session | null> {
+    const [session] = await db.select().from(sessions).where(eq(sessions.id, sessionId));
+    if (session && session.expiresAt > new Date()) {
+      return session;
+    }
+    if (session) {
+      await this.deleteSession(sessionId);
+    }
+    return null;
+  }
+
+  async deleteSession(sessionId: string): Promise<void> {
+    await db.delete(sessions).where(eq(sessions.id, sessionId));
+  }
+
+  // Purchase management methods
+  async createPurchase(insertPurchase: InsertPurchase): Promise<Purchase> {
+    const [purchase] = await db.insert(purchases).values({
+      ...insertPurchase,
+      status: insertPurchase.status || "pending",
+      paypalOrderId: insertPurchase.paypalOrderId ?? null
+    }).returning();
+    return purchase;
+  }
+
+  async getPurchasesByUserId(userId: number): Promise<Purchase[]> {
+    return await db.select().from(purchases)
+      .where(eq(purchases.userId, userId))
+      .orderBy(desc(purchases.createdAt));
+  }
+
+  async updatePurchaseStatus(purchaseId: number, status: string): Promise<void> {
+    await db.update(purchases)
+      .set({ status })
+      .where(eq(purchases.id, purchaseId));
+  }
+}
+
+export const storage = new DatabaseStorage();
