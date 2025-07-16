@@ -546,3 +546,16 @@ Preferred communication style: Simple, everyday language.
   - All AI models (DeepSeek, OpenAI, Anthropic, Perplexity) activated and fully operational with provided API keys
   - Document now contains authentic content from the manifesto with proper HTML formatting and CSS styling
   - Zero functionality removed - complete preservation of all existing features
+- July 16, 2025: DATABASE MIGRATION AND ADMIN PRIVILEGES IMPLEMENTATION
+  - MIGRATED from in-memory storage (MemStorage) to PostgreSQL database storage (DatabaseStorage)
+  - Fixed critical session persistence issue - users now stay logged in between page refreshes
+  - Implemented proper admin privileges for username 'jmkuczynski' with unlimited credits (999,999,999)
+  - Created complete database schema with users, sessions, purchases, chat_messages, instructions, rewrites, quizzes, study_guides tables
+  - Applied database schema with `npm run db:push` command - all tables successfully created
+  - Fixed authentication system to use persistent database sessions instead of volatile memory storage
+  - Admin user automatically receives unlimited credits upon registration for unrestricted testing access
+- July 16, 2025: DEFAULT AI MODEL CHANGED TO OPENAI
+  - Changed default AI model selection from "deepseek" to "openai" in living-book.tsx
+  - OpenAI is now the default LLM that users see when first loading the application
+  - All other AI models (DeepSeek, Anthropic, Perplexity) remain available for manual selection
+  - Change applies immediately to new user sessions
