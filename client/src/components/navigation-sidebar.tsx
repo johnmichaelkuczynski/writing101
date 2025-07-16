@@ -1,10 +1,15 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { tractatusContent } from "@shared/tractatus-content";
+import { paperContent } from "@shared/paper-content";
 
-// Dictionary entries for navigation
-const tractatusSections = [
-  { term: "Introduction by Bertrand Russell", id: "introduction" },
-  { term: "Tractatus Logico-Philosophicus", id: "tractatus" }
+// Navigation sections for Industrial Society
+const documentSections = [
+  { term: "Introduction", id: "introduction" },
+  { term: "Psychology of Modern Leftism", id: "psychology" },
+  { term: "The Power Process", id: "power-process" },
+  { term: "Socialization", id: "socialization" },
+  { term: "Technology", id: "technology" },
+  { term: "Freedom", id: "freedom" },
+  { term: "Disruption of the Power Process", id: "disruption" }
 ];
 
 export default function NavigationSidebar() {
@@ -24,7 +29,7 @@ export default function NavigationSidebar() {
         <ScrollArea className="flex-1 h-full">
           <div className="pr-4">
             <nav className="space-y-1">
-              {tractatusSections.map((entry) => (
+              {documentSections.map((entry) => (
                 <button
                   key={entry.id}
                   onClick={() => handleNavClick(entry.id)}

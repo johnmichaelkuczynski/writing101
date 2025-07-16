@@ -6,7 +6,7 @@ import { useTextSelection } from "@/hooks/use-text-selection";
 import SelectionToolbar from "@/components/selection-toolbar";
 import ChunkingModal from "@/components/chunking-modal";
 
-import { tractatusContent } from "@shared/tractatus-content";
+import { paperContent } from "@shared/paper-content";
 import { Copy, Lock } from "lucide-react";
 
 interface DocumentContentProps {
@@ -109,7 +109,7 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
       selection?.addRange(range);
       
       // Get the full document text
-      const fullText = tractatusContent.sections.map(section => 
+      const fullText = paperContent.sections.map(section => 
         `${section.title}\n\n${section.content}`
       ).join('\n\n');
       
@@ -191,15 +191,15 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
             {/* Document Title */}
             <header className="text-center mb-12">
               <h1 className="text-3xl font-georgia font-bold text-foreground mb-2">
-                Tractatus Logico-Philosophicus
+                Industrial Society and Its Future
               </h1>
               <p className="text-lg font-georgia text-muted-foreground text-center">
-                by Ludwig Wittgenstein
+                by Theodore Kaczynski
               </p>
             </header>
 
             {/* Full Document Content - No Paywall */}
-            {tractatusContent.sections.map((section, index) => (
+            {paperContent.sections.map((section, index) => (
               <section key={section.id} id={section.id} className="mb-12">
                 <div 
                   className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}

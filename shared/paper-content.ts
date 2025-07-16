@@ -1,1 +1,1 @@
-export { tractatusContent as paperContent } from './tractatus-content';
+export { industrialSocietyContent as paperContent } from './industrial-society-content';
