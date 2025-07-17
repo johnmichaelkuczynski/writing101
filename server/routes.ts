@@ -11,7 +11,7 @@ import { generatePDF } from "./services/pdf-generator";
 import { transcribeAudio } from "./services/speech-service";
 import { register, login, createSession, getUserFromSession, canAccessFeature, getPreviewResponse, isAdmin, hashPassword } from "./auth";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalTransaction } from "./safe-paypal";
-import { chatRequestSchema, instructionRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, registerRequestSchema, loginRequestSchema, purchaseRequestSchema, type AIModel } from "@shared/schema";
+import { chatRequestSchema, instructionRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, testRequestSchema, registerRequestSchema, loginRequestSchema, purchaseRequestSchema, type AIModel } from "@shared/schema";
 import multer from "multer";
 
 declare module 'express-session' {
@@ -600,7 +600,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Test generation endpoint with authentication
   app.post("/api/generate-test", async (req, res) => {
     try {
-      const { sourceText, instructions, testType, model, cursorPosition, chunkIndex } = req.body;
+      const { sourceText, instructions, testType, model, cursorPosition, chunkIndex } = testRequestSchema.parse(req.body);
       const user = await getCurrentUser(req);
       
       const fullTestContent = await generateTest({

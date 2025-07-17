@@ -25,10 +25,10 @@ const anthropic = new Anthropic({
 
 function getModelDisplayName(model: AIModel): string {
   const modelNames = {
-    ai1: "AI1",
-    ai2: "AI2", 
-    ai3: "AI3",
-    ai4: "AI4"
+    deepseek: "DeepSeek",
+    openai: "OpenAI",
+    anthropic: "Anthropic",
+    perplexity: "Perplexity"
   };
   return modelNames[model] || model;
 }

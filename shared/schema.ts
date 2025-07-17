@@ -262,7 +262,14 @@ export const studyGuideRequestSchema = z.object({
   chunkIndex: z.number().optional(),
 });
 
-
+export const testRequestSchema = z.object({
+  sourceText: z.string(),
+  instructions: z.string().optional(),
+  testType: z.enum(["selection", "cumulative"]),
+  model: z.enum(["deepseek", "openai", "anthropic", "perplexity"]),
+  cursorPosition: z.number().optional(),
+  chunkIndex: z.number().optional(),
+});
 
 export const registerRequestSchema = z.object({
   username: z.string().min(3).max(50),
