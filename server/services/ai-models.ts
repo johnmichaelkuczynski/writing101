@@ -373,8 +373,8 @@ async function generateOpenAIResponse(prompt: string, systemPrompt: string): Pro
       { role: "system", content: systemPrompt },
       { role: "user", content: prompt }
     ],
-    max_tokens: 800, // Optimized for test generation - enough for 5-8 questions
-    temperature: 0.2, // Lower temperature for more focused, consistent responses
+    max_tokens: 500, // Drastically reduced for ultra-fast test generation
+    temperature: 0.1, // Minimal temperature for fastest, most focused responses
   });
 
   return response.choices[0].message.content || "I apologize, but I couldn't generate a response.";
@@ -386,7 +386,7 @@ async function generateAnthropicResponse(prompt: string, systemPrompt: string): 
     model: DEFAULT_ANTHROPIC_MODEL,
     system: systemPrompt,
     messages: [{ role: "user", content: prompt }],
-    max_tokens: 800, // Optimized for test generation
+    max_tokens: 500, // Reduced for ultra-fast generation
   });
 
   const textContent = response.content[0];
@@ -406,8 +406,8 @@ async function generatePerplexityResponse(prompt: string, systemPrompt: string):
         { role: "system", content: systemPrompt },
         { role: "user", content: prompt }
       ],
-      max_tokens: 800, // Optimized for faster responses
-      temperature: 0.2, // Lower temperature for focused test generation
+      max_tokens: 500, // Reduced for ultra-fast responses  
+      temperature: 0.1, // Minimal temperature for fastest generation
       stream: false,
     }),
   });
@@ -608,8 +608,8 @@ async function generateDeepSeekResponse(prompt: string, systemPrompt: string): P
           { role: "system", content: systemPrompt },
           { role: "user", content: prompt }
         ],
-        max_tokens: 800, // Optimized for test generation
-        temperature: 0.2, // Lower temperature for focused responses
+        max_tokens: 500, // Reduced for ultra-fast generation
+        temperature: 0.1, // Minimal temperature for fastest responses
         stream: false,
       }),
       signal: controller.signal

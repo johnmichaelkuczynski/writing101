@@ -40,10 +40,10 @@ export async function generateTest(request: TestGenerationRequest): Promise<stri
     contentToTest = fullContent.substring(0, cursorPosition);
   }
 
-  // PERFORMANCE OPTIMIZATION: Limit content size to prevent slow responses
-  const MAX_CONTENT_LENGTH = 3000; // Limit to ~3000 characters for faster processing
+  // CRITICAL PERFORMANCE FIX: Drastically limit content size for fast responses
+  const MAX_CONTENT_LENGTH = 1000; // Reduced to 1000 characters for much faster processing
   if (contentToTest.length > MAX_CONTENT_LENGTH) {
-    // Take the last 3000 characters to focus on most recent content
+    // Take the last 1000 characters to focus on most recent content
     contentToTest = "..." + contentToTest.substring(contentToTest.length - MAX_CONTENT_LENGTH);
   }
 
@@ -62,15 +62,15 @@ CRITICAL FORMATTING RULES:
 
 Content Focus: ${testType === "selection" ? "Test specifically on the selected text content" : "Test cumulatively on content"}
 
-Additional Instructions: ${instructions || "Create a balanced test with various difficulty levels"}
+Additional Instructions: ${instructions || "Create a moderately difficult test with comprehensive coverage of key concepts. Include 3-4 multiple choice questions, 1-2 short answer questions, and 1 true/false question. Focus on practical understanding and application of concepts."}
 
-Generate 5-8 questions of mixed types. Focus on key logical concepts and reasoning principles.`;
+Generate exactly 5-6 questions maximum. Be concise and focused.`;
 
-  const userPrompt = `Create a focused test based on this symbolic logic content:
+  const userPrompt = `Create a short test based on this content:
 
 ${contentToTest}
 
-Generate questions that test understanding of logical concepts, reasoning principles, and critical thinking. Include multiple choice, short answer, and true/false questions. Make sure each question is clearly numbered and formatted.`;
+Generate 5-6 clear, focused questions. Be concise and direct.`;
 
   try {
     const response = await generateAIResponse(model, userPrompt, systemPrompt);
