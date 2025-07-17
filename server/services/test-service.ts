@@ -40,7 +40,14 @@ export async function generateTest(request: TestGenerationRequest): Promise<stri
     contentToTest = fullContent.substring(0, cursorPosition);
   }
 
-  const systemPrompt = `You are an expert educator creating comprehensive tests. Generate a well-structured test based on the provided content.
+  // PERFORMANCE OPTIMIZATION: Limit content size to prevent slow responses
+  const MAX_CONTENT_LENGTH = 3000; // Limit to ~3000 characters for faster processing
+  if (contentToTest.length > MAX_CONTENT_LENGTH) {
+    // Take the last 3000 characters to focus on most recent content
+    contentToTest = "..." + contentToTest.substring(contentToTest.length - MAX_CONTENT_LENGTH);
+  }
+
+  const systemPrompt = `You are an expert educator creating comprehensive tests on symbolic logic concepts. Generate a well-structured test based on the provided content.
 
 CRITICAL FORMATTING RULES:
 - Number each question (1., 2., 3., etc.)
@@ -53,17 +60,17 @@ CRITICAL FORMATTING RULES:
 - Each question should be on a separate line
 - Leave blank lines between questions for clarity
 
-Content Focus: ${testType === "selection" ? "Test specifically on the selected text content" : "Test cumulatively on all content up to the specified point"}
+Content Focus: ${testType === "selection" ? "Test specifically on the selected text content" : "Test cumulatively on content"}
 
 Additional Instructions: ${instructions || "Create a balanced test with various difficulty levels"}
 
-Generate 5-10 questions of mixed types.`;
+Generate 5-8 questions of mixed types. Focus on key logical concepts and reasoning principles.`;
 
-  const userPrompt = `Create a comprehensive test based on this content:
+  const userPrompt = `Create a focused test based on this symbolic logic content:
 
 ${contentToTest}
 
-Generate questions that test understanding, application, and critical thinking. Include multiple choice, short answer, and true/false questions. Make sure each question is clearly numbered and formatted.`;
+Generate questions that test understanding of logical concepts, reasoning principles, and critical thinking. Include multiple choice, short answer, and true/false questions. Make sure each question is clearly numbered and formatted.`;
 
   try {
     const response = await generateAIResponse(model, userPrompt, systemPrompt);

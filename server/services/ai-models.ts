@@ -373,8 +373,8 @@ async function generateOpenAIResponse(prompt: string, systemPrompt: string): Pro
       { role: "system", content: systemPrompt },
       { role: "user", content: prompt }
     ],
-    max_tokens: 600, // Balanced for informative responses
-    temperature: 0.3, // Lower temp for more focused responses
+    max_tokens: 800, // Optimized for test generation - enough for 5-8 questions
+    temperature: 0.2, // Lower temperature for more focused, consistent responses
   });
 
   return response.choices[0].message.content || "I apologize, but I couldn't generate a response.";
@@ -386,7 +386,7 @@ async function generateAnthropicResponse(prompt: string, systemPrompt: string): 
     model: DEFAULT_ANTHROPIC_MODEL,
     system: systemPrompt,
     messages: [{ role: "user", content: prompt }],
-    max_tokens: 600, // Balanced for informative responses
+    max_tokens: 800, // Optimized for test generation
   });
 
   const textContent = response.content[0];
@@ -406,8 +406,8 @@ async function generatePerplexityResponse(prompt: string, systemPrompt: string):
         { role: "system", content: systemPrompt },
         { role: "user", content: prompt }
       ],
-      max_tokens: 2000,
-      temperature: 0.7,
+      max_tokens: 800, // Optimized for faster responses
+      temperature: 0.2, // Lower temperature for focused test generation
       stream: false,
     }),
   });
@@ -593,7 +593,7 @@ Please provide a well-structured study guide that helps students understand and 
 
 async function generateDeepSeekResponse(prompt: string, systemPrompt: string): Promise<string> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // Reduced to 10 second timeout for faster response
   
   try {
     const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
@@ -608,8 +608,8 @@ async function generateDeepSeekResponse(prompt: string, systemPrompt: string): P
           { role: "system", content: systemPrompt },
           { role: "user", content: prompt }
         ],
-        max_tokens: 600,
-        temperature: 0.3,
+        max_tokens: 800, // Optimized for test generation
+        temperature: 0.2, // Lower temperature for focused responses
         stream: false,
       }),
       signal: controller.signal
