@@ -1,16 +1,11 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { paperContent } from "@shared/paper-content";
 
-// Navigation sections for Industrial Society
-const documentSections = [
-  { term: "Introduction", id: "introduction" },
-  { term: "Psychology of Modern Leftism", id: "psychology" },
-  { term: "The Power Process", id: "power-process" },
-  { term: "Socialization", id: "socialization" },
-  { term: "Technology", id: "technology" },
-  { term: "Freedom", id: "freedom" },
-  { term: "Disruption of the Power Process", id: "disruption" }
-];
+// Navigation sections dynamically generated from paper content
+const documentSections = paperContent.sections.map(section => ({
+  term: section.title,
+  id: section.id
+}));
 
 export default function NavigationSidebar() {
   const handleNavClick = (id: string) => {

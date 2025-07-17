@@ -70,18 +70,53 @@ export function getDocumentYear(): string {{
         return None
 
 def format_content_as_html(text):
-    """Format text content as HTML with proper paragraph tags"""
-    # Split into paragraphs
-    paragraphs = text.split('\n\n')
+    """Format text content as HTML with proper paragraph tags and structure"""
+    # First, let's clean and structure the text better
+    lines = text.split('\n')
     
+    # Process lines to identify headers, paragraphs, and sections
+    formatted_lines = []
+    current_paragraph = []
+    
+    for line in lines:
+        line = line.strip()
+        if not line:
+            # Empty line - end current paragraph if we have one
+            if current_paragraph:
+                formatted_lines.append('\n\n'.join(current_paragraph))
+                current_paragraph = []
+            continue
+            
+        # Check if this is a section header (starts with number followed by period)
+        if line.startswith(('1.', '2.', '3.', '4.', '5.', '6.', '7.')) and len(line.split()) <= 10:
+            # This is likely a section header
+            if current_paragraph:
+                formatted_lines.append('\n\n'.join(current_paragraph))
+                current_paragraph = []
+            formatted_lines.append(f"HEADER:{line}")
+        else:
+            # Regular content line
+            current_paragraph.append(line)
+    
+    # Don't forget the last paragraph
+    if current_paragraph:
+        formatted_lines.append('\n\n'.join(current_paragraph))
+    
+    # Now convert to HTML
     html_content = ""
-    for para in paragraphs:
-        if para.strip():
-            # Clean up the paragraph
-            clean_para = para.strip().replace('\n', ' ')
-            # Escape backticks and other special characters
-            clean_para = clean_para.replace('`', '\\`').replace('${', '\\${')
-            html_content += f'<p class="document-paragraph">{clean_para}</p>'
+    for item in formatted_lines:
+        if item.startswith("HEADER:"):
+            header_text = item.replace("HEADER:", "").strip()
+            html_content += f'<h3 class="text-xl font-semibold mt-8 mb-4 text-foreground">{header_text}</h3>'
+        elif item.strip():
+            # Regular paragraph - split by double newlines for sub-paragraphs
+            paragraphs = item.split('\n\n')
+            for para in paragraphs:
+                if para.strip():
+                    clean_para = para.strip().replace('\n', ' ')
+                    # Escape backticks and other special characters
+                    clean_para = clean_para.replace('`', '\\`').replace('${', '\\${')
+                    html_content += f'<p class="document-paragraph mb-4">{clean_para}</p>'
     
     return html_content
 
