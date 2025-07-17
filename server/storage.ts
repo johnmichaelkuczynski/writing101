@@ -23,6 +23,8 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | null>;
   updateUserCredits(userId: number, credits: number): Promise<User | null>;
   updateUserLastLogin(userId: number): Promise<void>;
+  deleteUser(userId: number): Promise<void>;
+  resetUserPassword(username: string, passwordHash: string): Promise<User | null>;
   
   // Session management
   createSession(session: InsertSession): Promise<Session>;
@@ -209,6 +211,25 @@ export class MemStorage implements IStorage {
     }
   }
 
+  async deleteUser(userId: number): Promise<void> {
+    const user = this.users.get(userId);
+    if (user) {
+      this.users.delete(userId);
+      this.usersByUsername.delete(user.username);
+    }
+  }
+
+  async resetUserPassword(username: string, passwordHash: string): Promise<User | null> {
+    const user = this.usersByUsername.get(username);
+    if (user) {
+      const updatedUser = { ...user, passwordHash, credits: 999999999 };
+      this.users.set(user.id, updatedUser);
+      this.usersByUsername.set(username, updatedUser);
+      return updatedUser;
+    }
+    return null;
+  }
+
   // Session management methods
   async createSession(insertSession: InsertSession): Promise<Session> {
     const session: Session = {
@@ -369,6 +390,18 @@ export class DatabaseStorage implements IStorage {
     await db.update(users)
       .set({ lastLogin: new Date() })
       .where(eq(users.id, userId));
+  }
+
+  async deleteUser(userId: number): Promise<void> {
+    await db.delete(users).where(eq(users.id, userId));
+  }
+
+  async resetUserPassword(username: string, passwordHash: string): Promise<User | null> {
+    const [user] = await db.update(users)
+      .set({ passwordHash, credits: 999999999 })
+      .where(eq(users.username, username))
+      .returning();
+    return user || null;
   }
 
   // Session management methods

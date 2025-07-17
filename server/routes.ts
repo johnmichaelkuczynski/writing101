@@ -8,7 +8,7 @@ import { getFullDocumentContent } from "./services/document-processor";
 
 import { generatePDF } from "./services/pdf-generator";
 import { transcribeAudio } from "./services/speech-service";
-import { register, login, createSession, getUserFromSession, canAccessFeature, getPreviewResponse, isAdmin } from "./auth";
+import { register, login, createSession, getUserFromSession, canAccessFeature, getPreviewResponse, isAdmin, hashPassword } from "./auth";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalTransaction } from "./safe-paypal";
 import { chatRequestSchema, instructionRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, registerRequestSchema, loginRequestSchema, purchaseRequestSchema, type AIModel } from "@shared/schema";
 import multer from "multer";
@@ -44,6 +44,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return await storage.getUserById(req.session.userId);
   };
 
+  // Test database connection endpoint
+  app.get("/api/test-db", async (req, res) => {
+    try {
+      console.log("Testing database connection...");
+      const testUser = await storage.getUserByUsername("test-user-123");
+      console.log("Database test result:", testUser);
+      res.json({ success: true, message: "Database connection working", testUser });
+    } catch (error) {
+      console.error("Database test failed:", error);
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
+  // Admin reset endpoint
+  app.post("/api/admin-reset", async (req, res) => {
+    try {
+      const { username } = req.body;
+      if (username !== "jmkuczynski") {
+        return res.status(403).json({ success: false, error: "Not authorized" });
+      }
+      
+      console.log("Resetting admin user password...");
+      const passwordHash = await hashPassword("admin123");
+      const updatedUser = await storage.resetUserPassword(username, passwordHash);
+      
+      if (updatedUser) {
+        console.log("Admin user password reset successful:", updatedUser);
+        res.json({ success: true, message: "Admin password reset to admin123", user: updatedUser });
+      } else {
+        res.status(404).json({ success: false, error: "User not found" });
+      }
+    } catch (error) {
+      console.error("Admin reset failed:", error);
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
   // Authentication routes
   app.post("/api/register", async (req, res) => {
     try {
@@ -68,7 +105,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       console.error("Registration error:", error);
-      res.status(500).json({ success: false, error: "Registration failed" });
+      res.status(500).json({ success: false, error: "Registration failed: " + error.message });
     }
   });
 
@@ -94,7 +131,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       console.error("Login error:", error);
-      res.status(500).json({ success: false, error: "Login failed" });
+      res.status(500).json({ success: false, error: "Login failed: " + error.message });
     }
   });
 
