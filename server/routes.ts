@@ -66,12 +66,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log("Resetting admin user password...");
-      const passwordHash = await hashPassword("admin123");
+      const passwordHash = await hashPassword("Brahms777!");
       const updatedUser = await storage.resetUserPassword(username, passwordHash);
       
       if (updatedUser) {
-        console.log("Admin user password reset successful:", updatedUser);
-        res.json({ success: true, message: "Admin password reset to admin123", user: updatedUser });
+        res.json({ success: true, message: "Admin password reset to Brahms777!", user: updatedUser });
       } else {
         res.status(404).json({ success: false, error: "User not found" });
       }
