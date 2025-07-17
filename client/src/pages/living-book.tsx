@@ -11,6 +11,7 @@ import RewriteModal from "@/components/rewrite-modal";
 import PassageDiscussionModal from "@/components/passage-discussion-modal";
 import QuizModal from "@/components/quiz-modal";
 import StudyGuideModal from "@/components/study-guide-modal";
+import TestModal from "@/components/test-modal";
 import ChunkingModal from "@/components/chunking-modal";
 import AuthModal from "@/components/auth-modal";
 import PaymentModal from "@/components/payment-modal";
@@ -38,6 +39,10 @@ export default function LivingBook() {
   const [studyGuideModalOpen, setStudyGuideModalOpen] = useState(false);
   const [selectedTextForStudyGuide, setSelectedTextForStudyGuide] = useState<string>("");
   const [studyGuideChunkIndex, setStudyGuideChunkIndex] = useState<number | null>(null);
+  const [testModalOpen, setTestModalOpen] = useState(false);
+  const [testType, setTestType] = useState<"selection" | "cumulative">("selection");
+  const [selectedTextForTest, setSelectedTextForTest] = useState<string>("");
+  const [testCursorPosition, setTestCursorPosition] = useState<number | null>(null);
   const [chunkingModalOpen, setChunkingModalOpen] = useState(false);
   const [pendingChunkText, setPendingChunkText] = useState<string>("");
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -141,6 +146,28 @@ export default function LivingBook() {
     setStudyGuideModalOpen(false);
     setSelectedTextForStudyGuide("");
     setStudyGuideChunkIndex(null);
+  };
+
+  const handleTestMe = (text: string) => {
+    setSelectedTextForTest(text);
+    setTestType("selection");
+    setTestCursorPosition(null);
+    setTestModalOpen(true);
+  };
+
+  const handleTestMeCumulative = () => {
+    // Get cursor position from current document scroll or selection
+    const scrollPosition = window.scrollY;
+    setSelectedTextForTest("");
+    setTestType("cumulative");
+    setTestCursorPosition(scrollPosition);
+    setTestModalOpen(true);
+  };
+
+  const handleTestModalClose = () => {
+    setTestModalOpen(false);
+    setSelectedTextForTest("");
+    setTestCursorPosition(null);
   };
 
   const handleQuizModalClose = () => {
@@ -310,6 +337,8 @@ export default function LivingBook() {
             onPassageDiscussion={handlePassageDiscussion}
             onCreateTest={handleCreateTestFromSelection}
             onCreateStudyGuide={handleCreateStudyGuideFromSelection}
+            onTestMe={handleTestMe}
+            onTestMeCumulative={handleTestMeCumulative}
           />
         </main>
 
@@ -367,6 +396,17 @@ export default function LivingBook() {
         sourceText={selectedTextForStudyGuide}
         chunkIndex={studyGuideChunkIndex}
         selectedModel={selectedModel}
+      />
+
+      {/* Test Modal */}
+      <TestModal
+        isOpen={testModalOpen}
+        onClose={handleTestModalClose}
+        selectedText={selectedTextForTest}
+        testType={testType}
+        cursorPosition={testCursorPosition}
+        selectedModel={selectedModel}
+        mathMode={mathMode}
       />
 
       {/* Chunking Modal */}

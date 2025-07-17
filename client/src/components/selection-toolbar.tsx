@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Highlighter, X, MessageSquare, Edit3, FileText, BookOpen } from "lucide-react";
+import { MessageCircle, Highlighter, X, MessageSquare, Edit3, FileText, BookOpen, Brain, Target } from "lucide-react";
 import { useState } from "react";
 
 interface SelectionToolbarProps {
@@ -9,6 +9,8 @@ interface SelectionToolbarProps {
   onRewrite: (text: string) => void;
   onCreateTest: (text: string) => void;
   onCreateStudyGuide: (text: string) => void;
+  onTestMe: (text: string) => void;
+  onTestMeCumulative: () => void;
   onHighlight: () => void;
   onClear: () => void;
   position?: { x: number; y: number };
@@ -21,6 +23,8 @@ export default function SelectionToolbar({
   onRewrite,
   onCreateTest,
   onCreateStudyGuide,
+  onTestMe,
+  onTestMeCumulative,
   onHighlight, 
   onClear, 
   position 
@@ -54,6 +58,16 @@ export default function SelectionToolbar({
     // Keep toolbar visible so user can try other actions
   };
 
+  const handleTestMe = () => {
+    onTestMe(selectedText);
+    // Keep toolbar visible so user can try other actions
+  };
+
+  const handleTestMeCumulative = () => {
+    onTestMeCumulative();
+    // Keep toolbar visible so user can try other actions
+  };
+
 
 
 
@@ -82,11 +96,11 @@ export default function SelectionToolbar({
 
   return (
     <div 
-      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-2 flex items-center space-x-2"
+      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-2 flex items-center space-x-1 max-w-fit"
       style={style}
     >
-      <div className="text-xs text-muted-foreground max-w-40 truncate">
-        "{selectedText.substring(0, 30)}..."
+      <div className="text-xs text-muted-foreground max-w-32 truncate">
+        "{selectedText.substring(0, 25)}..."
       </div>
       
       <Button
@@ -137,6 +151,26 @@ export default function SelectionToolbar({
       >
         <BookOpen className="w-3 h-3" />
         <span className="text-xs">Study Guide</span>
+      </Button>
+
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={handleTestMe}
+        className="flex items-center space-x-1 text-red-600 border-red-200 hover:bg-red-50"
+      >
+        <Brain className="w-3 h-3" />
+        <span className="text-xs">Test Me</span>
+      </Button>
+
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={handleTestMeCumulative}
+        className="flex items-center space-x-1 text-amber-600 border-amber-200 hover:bg-amber-50"
+      >
+        <Target className="w-3 h-3" />
+        <span className="text-xs">Test All</span>
       </Button>
       
       <Button
