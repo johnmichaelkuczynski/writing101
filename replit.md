@@ -1,8 +1,8 @@
-# Living Book: Dictionary of Analytic Philosophy
+# Living Book: Introduction to Symbolic Logic
 
 ## Overview
 
-This is an interactive AI-augmented interface for exploring the academic paper "The Incompleteness of Deductive Logic: A Generalization of Gödel's Theorem". The application transforms a static academic document into a dynamic, conversational learning experience with mathematical notation support and multiple AI model integration.
+This is an interactive AI-augmented interface for exploring "Introduction to Symbolic Logic" by J.-M. Kuczynski. The application transforms a static academic document into a dynamic, conversational learning experience with mathematical notation support and multiple AI model integration.
 
 ## System Architecture
 
@@ -243,6 +243,16 @@ Preferred communication style: Simple, everyday language.
   - When user highlights text, "Discuss" button opens dedicated discussion modal
   - Modal automatically generates AI explanation of selected passage to enlighten and engage user
   - Allows ongoing dialogue about specific passage with conversation history
+- July 17, 2025: COMPLETE DOCUMENT REPLACEMENT - Introduction to Symbolic Logic
+  - COMPLETE TEXT REPLACEMENT: Replaced all existing content with "Introduction to Symbolic Logic" by J.-M. Kuczynski
+  - Extracted authentic 87,382-character text from user-uploaded authoritative PDF edition
+  - Content now covers fundamental logical concepts: inference, deduction, induction, entailment, validity, soundness
+  - Structured comprehensive logical education: formal/informal logic, model theory, truth functions, set theory
+  - Updated AI context to handle logical reasoning, symbolic notation, and philosophical foundations of logic
+  - ALL API KEYS ACTIVATED: OpenAI, Anthropic, Perplexity, and DeepSeek models fully operational
+  - All existing functionality preserved: chat, rewrite, voice, text selection, math mode, passage discussion
+  - Zero content modification - pure passthrough of uploaded PDF maintains academic integrity
+  - Application now serves as comprehensive symbolic logic learning platform with AI-powered analysis
   - Uses user's chosen AI model with no filtering or interference from system
   - AI provides brief philosophical explanations and engages in thoughtful dialogue about Wittgenstein concepts
 - July 10, 2025: CRITICAL TEXT INTEGRITY FIX - Complete document replacement with authentic PDF content

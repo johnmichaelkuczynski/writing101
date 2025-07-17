@@ -1,1 +1,1 @@
-export { industrialSocietyContent as paperContent } from './industrial-society-content';
+export { symbolicLogicContent as paperContent } from './symbolic-logic-content';
