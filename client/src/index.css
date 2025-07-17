@@ -155,4 +155,21 @@
   font-family: Georgia, serif;
   text-align: justify;
   text-indent: 0;
+  font-size: 1rem;
+  font-weight: normal;
+}
+
+/* Ensure all text in document content is uniform */
+.document-content * {
+  font-size: 1rem !important;
+  font-weight: normal !important;
+  font-family: Georgia, serif !important;
+}
+
+.document-paragraph {
+  font-size: 1rem !important;
+  font-weight: normal !important;
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+  text-align: justify;
 }

@@ -190,10 +190,10 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
           <article className="prose prose-xl max-w-none text-foreground w-full leading-relaxed select-text">
             {/* Document Title */}
             <header className="text-center mb-12">
-              <h1 className="text-3xl font-georgia font-bold text-foreground mb-2">
+              <h1 className="text-base font-normal text-foreground mb-2">
                 {paperContent.title}
               </h1>
-              <p className="text-lg font-georgia text-muted-foreground text-center">
+              <p className="text-base font-normal text-muted-foreground text-center">
                 by {paperContent.author}
               </p>
             </header>

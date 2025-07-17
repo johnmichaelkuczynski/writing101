@@ -107,7 +107,7 @@ def format_content_as_html(text):
     for item in formatted_lines:
         if item.startswith("HEADER:"):
             header_text = item.replace("HEADER:", "").strip()
-            html_content += f'<h3 class="text-xl font-semibold mt-8 mb-4 text-foreground">{header_text}</h3>'
+            html_content += f'<p class="document-paragraph mb-6 mt-8 font-normal">{header_text}</p>'
         elif item.strip():
             # Regular paragraph - split by double newlines for sub-paragraphs
             paragraphs = item.split('\n\n')
