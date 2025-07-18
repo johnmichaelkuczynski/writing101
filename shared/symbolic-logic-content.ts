@@ -19,6 +19,8 @@ export const symbolicLogicContent = {
         <p class="document-paragraph mb-4">A premise is a belief that one either has or is willing to accept for argument's sake. An inference always begins with certain premises and ends with a conclusion that one accepts on the basis of those premises. An inference is legitimate if the premises warrants acceptance of the conclusion.</p>
         <p class="document-paragraph mb-4">There are two very different reasons why acceptance of P might warrant acceptance of Q. On the one hand, it might be impossible, for reasons of a strictly logical nature, that Q should be false if P is true. (P: Smith owns 127 cars. Q: Smith owns more than 100 cars.) On the other hand, it might be unlikely, but not impossible, that Q should be false if P is true. (P: Smith owns 127 cars. Q: Smith is very wealthy.)</p>
         <p class="document-paragraph mb-4">P entails Q if it is logically impossible that Q should be false if P is true. P confirms Q if P increases the likelihood that Q is true.</p>
+        <p class="document-paragraph mb-4">Given only that P confirms Q, it doesn't follow that acceptance of P warrants acceptance of Q. Smith is more likely to find a cure for cancer if he is intelligent than if he is unintelligent, and P: Smith is intelligent therefore confirms Q: Smith will find a cure for cancer.</p>
+        <p class="document-paragraph mb-4">But acceptance of P obviously doesn't warrant acceptance of Q, since Q is more likely than not to be false even if P is true. By the same token, P does warrant acceptance of R: Smith has not had more than 10 massive strokes, given that that, if P is true, there is only a small chance that R is false.</p>
       </div>`
     },
     {
@@ -26,9 +28,11 @@ export const symbolicLogicContent = {
       title: "1.2 Deduction in relation to entailment",
       content: `<div class="document-content">
         <h2 id="deduction-entailment" class="text-xl font-bold mb-4">1.2 Deduction in relation to entailment</h2>
-        <p class="document-paragraph mb-4">If P entails Q, then Q can be deduced from P. If a given person knows that P entails Q and on that basis infers Q from P, then that person has made a deductive inference.</p>
-        <p class="document-paragraph mb-4">P: x is a square. Q: x has more than two sides. It is impossible for Q to be false if P is true. Therefore, P entails Q.</p>
+        <p class="document-paragraph mb-4">If P entails Q, then Q can be deduced from P. If a given person knows that P entails Q and on that basis infers Q:</p>
+        <p class="document-paragraph mb-4" style="text-align: center;">P: x is a square.<br/>Q: x has more than two sides.</p>
+        <p class="document-paragraph mb-4">It is impossible for Q to be false if P is true. Therefore, P entails Q.</p>
         <p class="document-paragraph mb-4">Given only that P entails Q, it doesn't follow that, if one infers Q from P, one is thereby making a legitimate inference.</p>
+        <p class="document-paragraph mb-4">If Smith knows that P is true and Smith correctly believes that P entails Q, Smith's inference does not yield knowledge of Q unless Smith's reason for believing that P entails Q is the right one. If Smith believes that squares have 90 sides and for that reason infers Q from P, Smith has not made a legitimate inference, it being a coincidence that he arrived at the right conclusion.</p>
       </div>`
     },
     {
@@ -37,7 +41,14 @@ export const symbolicLogicContent = {
       content: `<div class="document-content">
         <h2 id="induction-confirmation" class="text-xl font-bold mb-4">1.3 Induction in relation to confirmation</h2>
         <p class="document-paragraph mb-4">P confirms Q if the probability of Q, given P, is higher than the probability of Q, given not-P. Equivalently, P confirms Q if P, if true, raises the probability of Q without giving Q a probability of 100%.</p>
-        <p class="document-paragraph mb-4">It follows that a sufficient condition for P's confirming Q is that Q be capable of being legitimately inductively inferred from P.</p>
+        <p class="document-paragraph mb-4">It follows that a sufficient condition for P's confirming Q is that Q be capable of being legitimately inductively inferred from P:</p>
+        <p class="document-paragraph mb-4" style="margin-left: 2rem;">P: Smith drives a Rolls Royce, wears extremely expensive clothes, has an excellent credit rating, has an excellent employment history, all of his jobs being extremely lucrative ones; and, finally, Smith has no criminal record.</p>
+        <p class="document-paragraph mb-4" style="margin-left: 2rem;">Q: Smith is wealthy.</p>
+        <p class="document-paragraph mb-4">P, if true, makes it sufficiently improbable that Q is false that we may infer Q from P. Such an inference is not deductive, given that Smith might be an extraordinarily talented but penniless con-artist.</p>
+        <p class="document-paragraph mb-4">Even though Q's being capable of being legitimately inductively inferred from P is sufficient for P's confirming Q, it is not necessary for it.</p>
+        <p class="document-paragraph mb-4" style="margin-left: 2rem;">P: Smith is the most intellectually gifted person in Russia.</p>
+        <p class="document-paragraph mb-4" style="margin-left: 2rem;">Q: Smith will find a cure for cancer.</p>
+        <p class="document-paragraph mb-4">P raises the probability of Q, whereas not-P lowers the probability of Q. Thus, P confirms Q, even though by does not by itself warrant acceptance of Q.</p>
       </div>`
     },
     {
@@ -46,8 +57,9 @@ export const symbolicLogicContent = {
       content: `<div class="document-content">
         <h2 id="validity-soundness" class="text-xl font-bold mb-4">1.4 Validity vs. soundness</h2>
         <p class="document-paragraph mb-4">A valid argument is a deductive argument whose premises, if true, in fact give a probability of 100% to the conclusion. In other words, a valid argument is an argument whose premises are supposed to give 100% probability to the conclusion and whose premises in fact give 100% probability to the conclusion.</p>
-        <p class="document-paragraph mb-4">A valid argument can have false premises. For an argument to be valid it is necessary only that if the premises were true, then there would be a 100% chance that the conclusion is true.</p>
-        <p class="document-paragraph mb-4">A sound argument is a valid argument with true premises. A valid argument cannot possibly have true premises and a false conclusion, but it can have false premises and a false conclusion or false premises and a true conclusion.</p>
+        <p class="document-paragraph mb-4">A valid argument can have false premises. For an argument to be valid it is necessary only that if the premises were true, then there would be a 100% chance that the conclusion is true. It may be that Smith doesn't drive a Rolls Royce or any kind of car for that matter. But it's still the case that if Smith did drive a Rolls Royce, then, given that all Rolls Royces are cars, there would be no chance that Smith didn't drive a car.</p>
+        <p class="document-paragraph mb-4">A sound argument is a valid argument with true premises. (For example: JMK is a human; all humans are mammals; therefore, JMK is a mammal.)</p>
+        <p class="document-paragraph mb-4">A valid argument cannot possibly have true premises and a false conclusion, but it can have false premises and a false conclusion or false premises and a true conclusion.</p>
       </div>`
     },
     {
@@ -56,7 +68,10 @@ export const symbolicLogicContent = {
       content: `<div class="document-content">
         <h2 id="two-kinds-induction" class="text-xl font-bold mb-4">1.5 Two kinds of induction</h2>
         <p class="document-paragraph mb-4">There are two kinds of inductive inference: induction by enumeration and inference to the best explanation.</p>
-        <p class="document-paragraph mb-4">If, on the basis of the fact that you know of many x's that are y's and of no x's that aren't y's, you infer that all x's are y's or that the next x you encounter is a y, you've performed an induction by enumeration.</p>
+        <p class="document-paragraph mb-4">If, on the basis of the fact that you know of many x's that are y's and of no x's that aren't y's, you infer that all x's are y's or that the next x you encounter is a y, you've performed a case of induction by enumeration.</p>
+        <p class="document-paragraph mb-4">Here is an example. You've seen a million swans. They were all white. (Moreover, you knew in each case that what you were seeing was a white swan—you didn't think it was, for example, a beige duck.) You've never seen, or otherwise come to know of, any non-white swan. On this basis, you infer that all swans are white and, therefore, that, if you ever encounter another swan, it will be white.</p>
+        <p class="document-paragraph mb-4">If, in order to account for something of which you have knowledge, you posit the existence of something of which you don't have knowledge; you have made an inference to the best explanation.</p>
+        <p class="document-paragraph mb-4">All theories are cases of inference to the best explanation. All the theories put forth by Einstein, Darwin, Freud are instances of this mode of inference. Inference to the best explanation is a very powerful form of inference. (In fact, we will see in Section 1.7. that it is the only form of non-deductive inference. So-called "induction by enumeration," to the extent that it isn't a spurious method of inference, collapses into inference to the best explanation.)</p>
       </div>`
     },
     {
@@ -64,7 +79,9 @@ export const symbolicLogicContent = {
       title: "1.6 A fact about induction by enumeration",
       content: `<div class="document-content">
         <h2 id="induction-enumeration" class="text-xl font-bold mb-4">1.6 A fact about induction by enumeration</h2>
-        <p class="document-paragraph mb-4">This section discusses specific facts about induction by enumeration and its role in logical reasoning.</p>
+        <p class="document-paragraph mb-4">Induction by enumeration isn't nearly as powerful a form of inference as inference to the best explanation. Given only that every single one of the 5,000 first editions you've ever come across smelled like pipe tobacco, you cannot reasonably infer that all first editions smell like pipe tobacco. What if all of those first editions were the property of your pipe-smoking friend Larry? In that case, you'd have good to reason to suspect that their smelling like pipe tobacco had to do, not with their being first editions, but with their being things that had been around Larry.</p>
+        <p class="document-paragraph mb-4">By the same token, so far as you are entitled to infer that all first editions smell like pipe tobacco, it's only to the extent that you have reason to believe that a thing's smelling like pipe tobacco is rooted in its being a first edition. But that means that, if the data entitles you to infer that all first editions smell like pipe tobacco, it's only because it also entitles you to accept some inference to the best explanation (one to the effect that a thing's being a first edition is, for some reason or other, responsible for its smelling like pipe tobacco).</p>
+        <p class="document-paragraph mb-4">In general, induction by enumeration is parasitic on inference to the best explanation. In Chapter 12 of Analytic Philosophy, it is shown how a failure to see this underlies the spurious belief that there is no non-deductive, inferential knowledge.</p>
       </div>`
     },
     {
@@ -72,7 +89,13 @@ export const symbolicLogicContent = {
       title: "1.7 Two kinds of entailment",
       content: `<div class="document-content">
         <h2 id="two-kinds-entailment" class="text-xl font-bold mb-4">1.7 Two kinds of entailment</h2>
-        <p class="document-paragraph mb-4">This section explores the distinction between different types of entailment relations in logic.</p>
+        <p class="document-paragraph mb-4">There are two kinds of entailment: logical entailment and ontological entailment. Here are paradigmatic examples of each:</p>
+        <p class="document-paragraph mb-4" style="font-weight: bold;">Logical entailment:</p>
+        <p class="document-paragraph mb-4" style="margin-left: 2rem;">Premise: Either Jones is dead or Jones is alive.<br/>Conclusion: Jones is alive or Jones is dead.</p>
+        <p class="document-paragraph mb-4" style="font-weight: bold;">Ontological entailment:</p>
+        <p class="document-paragraph mb-4" style="margin-left: 2rem;">Premise: That car is red.<br/>Conclusion: That car is colored.</p>
+        <p class="document-paragraph mb-4">The first is a case of logical entailment for the reason that the premise means the same thing as the conclusion. The second is a case of ontological entailment because the premise doesn't mean the same thing as the conclusion, but it's still impossible, for reasons having to do with the nature of reality (as opposed to the nature of language), for the premise to be true and the conclusion false.</p>
+        <p class="document-paragraph mb-4">Also, the second inference is a case of ontological entailment because the premise doesn't mean the same thing as the conclusion, but reality is such that the premise cannot be true unless the conclusion is true.</p>
       </div>`
     },
     {
