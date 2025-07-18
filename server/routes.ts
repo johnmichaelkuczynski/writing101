@@ -321,6 +321,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Clear chat history
+  app.delete("/api/chat/history", async (req, res) => {
+    try {
+      await storage.clearChatMessages();
+      res.json({ success: true, message: "Chat history cleared" });
+    } catch (error) {
+      console.error("Clear chat history error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Rewrite endpoint with authentication
   app.post("/api/rewrite", async (req, res) => {
     try {

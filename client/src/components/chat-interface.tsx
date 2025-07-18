@@ -4,8 +4,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { MessageCircle, Send, Bot, User, Download, Mail, Copy, Printer, Lock } from "lucide-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { MessageCircle, Send, Bot, User, Download, Mail, Copy, Printer, Lock, Trash2 } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -27,6 +27,7 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
   const [emailAddress, setEmailAddress] = useState("");
   const [contentToEmail, setContentToEmail] = useState("");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
 
   const { data: chatHistory = [], refetch } = useQuery({
@@ -109,6 +110,28 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
     onSuccess: () => {
       setMessage("");
       refetch();
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const clearChatMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("/api/chat/history", {
+        method: "DELETE"
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/chat/history"] });
+      toast({
+        title: "Chat Cleared",
+        description: "All chat history has been cleared",
+      });
     },
     onError: (error) => {
       toast({
@@ -248,11 +271,27 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
       <div className="flex flex-col h-full overflow-hidden">
         {/* Chat Header */}
         <div className="bg-muted px-4 py-3 border-b border-border">
-          <h3 className="font-inter font-semibold text-sm text-foreground flex items-center">
-            <MessageCircle className="text-primary mr-2 w-4 h-4" />
-            AI Chat Interface
-          </h3>
-          <p className="text-xs text-muted-foreground mt-1">Ask questions about the paper</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-inter font-semibold text-sm text-foreground flex items-center">
+                <MessageCircle className="text-primary mr-2 w-4 h-4" />
+                AI Chat Interface
+              </h3>
+              <p className="text-xs text-muted-foreground mt-1">Ask questions about the paper</p>
+            </div>
+            {chatHistory.length > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => clearChatMutation.mutate()}
+                disabled={clearChatMutation.isPending}
+                className="text-xs text-red-600 hover:text-red-800 hover:bg-red-50"
+              >
+                <Trash2 className="w-3 h-3 mr-1" />
+                Clear Chat
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Chat Messages */}
