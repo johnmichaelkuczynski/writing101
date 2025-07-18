@@ -143,7 +143,7 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
       const contentParts = processedContent.split('1.0 The concept of an inference');
       
       if (contentParts.length > 1) {
-        // Process only the actual content part (skip table of contents)
+        // Skip the table of contents section entirely and show only the actual content
         const actualContent = '1.0 The concept of an inference' + contentParts.slice(1).join('1.0 The concept of an inference');
         
         const processedActualContent = actualContent.replace(
@@ -157,8 +157,9 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
           }
         );
         
-        // Reconstruct the content with IDs only in the actual content sections
-        processedContent = contentParts[0] + processedActualContent;
+        // Only show the header and actual content, skip the table of contents
+        const headerPart = '<div class="document-content"><p class="document-paragraph mb-4">Introduction to Symbolic Logic</p><p class="document-paragraph mb-4">J.-M. Kuczynski</p>';
+        processedContent = headerPart + processedActualContent;
       }
       
       if (!mathMode) {
