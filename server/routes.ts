@@ -4,14 +4,14 @@ import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
 import { generateAIResponse, generateRewrite, generatePassageExplanation, generatePassageDiscussionResponse, generateQuiz, generateStudyGuide } from "./services/ai-models";
-import { generateTest, gradeTest } from "./services/test-service";
+
 import { getFullDocumentContent } from "./services/document-processor";
 
 import { generatePDF } from "./services/pdf-generator";
 import { transcribeAudio } from "./services/speech-service";
 import { register, login, createSession, getUserFromSession, canAccessFeature, getPreviewResponse, isAdmin, hashPassword } from "./auth";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalTransaction } from "./safe-paypal";
-import { chatRequestSchema, instructionRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, testRequestSchema, registerRequestSchema, loginRequestSchema, purchaseRequestSchema, type AIModel } from "@shared/schema";
+import { chatRequestSchema, instructionRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, registerRequestSchema, loginRequestSchema, purchaseRequestSchema, type AIModel } from "@shared/schema";
 import multer from "multer";
 
 declare module 'express-session' {
@@ -597,106 +597,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Test generation endpoint with authentication
-  app.post("/api/generate-test", async (req, res) => {
-    try {
-      const { sourceText, instructions, testType, model, cursorPosition, chunkIndex } = testRequestSchema.parse(req.body);
-      const user = await getCurrentUser(req);
-      
-      const fullTestContent = await generateTest({
-        sourceText,
-        instructions,
-        testType,
-        model,
-        cursorPosition
-      });
-      
-      // Check if user has access to full features
-      let testContent = fullTestContent;
-      let isPreview = false;
-      
-      if (!canAccessFeature(user)) {
-        testContent = getPreviewResponse(fullTestContent, !user);
-        isPreview = true;
-      } else {
-        // Deduct 1 credit for full response (skip for admin)
-        if (!isAdmin(user)) {
-          await storage.updateUserCredits(user!.id, user!.credits - 1);
-        }
-      }
-      
-      const savedTestSession = await storage.createTestSession({
-        sourceText,
-        testContent: fullTestContent,
-        instructions: instructions || "Generate a comprehensive test",
-        testType,
-        model,
-        chunkIndex,
-        cursorPosition
-      });
-      
-      res.json({ 
-        id: savedTestSession.id,
-        testContent,
-        isPreview,
-        timestamp: savedTestSession.timestamp
-      });
-    } catch (error) {
-      console.error("Test generation error:", error);
-      res.status(500).json({ error: error.message });
-    }
-  });
 
-  // Test grading endpoint with authentication
-  app.post("/api/grade-test", async (req, res) => {
-    try {
-      const { testSessionId, responses, model } = req.body;
-      const user = await getCurrentUser(req);
-      
-      if (!canAccessFeature(user)) {
-        return res.status(403).json({ error: "Authentication required for test grading" });
-      }
-      
-      // Get the original test session
-      const testSession = await storage.getTestSessionById(testSessionId);
-      if (!testSession) {
-        return res.status(404).json({ error: "Test session not found" });
-      }
-      
-      // Save user responses
-      for (const response of responses) {
-        await storage.createTestResponse(response);
-      }
-      
-      // Grade the test
-      const gradeResult = await gradeTest({
-        testSessionId,
-        responses,
-        originalQuestions: [], // Would need to parse from testSession.testContent
-        model
-      });
-      
-      // Save the grade
-      const savedGrade = await storage.createTestGrade({
-        testSessionId,
-        totalQuestions: gradeResult.totalQuestions,
-        correctAnswers: gradeResult.correctAnswers,
-        percentage: gradeResult.percentage,
-        grade: gradeResult.grade,
-        feedback: gradeResult.feedback
-      });
-      
-      // Deduct 1 credit for grading (skip for admin)
-      if (!isAdmin(user)) {
-        await storage.updateUserCredits(user!.id, user!.credits - 1);
-      }
-      
-      res.json(gradeResult);
-    } catch (error) {
-      console.error("Test grading error:", error);
-      res.status(500).json({ error: error.message });
-    }
-  });
 
   const httpServer = createServer(app);
   return httpServer;

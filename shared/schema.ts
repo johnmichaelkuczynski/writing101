@@ -77,38 +77,7 @@ export const purchases = pgTable("purchases", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const testSessions = pgTable("test_sessions", {
-  id: serial("id").primaryKey(),
-  sourceText: text("source_text").notNull(),
-  instructions: text("instructions").notNull(),
-  testContent: text("test_content").notNull(),
-  testType: text("test_type").notNull(), // "selection" or "cumulative"
-  model: text("model").notNull(),
-  chunkIndex: integer("chunk_index"),
-  cursorPosition: integer("cursor_position"), // for cumulative tests
-  timestamp: timestamp("timestamp").defaultNow().notNull(),
-});
 
-export const testResponses = pgTable("test_responses", {
-  id: serial("id").primaryKey(),
-  testSessionId: integer("test_session_id").notNull(),
-  questionIndex: integer("question_index").notNull(),
-  userAnswer: text("user_answer").notNull(),
-  isCorrect: boolean("is_correct"),
-  feedback: text("feedback"),
-  timestamp: timestamp("timestamp").defaultNow().notNull(),
-});
-
-export const testGrades = pgTable("test_grades", {
-  id: serial("id").primaryKey(),
-  testSessionId: integer("test_session_id").notNull(),
-  totalQuestions: integer("total_questions").notNull(),
-  correctAnswers: integer("correct_answers").notNull(),
-  percentage: integer("percentage").notNull(),
-  grade: text("grade").notNull(), // A, B, C, D, F
-  feedback: text("feedback"),
-  timestamp: timestamp("timestamp").defaultNow().notNull(),
-});
 
 
 
@@ -172,32 +141,7 @@ export const insertPurchaseSchema = createInsertSchema(purchases).pick({
   status: true,
 });
 
-export const insertTestSessionSchema = createInsertSchema(testSessions).pick({
-  sourceText: true,
-  instructions: true,
-  testContent: true,
-  testType: true,
-  model: true,
-  chunkIndex: true,
-  cursorPosition: true,
-});
 
-export const insertTestResponseSchema = createInsertSchema(testResponses).pick({
-  testSessionId: true,
-  questionIndex: true,
-  userAnswer: true,
-  isCorrect: true,
-  feedback: true,
-});
-
-export const insertTestGradeSchema = createInsertSchema(testGrades).pick({
-  testSessionId: true,
-  totalQuestions: true,
-  correctAnswers: true,
-  percentage: true,
-  grade: true,
-  feedback: true,
-});
 
 
 
@@ -218,12 +162,7 @@ export type Session = typeof sessions.$inferSelect;
 export type InsertSession = z.infer<typeof insertSessionSchema>;
 export type Purchase = typeof purchases.$inferSelect;
 export type InsertPurchase = z.infer<typeof insertPurchaseSchema>;
-export type TestSession = typeof testSessions.$inferSelect;
-export type InsertTestSession = z.infer<typeof insertTestSessionSchema>;
-export type TestResponse = typeof testResponses.$inferSelect;
-export type InsertTestResponse = z.infer<typeof insertTestResponseSchema>;
-export type TestGrade = typeof testGrades.$inferSelect;
-export type InsertTestGrade = z.infer<typeof insertTestGradeSchema>;
+
 
 
 // AI Models
@@ -262,14 +201,7 @@ export const studyGuideRequestSchema = z.object({
   chunkIndex: z.number().optional(),
 });
 
-export const testRequestSchema = z.object({
-  sourceText: z.string(),
-  instructions: z.string().optional(),
-  testType: z.enum(["selection", "cumulative"]),
-  model: z.enum(["deepseek", "openai", "anthropic", "perplexity"]),
-  cursorPosition: z.number().optional(),
-  chunkIndex: z.number().optional(),
-});
+
 
 export const registerRequestSchema = z.object({
   username: z.string().min(3).max(50),

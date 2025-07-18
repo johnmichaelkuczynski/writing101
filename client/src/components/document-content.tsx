@@ -15,13 +15,12 @@ interface DocumentContentProps {
   onTextSelectedForChat?: (text: string) => void;
   onRewriteFromSelection?: (text: string) => void;
   onPassageDiscussion?: (text: string) => void;
-  onCreateTest?: (text: string) => void;
+
   onCreateStudyGuide?: (text: string) => void;
-  onTestMe?: (text: string) => void;
-  onTestMeCumulative?: () => void;
+
 }
 
-export default function DocumentContent({ mathMode = true, onQuestionFromSelection, onTextSelectedForChat, onRewriteFromSelection, onPassageDiscussion, onCreateTest, onCreateStudyGuide, onTestMe, onTestMeCumulative }: DocumentContentProps) {
+export default function DocumentContent({ mathMode = true, onQuestionFromSelection, onTextSelectedForChat, onRewriteFromSelection, onPassageDiscussion, onCreateStudyGuide }: DocumentContentProps) {
   const { selection, isSelecting, clearSelection, highlightSelection, removeHighlights } = useTextSelection();
   const [showChunkingModal, setShowChunkingModal] = useState(false);
   const [selectedTextForChunking, setSelectedTextForChunking] = useState("");
@@ -80,12 +79,7 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
     // Don't clear selection - let user choose other actions if needed
   };
 
-  const handleCreateTest = (text: string) => {
-    if (onCreateTest) {
-      onCreateTest(text);
-    }
-    // Don't clear selection - let user choose other actions if needed
-  };
+
 
   const handleCreateStudyGuide = (text: string) => {
     if (onCreateStudyGuide) {
@@ -94,19 +88,7 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
     // Don't clear selection - let user choose other actions if needed
   };
 
-  const handleTestMe = (text: string) => {
-    if (onTestMe) {
-      onTestMe(text);
-    }
-    // Don't clear selection - let user choose other actions if needed
-  };
 
-  const handleTestMeCumulative = () => {
-    if (onTestMeCumulative) {
-      onTestMeCumulative();
-    }
-    // Don't clear selection - let user choose other actions if needed
-  };
 
 
 
@@ -236,10 +218,9 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
           onAskQuestion={handleAskQuestion}
           onSendToChat={handleSendToChat}
           onRewrite={handleRewrite}
-          onCreateTest={handleCreateTest}
+
           onCreateStudyGuide={handleCreateStudyGuide}
-          onTestMe={handleTestMe}
-          onTestMeCumulative={handleTestMeCumulative}
+
           onHighlight={handleHighlight}
           onClear={clearSelection}
         />

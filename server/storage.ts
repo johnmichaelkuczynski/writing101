@@ -1,4 +1,4 @@
-import { chatMessages, instructions, rewrites, quizzes, studyGuides, users, sessions, purchases, testSessions, testResponses, testGrades, type ChatMessage, type InsertChatMessage, type Instruction, type InsertInstruction, type Rewrite, type InsertRewrite, type Quiz, type InsertQuiz, type StudyGuide, type InsertStudyGuide, type User, type InsertUser, type Session, type InsertSession, type Purchase, type InsertPurchase, type TestSession, type InsertTestSession, type TestResponse, type InsertTestResponse, type TestGrade, type InsertTestGrade } from "@shared/schema";
+import { chatMessages, instructions, rewrites, quizzes, studyGuides, users, sessions, purchases, type ChatMessage, type InsertChatMessage, type Instruction, type InsertInstruction, type Rewrite, type InsertRewrite, type Quiz, type InsertQuiz, type StudyGuide, type InsertStudyGuide, type User, type InsertUser, type Session, type InsertSession, type Purchase, type InsertPurchase } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
 
@@ -36,13 +36,7 @@ export interface IStorage {
   getPurchasesByUserId(userId: number): Promise<Purchase[]>;
   updatePurchaseStatus(purchaseId: number, status: string): Promise<void>;
   
-  // Test session management
-  createTestSession(testSession: InsertTestSession): Promise<TestSession>;
-  getTestSessionById(id: number): Promise<TestSession | null>;
-  createTestResponse(response: InsertTestResponse): Promise<TestResponse>;
-  getTestResponsesBySessionId(sessionId: number): Promise<TestResponse[]>;
-  createTestGrade(grade: InsertTestGrade): Promise<TestGrade>;
-  getTestGradeBySessionId(sessionId: number): Promise<TestGrade | null>;
+
 }
 
 export class MemStorage implements IStorage {
@@ -455,46 +449,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(purchases.id, purchaseId));
   }
 
-  // Test session management methods
-  async createTestSession(insertTestSession: InsertTestSession): Promise<TestSession> {
-    const [testSession] = await db.insert(testSessions).values({
-      ...insertTestSession,
-      chunkIndex: insertTestSession.chunkIndex ?? null,
-      cursorPosition: insertTestSession.cursorPosition ?? null
-    }).returning();
-    return testSession;
-  }
 
-  async getTestSessionById(id: number): Promise<TestSession | null> {
-    const [testSession] = await db.select().from(testSessions).where(eq(testSessions.id, id));
-    return testSession || null;
-  }
-
-  async createTestResponse(insertResponse: InsertTestResponse): Promise<TestResponse> {
-    const [response] = await db.insert(testResponses).values({
-      ...insertResponse,
-      isCorrect: insertResponse.isCorrect ?? null,
-      feedback: insertResponse.feedback ?? null
-    }).returning();
-    return response;
-  }
-
-  async getTestResponsesBySessionId(sessionId: number): Promise<TestResponse[]> {
-    return await db.select().from(testResponses).where(eq(testResponses.testSessionId, sessionId));
-  }
-
-  async createTestGrade(insertGrade: InsertTestGrade): Promise<TestGrade> {
-    const [grade] = await db.insert(testGrades).values({
-      ...insertGrade,
-      feedback: insertGrade.feedback ?? null
-    }).returning();
-    return grade;
-  }
-
-  async getTestGradeBySessionId(sessionId: number): Promise<TestGrade | null> {
-    const [grade] = await db.select().from(testGrades).where(eq(testGrades.testSessionId, sessionId));
-    return grade || null;
-  }
 }
 
 export const storage = new DatabaseStorage();

@@ -11,7 +11,7 @@ import RewriteModal from "@/components/rewrite-modal";
 import PassageDiscussionModal from "@/components/passage-discussion-modal";
 import QuizModal from "@/components/quiz-modal";
 import StudyGuideModal from "@/components/study-guide-modal";
-import TestModal from "@/components/test-modal";
+
 import ChunkingModal from "@/components/chunking-modal";
 import AuthModal from "@/components/auth-modal";
 import PaymentModal from "@/components/payment-modal";
@@ -39,10 +39,7 @@ export default function LivingBook() {
   const [studyGuideModalOpen, setStudyGuideModalOpen] = useState(false);
   const [selectedTextForStudyGuide, setSelectedTextForStudyGuide] = useState<string>("");
   const [studyGuideChunkIndex, setStudyGuideChunkIndex] = useState<number | null>(null);
-  const [testModalOpen, setTestModalOpen] = useState(false);
-  const [testType, setTestType] = useState<"selection" | "cumulative">("selection");
-  const [selectedTextForTest, setSelectedTextForTest] = useState<string>("");
-  const [testCursorPosition, setTestCursorPosition] = useState<number | null>(null);
+
   const [chunkingModalOpen, setChunkingModalOpen] = useState(false);
   const [pendingChunkText, setPendingChunkText] = useState<string>("");
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -98,18 +95,7 @@ export default function LivingBook() {
     setSelectedTextForDiscussion("");
   };
 
-  const handleCreateTestFromSelection = (text: string) => {
-    const wordCount = text.split(/\s+/).length;
-    
-    if (wordCount > 1000) {
-      setPendingChunkText(text);
-      setChunkingModalOpen(true);
-    } else {
-      setSelectedTextForQuiz(text);
-      setQuizChunkIndex(null);
-      setQuizModalOpen(true);
-    }
-  };
+
 
   const handleChunkAction = (chunk: string, chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite' | 'study-guide') => {
     if (action === 'quiz') {
@@ -148,27 +134,7 @@ export default function LivingBook() {
     setStudyGuideChunkIndex(null);
   };
 
-  const handleTestMe = (text: string) => {
-    setSelectedTextForTest(text);
-    setTestType("selection");
-    setTestCursorPosition(null);
-    setTestModalOpen(true);
-  };
 
-  const handleTestMeCumulative = () => {
-    // Get cursor position from current document scroll or selection
-    const scrollPosition = window.scrollY;
-    setSelectedTextForTest("");
-    setTestType("cumulative");
-    setTestCursorPosition(scrollPosition);
-    setTestModalOpen(true);
-  };
-
-  const handleTestModalClose = () => {
-    setTestModalOpen(false);
-    setSelectedTextForTest("");
-    setTestCursorPosition(null);
-  };
 
   const handleQuizModalClose = () => {
     setQuizModalOpen(false);
@@ -234,18 +200,7 @@ export default function LivingBook() {
                 <span>Rewrite Document</span>
               </Button>
               
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const fullText = getFullDocumentContent();
-                  handleCreateTestFromSelection(fullText);
-                }}
-                className="flex items-center space-x-2 text-orange-600 border-orange-200 hover:bg-orange-50"
-              >
-                <FileText className="w-4 h-4" />
-                <span>Create Test</span>
-              </Button>
+
               
               <Button
                 variant="outline"
@@ -335,10 +290,9 @@ export default function LivingBook() {
             onTextSelectedForChat={handleTextSelectedForChat}
             onRewriteFromSelection={handleRewriteFromSelection}
             onPassageDiscussion={handlePassageDiscussion}
-            onCreateTest={handleCreateTestFromSelection}
+
             onCreateStudyGuide={handleCreateStudyGuideFromSelection}
-            onTestMe={handleTestMe}
-            onTestMeCumulative={handleTestMeCumulative}
+
           />
         </main>
 
@@ -398,16 +352,7 @@ export default function LivingBook() {
         selectedModel={selectedModel}
       />
 
-      {/* Test Modal */}
-      <TestModal
-        isOpen={testModalOpen}
-        onClose={handleTestModalClose}
-        selectedText={selectedTextForTest}
-        testType={testType}
-        cursorPosition={testCursorPosition}
-        selectedModel={selectedModel}
-        mathMode={mathMode}
-      />
+
 
       {/* Chunking Modal */}
       <ChunkingModal
