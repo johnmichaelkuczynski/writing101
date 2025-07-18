@@ -127,16 +127,29 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
     }
   };
 
-  // Function to convert math content based on mode
+  // Function to convert math content based on mode and add IDs to section headings
   const processContentForMathMode = (content: string) => {
     try {
       if (!content || typeof content !== 'string') {
         return content || '';
       }
       
+      // Add IDs to section headings for navigation
+      let processedContent = content;
+      let counter = 0;
+      processedContent = processedContent.replace(
+        /class="document-paragraph mb-6 mt-8 font-normal">([0-9]+\.[0-9]+(?:\.[0-9]+)?\s+[^<]+)/g,
+        (match, titleText) => {
+          const sectionNumber = titleText.match(/^([0-9]+\.[0-9]+(?:\.[0-9]+)?)/)?.[1] || '';
+          const id = `section-${sectionNumber.replace(/\./g, '-')}-${counter}`;
+          counter++;
+          return `class="document-paragraph mb-6 mt-8 font-normal" id="${id}">${titleText}`;
+        }
+      );
+      
       if (!mathMode) {
         // Remove LaTeX notation when math mode is off
-        return content
+        return processedContent
           .replace(/\$\$([^$]+)\$\$/g, '$1') // Remove display math delimiters
           .replace(/\$([^$]+)\$/g, '$1') // Remove inline math delimiters
           .replace(/\\sqrt\{([^}]+)\}/g, 'sqrt($1)') // Convert sqrt notation
@@ -149,7 +162,7 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
           .replace(/\\times/g, '×'); // Convert multiplication
       } else {
         // Process LaTeX notation for rendering
-        let processed = content;
+        let processed = processedContent;
         // Replace display math blocks
         processed = processed.replace(/\$\$([^$]+)\$\$/g, (match, latex) => {
           if (!match || !latex) return match || '';
