@@ -66,7 +66,7 @@ export default function NavigationSidebar() {
         <ScrollArea className="flex-1 h-full">
           <div className="pr-4">
             <nav className="space-y-1">
-              {tableOfContents.map((entry) => (
+              {tableOfContents.slice(Math.floor(tableOfContents.length / 2)).map((entry) => (
                 <button
                   key={entry.id}
                   onClick={() => handleNavClick(entry.id)}
