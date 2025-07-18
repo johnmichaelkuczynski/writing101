@@ -87,6 +87,18 @@ export const purchases = pgTable("purchases", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const testResults = pgTable("test_results", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  studentTestId: integer("student_test_id").notNull(),
+  userAnswers: text("user_answers").notNull(), // JSON string of user answers
+  correctAnswers: text("correct_answers").notNull(), // JSON string of correct answers
+  score: integer("score").notNull(), // percentage score
+  totalQuestions: integer("total_questions").notNull(),
+  correctCount: integer("correct_count").notNull(),
+  completedAt: timestamp("completed_at").defaultNow().notNull(),
+});
+
 
 
 
@@ -159,6 +171,16 @@ export const insertPurchaseSchema = createInsertSchema(purchases).pick({
   status: true,
 });
 
+export const insertTestResultSchema = createInsertSchema(testResults).pick({
+  userId: true,
+  studentTestId: true,
+  userAnswers: true,
+  correctAnswers: true,
+  score: true,
+  totalQuestions: true,
+  correctCount: true,
+});
+
 
 
 
@@ -182,6 +204,8 @@ export type Session = typeof sessions.$inferSelect;
 export type InsertSession = z.infer<typeof insertSessionSchema>;
 export type Purchase = typeof purchases.$inferSelect;
 export type InsertPurchase = z.infer<typeof insertPurchaseSchema>;
+export type TestResult = typeof testResults.$inferSelect;
+export type InsertTestResult = z.infer<typeof insertTestResultSchema>;
 
 
 
@@ -226,6 +250,11 @@ export const studentTestRequestSchema = z.object({
   instructions: z.string().optional(),
   model: z.enum(["deepseek", "openai", "anthropic", "perplexity"]),
   chunkIndex: z.number().optional(),
+});
+
+export const submitTestRequestSchema = z.object({
+  studentTestId: z.number(),
+  userAnswers: z.record(z.string()), // question index -> user answer
 });
 
 

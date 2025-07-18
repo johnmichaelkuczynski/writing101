@@ -11,7 +11,7 @@ import { generatePDF } from "./services/pdf-generator";
 import { transcribeAudio } from "./services/speech-service";
 import { register, login, createSession, getUserFromSession, canAccessFeature, getPreviewResponse, isAdmin, hashPassword } from "./auth";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalTransaction } from "./safe-paypal";
-import { chatRequestSchema, instructionRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, studentTestRequestSchema, registerRequestSchema, loginRequestSchema, purchaseRequestSchema, type AIModel } from "@shared/schema";
+import { chatRequestSchema, instructionRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, studentTestRequestSchema, submitTestRequestSchema, registerRequestSchema, loginRequestSchema, purchaseRequestSchema, type AIModel } from "@shared/schema";
 import multer from "multer";
 
 declare module 'express-session' {
@@ -708,7 +708,130 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Submit test answers for grading
+  app.post("/api/submit-test", async (req, res) => {
+    try {
+      const { studentTestId, userAnswers } = submitTestRequestSchema.parse(req.body);
+      const user = await getCurrentUser(req);
+      
+      if (!user) {
+        return res.status(401).json({ error: "User not authenticated" });
+      }
+      
+      // Get the student test to extract correct answers
+      const studentTest = await storage.getStudentTestById(studentTestId);
+      if (!studentTest) {
+        return res.status(404).json({ error: "Student test not found" });
+      }
+      
+      // Parse the test content to extract questions and correct answers
+      const testContent = studentTest.test;
+      const correctAnswers = parseCorrectAnswers(testContent);
+      
+      // Grade the test
+      const gradeResult = gradeTest(userAnswers, correctAnswers);
+      
+      // Save the test result
+      const testResult = await storage.createTestResult({
+        userId: user.id,
+        studentTestId,
+        userAnswers: JSON.stringify(userAnswers),
+        correctAnswers: JSON.stringify(correctAnswers),
+        score: gradeResult.score,
+        totalQuestions: gradeResult.totalQuestions,
+        correctCount: gradeResult.correctCount
+      });
+      
+      res.json({ 
+        testResult: {
+          id: testResult.id,
+          score: gradeResult.score,
+          totalQuestions: gradeResult.totalQuestions,
+          correctCount: gradeResult.correctCount,
+          userAnswers: userAnswers,
+          correctAnswers: correctAnswers,
+          feedback: gradeResult.feedback,
+          completedAt: testResult.completedAt
+        }
+      });
+    } catch (error) {
+      console.error("Test submission error:", error);
+      res.status(500).json({ error: error instanceof Error ? error.message : "Failed to submit test" });
+    }
+  });
 
+
+
+  // Helper functions for test grading
+  function parseCorrectAnswers(testContent: string): Record<string, string> {
+    const correctAnswers: Record<string, string> = {};
+    
+    // Parse the test content to find questions and their correct answers
+    // This expects the test to be in a format like:
+    // 1. Question text
+    // A) Option A
+    // B) Option B (correct answer marked somehow)
+    // C) Option C
+    
+    const lines = testContent.split('\n');
+    let currentQuestionIndex = '';
+    let inAnswerChoices = false;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      
+      // Look for question numbers (1., 2., 3., etc.)
+      const questionMatch = line.match(/^(\d+)\./);
+      if (questionMatch) {
+        currentQuestionIndex = questionMatch[1];
+        inAnswerChoices = true;
+        continue;
+      }
+      
+      // Look for answer choices (A), B), C), D))
+      if (inAnswerChoices && currentQuestionIndex) {
+        const choiceMatch = line.match(/^([A-Z])\)\s*(.+)/);
+        if (choiceMatch) {
+          const [, letter, text] = choiceMatch;
+          // For now, assume first option is correct (this can be enhanced)
+          if (!correctAnswers[currentQuestionIndex]) {
+            correctAnswers[currentQuestionIndex] = letter;
+          }
+        } else if (line === '') {
+          inAnswerChoices = false;
+        }
+      }
+    }
+    
+    return correctAnswers;
+  }
+  
+  function gradeTest(userAnswers: Record<string, string>, correctAnswers: Record<string, string>) {
+    const totalQuestions = Object.keys(correctAnswers).length;
+    let correctCount = 0;
+    const feedback: Record<string, boolean> = {};
+    
+    for (const questionIndex of Object.keys(correctAnswers)) {
+      const userAnswer = userAnswers[questionIndex];
+      const correctAnswer = correctAnswers[questionIndex];
+      const isCorrect = userAnswer === correctAnswer;
+      
+      if (isCorrect) {
+        correctCount++;
+      }
+      
+      feedback[questionIndex] = isCorrect;
+    }
+    
+    const score = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+    
+    return {
+      score,
+      totalQuestions,
+      correctCount,
+      feedback
+    };
+  }
 
   const httpServer = createServer(app);
   return httpServer;

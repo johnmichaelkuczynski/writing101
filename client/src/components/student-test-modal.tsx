@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Download, FileText, Printer, X, Loader2 } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Download, FileText, Printer, X, Loader2, BookOpen, Trophy, CheckCircle } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -31,6 +33,10 @@ export default function StudentTestModal({
   const [customInstructions, setCustomInstructions] = useState("");
   const [currentStudentTest, setCurrentStudentTest] = useState<StudentTest | null>(null);
   const [showFullText, setShowFullText] = useState(false);
+  const [viewMode, setViewMode] = useState<"generate" | "take" | "results">("generate");
+  const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
+  const [testResult, setTestResult] = useState<any>(null);
+  const [parsedQuestions, setParsedQuestions] = useState<any[]>([]);
   const { toast } = useToast();
 
   const studentTestMutation = useMutation({
@@ -43,6 +49,8 @@ export default function StudentTestModal({
     },
     onSuccess: (data) => {
       setCurrentStudentTest(data.studentTest);
+      const questions = parseTestContent(data.studentTest.testContent);
+      setParsedQuestions(questions);
       toast({ title: "Student test generated successfully!" });
     },
     onError: (error) => {
@@ -53,6 +61,70 @@ export default function StudentTestModal({
       });
     },
   });
+
+  const submitTestMutation = useMutation({
+    mutationFn: async (data: { studentTestId: number; userAnswers: Record<string, string> }) => {
+      const response = await apiRequest("/api/submit-test", {
+        method: "POST",
+        body: JSON.stringify(data)
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setTestResult(data.testResult);
+      setViewMode("results");
+      toast({ title: "Test submitted and graded successfully!" });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error submitting test",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Parse test content into structured questions
+  const parseTestContent = (content: string) => {
+    const questions: any[] = [];
+    const lines = content.split('\n');
+    let currentQuestion: any = null;
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      
+      // Look for question numbers (1., 2., 3., etc.)
+      const questionMatch = line.match(/^(\d+)\.\s*(.+)/);
+      if (questionMatch) {
+        if (currentQuestion) {
+          questions.push(currentQuestion);
+        }
+        currentQuestion = {
+          number: questionMatch[1],
+          text: questionMatch[2],
+          options: []
+        };
+        continue;
+      }
+      
+      // Look for answer choices (A), B), C), D))
+      if (currentQuestion) {
+        const choiceMatch = line.match(/^([A-Z])\)\s*(.+)/);
+        if (choiceMatch) {
+          currentQuestion.options.push({
+            letter: choiceMatch[1],
+            text: choiceMatch[2]
+          });
+        }
+      }
+    }
+    
+    if (currentQuestion) {
+      questions.push(currentQuestion);
+    }
+    
+    return questions;
+  };
 
   const handleGenerateTest = () => {
     const requestData: any = {
@@ -215,129 +287,252 @@ ${currentStudentTest.testContent}`;
     };
   };
 
+  const handleTakeTest = () => {
+    setViewMode("take");
+    setUserAnswers({});
+  };
+
+  const handleSubmitTest = () => {
+    if (!currentStudentTest) return;
+    
+    submitTestMutation.mutate({
+      studentTestId: currentStudentTest.id,
+      userAnswers: userAnswers
+    });
+  };
+
+  const handleAnswerSelect = (questionNumber: string, answer: string) => {
+    setUserAnswers(prev => ({
+      ...prev,
+      [questionNumber]: answer
+    }));
+  };
+
+  const resetTest = () => {
+    setViewMode("generate");
+    setCurrentStudentTest(null);
+    setUserAnswers({});
+    setTestResult(null);
+    setParsedQuestions([]);
+    setCustomInstructions("");
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center text-xl font-bold">
-            <FileText className="mr-2 h-5 w-5 text-blue-600" />
+            <FileText className="mr-2 h-5 w-5 text-purple-600" />
             Test Me - Student Practice Test
           </DialogTitle>
         </DialogHeader>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
-          {/* Left Column - Instructions */}
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-semibold mb-2">Custom Instructions (Optional)</h3>
-              <Textarea
-                value={customInstructions}
-                onChange={(e) => setCustomInstructions(e.target.value)}
-                placeholder="e.g., 'Three multiple choice questions, one short answer, focus on logical reasoning, moderate difficulty'"
-                className="min-h-[120px]"
-              />
-              <p className="text-sm text-muted-foreground mt-1">
-                Leave blank for default: 5-7 questions (mix of multiple choice and short answer) at easy to moderate difficulty level.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-2">Selected Text Preview</h3>
-              <ScrollArea className="h-[200px] w-full border rounded-md p-3">
-                <p className="text-sm whitespace-pre-wrap">{selectedText.substring(0, 500)}...</p>
-              </ScrollArea>
-            </div>
-            
-            <Button 
-              onClick={handleGenerateTest}
-              disabled={studentTestMutation.isPending}
-              className="w-full"
-            >
-              {studentTestMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating Test...
-                </>
-              ) : (
-                <>
-                  <FileText className="mr-2 h-4 w-4" />
-                  Generate Practice Test
-                </>
-              )}
-            </Button>
-          </div>
-          
-          {/* Right Column - Generated Test */}
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Generated Practice Test</h3>
-              {currentStudentTest && (
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="sm" onClick={() => setShowFullText(true)}>
-                    View Full Text
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleCopy}>
-                    Copy
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handleDownloadTxt}>
-                    <Download className="h-4 w-4 mr-1" />
-                    TXT
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handlePrintPDF}>
-                    <Printer className="h-4 w-4 mr-1" />
-                    PDF
-                  </Button>
-                </div>
-              )}
-            </div>
-            
-            <ScrollArea className="h-[400px] w-full border rounded-md p-4">
-              {currentStudentTest ? (
-                <div dangerouslySetInnerHTML={renderContent(currentStudentTest.testContent)} />
-              ) : (
-                <div className="text-center text-muted-foreground py-8">
-                  <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Generate a practice test to see it here</p>
-                </div>
-              )}
-            </ScrollArea>
-          </div>
-        </div>
-        
-        {/* Full Text Modal */}
-        {showFullText && currentStudentTest && (
-          <Dialog open={showFullText} onOpenChange={setShowFullText}>
-            <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden">
-              <DialogHeader>
-                <DialogTitle className="flex items-center justify-between">
-                  <span>Full Practice Test</span>
-                  <Button variant="ghost" size="sm" onClick={() => setShowFullText(false)}>
-                    <X className="h-4 w-4" />
-                  </Button>
-                </DialogTitle>
-              </DialogHeader>
-              
-              <ScrollArea className="h-[70vh] w-full border rounded-md p-4">
-                <div dangerouslySetInnerHTML={renderContent(currentStudentTest.testContent)} />
-              </ScrollArea>
-              
-              <div className="flex justify-between items-center">
-                <p className="text-sm text-muted-foreground">
-                  Instructions: {customInstructions || "Default instructions"}
+        {/* View Mode: Generate Test */}
+        {viewMode === "generate" && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+            {/* Left Column - Instructions */}
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold mb-2">Custom Instructions (Optional)</h3>
+                <Textarea
+                  value={customInstructions}
+                  onChange={(e) => setCustomInstructions(e.target.value)}
+                  placeholder="e.g., 'Three multiple choice questions, one short answer, focus on logical reasoning, moderate difficulty'"
+                  className="min-h-[120px]"
+                />
+                <p className="text-sm text-muted-foreground mt-1">
+                  Leave blank for default: 5-7 multiple choice questions at easy to moderate difficulty level.
                 </p>
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="sm" onClick={handleDownloadTxt}>
-                    <Download className="h-4 w-4 mr-1" />
-                    Download TXT
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={handlePrintPDF}>
-                    <Printer className="h-4 w-4 mr-1" />
-                    Print PDF
-                  </Button>
-                </div>
               </div>
-            </DialogContent>
-          </Dialog>
+              
+              <div>
+                <h3 className="font-semibold mb-2">Selected Text Preview</h3>
+                <ScrollArea className="h-[200px] w-full border rounded-md p-3">
+                  <p className="text-sm whitespace-pre-wrap">{selectedText.substring(0, 500)}...</p>
+                </ScrollArea>
+              </div>
+              
+              <Button 
+                onClick={handleGenerateTest}
+                disabled={studentTestMutation.isPending}
+                className="w-full"
+              >
+                {studentTestMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Generating Test...
+                  </>
+                ) : (
+                  <>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Generate Practice Test
+                  </>
+                )}
+              </Button>
+            </div>
+            
+            {/* Right Column - Generated Test */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold">Generated Practice Test</h3>
+                {currentStudentTest && (
+                  <div className="flex space-x-2">
+                    <Button variant="outline" size="sm" onClick={handleTakeTest}>
+                      <BookOpen className="h-4 w-4 mr-1" />
+                      Take Test
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={handleDownloadTxt}>
+                      <Download className="h-4 w-4 mr-1" />
+                      Download
+                    </Button>
+                  </div>
+                )}
+              </div>
+              
+              <ScrollArea className="h-[400px] w-full border rounded-md p-4">
+                {currentStudentTest ? (
+                  <div dangerouslySetInnerHTML={renderContent(currentStudentTest.testContent)} />
+                ) : (
+                  <div className="text-center text-muted-foreground py-8">
+                    <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Generate a practice test to see it here</p>
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+          </div>
+        )}
+
+        {/* View Mode: Take Test */}
+        {viewMode === "take" && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Take Your Practice Test</h3>
+              <Button variant="outline" size="sm" onClick={() => setViewMode("generate")}>
+                Back to Test
+              </Button>
+            </div>
+            
+            <ScrollArea className="h-[500px] w-full border rounded-md p-4">
+              <div className="space-y-6">
+                {parsedQuestions.map((question, index) => (
+                  <div key={index} className="space-y-3">
+                    <h4 className="font-semibold text-lg">
+                      {question.number}. {question.text}
+                    </h4>
+                    
+                    {question.options.length > 0 && (
+                      <RadioGroup
+                        value={userAnswers[question.number] || ""}
+                        onValueChange={(value) => handleAnswerSelect(question.number, value)}
+                      >
+                        {question.options.map((option: any, optIndex: number) => (
+                          <div key={optIndex} className="flex items-center space-x-2">
+                            <RadioGroupItem value={option.letter} id={`q${question.number}-${option.letter}`} />
+                            <Label htmlFor={`q${question.number}-${option.letter}`} className="cursor-pointer">
+                              {option.letter}) {option.text}
+                            </Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+            
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-muted-foreground">
+                {Object.keys(userAnswers).length} of {parsedQuestions.length} questions answered
+              </p>
+              <Button 
+                onClick={handleSubmitTest}
+                disabled={submitTestMutation.isPending || Object.keys(userAnswers).length === 0}
+                className="bg-purple-600 hover:bg-purple-700"
+              >
+                {submitTestMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Grading...
+                  </>
+                ) : (
+                  <>
+                    <Trophy className="mr-2 h-4 w-4" />
+                    Submit & Grade Test
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* View Mode: Results */}
+        {viewMode === "results" && testResult && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Test Results</h3>
+              <Button variant="outline" size="sm" onClick={resetTest}>
+                Take New Test
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-blue-50 p-4 rounded-lg text-center">
+                <Trophy className="h-8 w-8 mx-auto mb-2 text-blue-600" />
+                <p className="text-2xl font-bold text-blue-600">{testResult.score}%</p>
+                <p className="text-sm text-blue-600">Final Score</p>
+              </div>
+              
+              <div className="bg-green-50 p-4 rounded-lg text-center">
+                <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-600" />
+                <p className="text-2xl font-bold text-green-600">{testResult.correctCount}</p>
+                <p className="text-sm text-green-600">Correct Answers</p>
+              </div>
+              
+              <div className="bg-gray-50 p-4 rounded-lg text-center">
+                <FileText className="h-8 w-8 mx-auto mb-2 text-gray-600" />
+                <p className="text-2xl font-bold text-gray-600">{testResult.totalQuestions}</p>
+                <p className="text-sm text-gray-600">Total Questions</p>
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <h4 className="font-semibold">Question Review</h4>
+              <ScrollArea className="h-[400px] w-full border rounded-md p-4">
+                <div className="space-y-4">
+                  {parsedQuestions.map((question, index) => {
+                    const userAnswer = testResult.userAnswers[question.number];
+                    const correctAnswer = testResult.correctAnswers[question.number];
+                    const isCorrect = userAnswer === correctAnswer;
+                    
+                    return (
+                      <div key={index} className={`p-4 rounded-lg border ${isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                        <div className="flex items-start justify-between">
+                          <h5 className="font-semibold">{question.number}. {question.text}</h5>
+                          {isCorrect ? (
+                            <CheckCircle className="h-5 w-5 text-green-600 mt-1" />
+                          ) : (
+                            <X className="h-5 w-5 text-red-600 mt-1" />
+                          )}
+                        </div>
+                        
+                        <div className="mt-2 space-y-1">
+                          <p className="text-sm">
+                            <span className="font-medium">Your answer:</span> {userAnswer || "Not answered"}
+                          </p>
+                          {!isCorrect && (
+                            <p className="text-sm">
+                              <span className="font-medium">Correct answer:</span> {correctAnswer}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </ScrollArea>
+            </div>
+          </div>
         )}
       </DialogContent>
     </Dialog>

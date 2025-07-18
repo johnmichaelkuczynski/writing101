@@ -1,4 +1,4 @@
-import { chatMessages, instructions, rewrites, quizzes, studyGuides, studentTests, users, sessions, purchases, type ChatMessage, type InsertChatMessage, type Instruction, type InsertInstruction, type Rewrite, type InsertRewrite, type Quiz, type InsertQuiz, type StudyGuide, type InsertStudyGuide, type StudentTest, type InsertStudentTest, type User, type InsertUser, type Session, type InsertSession, type Purchase, type InsertPurchase } from "@shared/schema";
+import { chatMessages, instructions, rewrites, quizzes, studyGuides, studentTests, users, sessions, purchases, testResults, type ChatMessage, type InsertChatMessage, type Instruction, type InsertInstruction, type Rewrite, type InsertRewrite, type Quiz, type InsertQuiz, type StudyGuide, type InsertStudyGuide, type StudentTest, type InsertStudentTest, type User, type InsertUser, type Session, type InsertSession, type Purchase, type InsertPurchase, type TestResult, type InsertTestResult } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
 
@@ -40,6 +40,10 @@ export interface IStorage {
   getPurchasesByUserId(userId: number): Promise<Purchase[]>;
   updatePurchaseStatus(purchaseId: number, status: string): Promise<void>;
   
+  // Test results management
+  createTestResult(testResult: InsertTestResult): Promise<TestResult>;
+  getTestResultsByUserId(userId: number): Promise<TestResult[]>;
+  getTestResultsByStudentTestId(studentTestId: number): Promise<TestResult[]>;
 
 }
 
@@ -502,6 +506,23 @@ export class DatabaseStorage implements IStorage {
       .where(eq(purchases.id, purchaseId));
   }
 
+  // Test results management methods
+  async createTestResult(insertTestResult: InsertTestResult): Promise<TestResult> {
+    const [testResult] = await db.insert(testResults).values(insertTestResult).returning();
+    return testResult;
+  }
+
+  async getTestResultsByUserId(userId: number): Promise<TestResult[]> {
+    return await db.select().from(testResults)
+      .where(eq(testResults.userId, userId))
+      .orderBy(desc(testResults.completedAt));
+  }
+
+  async getTestResultsByStudentTestId(studentTestId: number): Promise<TestResult[]> {
+    return await db.select().from(testResults)
+      .where(eq(testResults.studentTestId, studentTestId))
+      .orderBy(desc(testResults.completedAt));
+  }
 
 }
 
