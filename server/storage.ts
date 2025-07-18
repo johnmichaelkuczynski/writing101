@@ -5,7 +5,6 @@ import { eq, desc } from "drizzle-orm";
 export interface IStorage {
   createChatMessage(message: InsertChatMessage): Promise<ChatMessage>;
   getChatMessages(): Promise<ChatMessage[]>;
-  clearChatMessages(): Promise<void>;
   createInstruction(instruction: InsertInstruction): Promise<Instruction>;
   getInstructions(): Promise<Instruction[]>;
   createRewrite(rewrite: InsertRewrite): Promise<Rewrite>;
@@ -97,10 +96,6 @@ export class MemStorage implements IStorage {
   async getChatMessages(): Promise<ChatMessage[]> {
     return Array.from(this.chatMessages.values())
       .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
-  }
-
-  async clearChatMessages(): Promise<void> {
-    this.chatMessages.clear();
   }
 
   async createInstruction(insertInstruction: InsertInstruction): Promise<Instruction> {
@@ -307,10 +302,6 @@ export class DatabaseStorage implements IStorage {
 
   async getChatMessages(): Promise<ChatMessage[]> {
     return await db.select().from(chatMessages).orderBy(desc(chatMessages.timestamp));
-  }
-
-  async clearChatMessages(): Promise<void> {
-    await db.delete(chatMessages);
   }
 
   async createInstruction(insertInstruction: InsertInstruction): Promise<Instruction> {

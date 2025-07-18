@@ -208,7 +208,7 @@ export default function LivingBook() {
               <BookOpen className="text-primary text-lg" />
               <div className="flex flex-col">
                 <h1 className="font-inter font-semibold text-base text-foreground">
-                  Symbolic Logic
+                  Unabomber Manifesto
                 </h1>
                 <a 
                   href="mailto:contact@zhisystems.ai"

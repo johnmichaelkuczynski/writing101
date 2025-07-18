@@ -41,9 +41,9 @@ export async function generateTest(request: TestGenerationRequest): Promise<stri
   }
 
   // CRITICAL PERFORMANCE FIX: Drastically limit content size for fast responses
-  const MAX_CONTENT_LENGTH = 500; // Reduced to 500 characters for much faster processing
+  const MAX_CONTENT_LENGTH = 1000; // Reduced to 1000 characters for much faster processing
   if (contentToTest.length > MAX_CONTENT_LENGTH) {
-    // Take the last 500 characters to focus on most recent content
+    // Take the last 1000 characters to focus on most recent content
     contentToTest = "..." + contentToTest.substring(contentToTest.length - MAX_CONTENT_LENGTH);
   }
 
@@ -62,19 +62,18 @@ CRITICAL FORMATTING RULES:
 
 Content Focus: ${testType === "selection" ? "Test specifically on the selected text content" : "Test cumulatively on content"}
 
-Additional Instructions: ${instructions || "Create a simple test with basic coverage. Include 2-3 multiple choice questions and 1 true/false question. Keep it short and simple."}
+Additional Instructions: ${instructions || "Create a moderately difficult test with comprehensive coverage of key concepts. Include 3-4 multiple choice questions, 1-2 short answer questions, and 1 true/false question. Focus on practical understanding and application of concepts."}
 
-Generate exactly 3-4 questions maximum. Be very concise and focused.`;
+Generate exactly 5-6 questions maximum. Be concise and focused.`;
 
-  const userPrompt = `Create a very short test based on this content:
+  const userPrompt = `Create a short test based on this content:
 
 ${contentToTest}
 
-Generate 3-4 clear, focused questions. Be very concise and direct.`;
+Generate 5-6 clear, focused questions. Be concise and direct.`;
 
   try {
-    // Use the existing generateAIResponse function which already has optimizations
-    const response = await generateAIResponse(model, userPrompt, true);
+    const response = await generateAIResponse(model, userPrompt, systemPrompt);
     return response;
   } catch (error) {
     console.error("Test generation failed:", error);
