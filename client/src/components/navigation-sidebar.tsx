@@ -4,6 +4,7 @@ import { paperContent } from "@shared/paper-content";
 // Extract table of contents from the document content
 const extractTableOfContents = () => {
   const tableOfContents: Array<{ id: string; title: string; level: number }> = [];
+  const seenTitles = new Set<string>(); // Track seen titles to avoid duplicates
   
   // Get the full content from the first section (which contains all the text)
   const content = paperContent.sections[0]?.content || '';
@@ -16,6 +17,12 @@ const extractTableOfContents = () => {
   while ((match = sectionPattern.exec(content)) !== null) {
     const fullTitle = match[1].trim();
     const sectionNumber = fullTitle.match(/^([0-9]+\.[0-9]+(?:\.[0-9]+)?)/)?.[1] || '';
+    
+    // Skip duplicates - only include the first occurrence
+    if (seenTitles.has(fullTitle)) {
+      continue;
+    }
+    seenTitles.add(fullTitle);
     
     // Determine level based on section number depth
     const level = (sectionNumber.match(/\./g) || []).length;
@@ -41,6 +48,8 @@ export default function NavigationSidebar() {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      console.log(`Element with id '${id}' not found`);
     }
   };
 

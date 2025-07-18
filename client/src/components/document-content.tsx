@@ -137,9 +137,18 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
       // Add IDs to section headings for navigation
       let processedContent = content;
       let counter = 0;
+      const seenTitles = new Set<string>(); // Track seen titles to avoid duplicates
       processedContent = processedContent.replace(
         /class="document-paragraph mb-6 mt-8 font-normal">([0-9]+\.[0-9]+(?:\.[0-9]+)?\s+[^<]+)/g,
         (match, titleText) => {
+          const fullTitle = titleText.trim();
+          
+          // Skip duplicates - only add ID to the first occurrence
+          if (seenTitles.has(fullTitle)) {
+            return match; // Return original without ID
+          }
+          seenTitles.add(fullTitle);
+          
           const sectionNumber = titleText.match(/^([0-9]+\.[0-9]+(?:\.[0-9]+)?)/)?.[1] || '';
           const id = `section-${sectionNumber.replace(/\./g, '-')}-${counter}`;
           counter++;
