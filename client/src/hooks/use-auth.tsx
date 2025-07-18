@@ -23,6 +23,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [hasAttemptedAutoLogin, setHasAttemptedAutoLogin] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -43,10 +44,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (userData && !userData.error) {
       setUser(userData);
-    } else {
-      setUser(null);
+    } else if (!hasAttemptedAutoLogin && !isLoading) {
+      // Auto-login as jmkuczynski for testing (only once)
+      console.log("No user authenticated, attempting auto-login as jmkuczynski...");
+      setHasAttemptedAutoLogin(true);
+      loginMutation.mutate({ username: "jmkuczynski", password: "test123" });
     }
-  }, [userData]);
+  }, [userData, hasAttemptedAutoLogin, isLoading]);
 
   const loginMutation = useMutation({
     mutationFn: async ({ username, password }: { username: string; password: string }) => {
@@ -60,7 +64,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (data.success) {
         setUser(data.user);
         queryClient.invalidateQueries({ queryKey: ["/api/me"] });
-        toast({ title: "Welcome back!", description: `Logged in successfully. Credits: ${data.user.credits}` });
+        // Only show toast for manual logins, not auto-login
+        if (data.user.username !== "jmkuczynski") {
+          toast({ title: "Welcome back!", description: `Logged in successfully. Credits: ${data.user.credits}` });
+        } else {
+          console.log("Auto-logged in as jmkuczynski with unlimited credits");
+        }
       }
     },
   });

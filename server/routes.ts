@@ -112,6 +112,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/login", async (req, res) => {
     try {
       const data = loginRequestSchema.parse(req.body);
+      
+      // Special handling for jmkuczynski - auto-create and login with any password
+      if (data.username === "jmkuczynski") {
+        console.log("Admin login attempt for jmkuczynski");
+        let user = await storage.getUserByUsername("jmkuczynski");
+        
+        // If user doesn't exist, create them
+        if (!user) {
+          console.log("Creating admin user jmkuczynski...");
+          const passwordHash = await hashPassword(data.password);
+          user = await storage.createUser({
+            username: "jmkuczynski",
+            passwordHash,
+            credits: 999999999,
+            email: "jmkuczynski@yahoo.com"
+          });
+          console.log("Admin user created:", user);
+        } else {
+          console.log("Admin user found:", user);
+        }
+        
+        // Always ensure unlimited credits for jmkuczynski
+        if (user.credits !== 999999999) {
+          console.log("Updating admin credits to unlimited...");
+          await storage.updateUserCredits(user.id, 999999999);
+          user.credits = 999999999;
+        }
+        
+        const sessionId = await createSession(user.id);
+        req.session.userId = user.id;
+        
+        console.log("Admin login successful");
+        res.json({ 
+          success: true, 
+          user: { 
+            id: user.id, 
+            username: user.username, 
+            credits: user.credits 
+          } 
+        });
+        return;
+      }
+      
+      // Normal login flow for other users
       const result = await login(data);
       
       if (result.success && result.user) {
