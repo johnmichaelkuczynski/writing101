@@ -55,12 +55,18 @@ export default function StudentTestModal({
   });
 
   const handleGenerateTest = () => {
-    studentTestMutation.mutate({
+    const requestData: any = {
       sourceText: selectedText,
       instructions: customInstructions.trim() || undefined,
-      model: selectedModel,
-      chunkIndex
-    });
+      model: selectedModel
+    };
+    
+    // Only include chunkIndex if it's a valid number
+    if (typeof chunkIndex === 'number') {
+      requestData.chunkIndex = chunkIndex;
+    }
+    
+    studentTestMutation.mutate(requestData);
   };
 
   const handleDownloadTxt = () => {

@@ -255,6 +255,7 @@ export type InstructionRequest = z.infer<typeof instructionRequestSchema>;
 export type RewriteRequest = z.infer<typeof rewriteRequestSchema>;
 export type QuizRequest = z.infer<typeof quizRequestSchema>;
 export type StudyGuideRequest = z.infer<typeof studyGuideRequestSchema>;
+export type StudentTestRequest = z.infer<typeof studentTestRequestSchema>;
 
 export type RegisterRequest = z.infer<typeof registerRequestSchema>;
 export type LoginRequest = z.infer<typeof loginRequestSchema>;
