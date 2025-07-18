@@ -50,6 +50,16 @@ export const studyGuides = pgTable("study_guides", {
   timestamp: timestamp("timestamp").defaultNow().notNull(),
 });
 
+export const studentTests = pgTable("student_tests", {
+  id: serial("id").primaryKey(),
+  sourceText: text("source_text").notNull(),
+  instructions: text("instructions").notNull(),
+  test: text("test").notNull(),
+  model: text("model").notNull(),
+  chunkIndex: integer("chunk_index"),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+});
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
@@ -120,6 +130,14 @@ export const insertStudyGuideSchema = createInsertSchema(studyGuides).pick({
   chunkIndex: true,
 });
 
+export const insertStudentTestSchema = createInsertSchema(studentTests).pick({
+  sourceText: true,
+  instructions: true,
+  test: true,
+  model: true,
+  chunkIndex: true,
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   email: true,
@@ -156,6 +174,8 @@ export type Quiz = typeof quizzes.$inferSelect;
 export type InsertQuiz = z.infer<typeof insertQuizSchema>;
 export type StudyGuide = typeof studyGuides.$inferSelect;
 export type InsertStudyGuide = z.infer<typeof insertStudyGuideSchema>;
+export type StudentTest = typeof studentTests.$inferSelect;
+export type InsertStudentTest = z.infer<typeof insertStudentTestSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Session = typeof sessions.$inferSelect;
@@ -195,6 +215,13 @@ export const quizRequestSchema = z.object({
 });
 
 export const studyGuideRequestSchema = z.object({
+  sourceText: z.string(),
+  instructions: z.string().optional(),
+  model: z.enum(["deepseek", "openai", "anthropic", "perplexity"]),
+  chunkIndex: z.number().optional(),
+});
+
+export const studentTestRequestSchema = z.object({
   sourceText: z.string(),
   instructions: z.string().optional(),
   model: z.enum(["deepseek", "openai", "anthropic", "perplexity"]),

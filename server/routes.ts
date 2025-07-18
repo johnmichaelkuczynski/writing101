@@ -3,7 +3,7 @@ import express from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
-import { generateAIResponse, generateRewrite, generatePassageExplanation, generatePassageDiscussionResponse, generateQuiz, generateStudyGuide } from "./services/ai-models";
+import { generateAIResponse, generateRewrite, generatePassageExplanation, generatePassageDiscussionResponse, generateQuiz, generateStudyGuide, generateStudentTest } from "./services/ai-models";
 
 import { getFullDocumentContent } from "./services/document-processor";
 
@@ -11,7 +11,7 @@ import { generatePDF } from "./services/pdf-generator";
 import { transcribeAudio } from "./services/speech-service";
 import { register, login, createSession, getUserFromSession, canAccessFeature, getPreviewResponse, isAdmin, hashPassword } from "./auth";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalTransaction } from "./safe-paypal";
-import { chatRequestSchema, instructionRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, registerRequestSchema, loginRequestSchema, purchaseRequestSchema, type AIModel } from "@shared/schema";
+import { chatRequestSchema, instructionRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, studentTestRequestSchema, registerRequestSchema, loginRequestSchema, purchaseRequestSchema, type AIModel } from "@shared/schema";
 import multer from "multer";
 
 declare module 'express-session' {
@@ -604,6 +604,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(studyGuides);
     } catch (error) {
       console.error("Error fetching study guides:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Student test generation endpoint with authentication
+  app.post("/api/generate-student-test", async (req, res) => {
+    try {
+      const { sourceText, instructions, chunkIndex, model } = studentTestRequestSchema.parse(req.body);
+      const user = await getCurrentUser(req);
+      
+      const fullStudentTest = await generateStudentTest(model, sourceText, instructions);
+      
+      // Check if user has access to full features
+      let studentTest = fullStudentTest;
+      let isPreview = false;
+      
+      if (!canAccessFeature(user)) {
+        studentTest = getPreviewResponse(fullStudentTest.testContent, !user);
+        isPreview = true;
+      } else {
+        studentTest = fullStudentTest.testContent;
+        // Deduct 1 credit for full response (skip for admin)
+        if (!isAdmin(user)) {
+          await storage.updateUserCredits(user!.id, user!.credits - 1);
+        }
+      }
+      
+      const savedStudentTest = await storage.createStudentTest({
+        sourceText,
+        test: fullStudentTest.testContent,
+        instructions: instructions || "Create a practice test with 5-7 questions (mix of multiple choice and short answer) at easy to moderate difficulty level. Focus on key concepts and basic understanding of logical principles.",
+        model,
+        chunkIndex
+      });
+      
+      res.json({ 
+        studentTest: {
+          id: savedStudentTest.id,
+          testContent: studentTest, // Return preview or full test based on user status
+          timestamp: savedStudentTest.timestamp
+        },
+        isPreview 
+      });
+    } catch (error) {
+      console.error("Student test generation error:", error);
+      res.status(500).json({ error: error instanceof Error ? error.message : "Failed to generate student test" });
+    }
+  });
+
+  // Get student tests endpoint
+  app.get("/api/student-tests", async (req, res) => {
+    try {
+      const studentTests = await storage.getStudentTests();
+      res.json(studentTests);
+    } catch (error) {
+      console.error("Error fetching student tests:", error);
       res.status(500).json({ error: error.message });
     }
   });

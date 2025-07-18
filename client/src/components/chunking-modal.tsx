@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, MessageSquare, Edit3, X, BookOpen, FileQuestion } from "lucide-react";
+import { FileText, MessageSquare, Edit3, X, BookOpen, FileQuestion, GraduationCap } from "lucide-react";
 
 interface ChunkingModalProps {
   isOpen: boolean;
   onClose: () => void;
   text: string;
-  onChunkAction: (chunk: string, chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite' | 'study-guide') => void;
+  onChunkAction: (chunk: string, chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite' | 'study-guide' | 'student-test') => void;
 }
 
 export default function ChunkingModal({ isOpen, onClose, text, onChunkAction }: ChunkingModalProps) {
@@ -22,7 +22,7 @@ export default function ChunkingModal({ isOpen, onClose, text, onChunkAction }: 
     chunks.push(words.slice(i, i + chunkSize).join(' '));
   }
 
-  const handleChunkAction = (chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite' | 'study-guide') => {
+  const handleChunkAction = (chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite' | 'study-guide' | 'student-test') => {
     onChunkAction(chunks[chunkIndex], chunkIndex, action);
     onClose();
   };
@@ -75,6 +75,16 @@ export default function ChunkingModal({ isOpen, onClose, text, onChunkAction }: 
                     >
                       <FileQuestion className="w-3 h-3 mr-1" />
                       Create Test
+                    </Button>
+                    
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleChunkAction(index, 'student-test')}
+                      className="text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+                    >
+                      <GraduationCap className="w-3 h-3 mr-1" />
+                      Test Me
                     </Button>
                     
                     <Button

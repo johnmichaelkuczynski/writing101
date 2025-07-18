@@ -1,4 +1,4 @@
-import { chatMessages, instructions, rewrites, quizzes, studyGuides, users, sessions, purchases, type ChatMessage, type InsertChatMessage, type Instruction, type InsertInstruction, type Rewrite, type InsertRewrite, type Quiz, type InsertQuiz, type StudyGuide, type InsertStudyGuide, type User, type InsertUser, type Session, type InsertSession, type Purchase, type InsertPurchase } from "@shared/schema";
+import { chatMessages, instructions, rewrites, quizzes, studyGuides, studentTests, users, sessions, purchases, type ChatMessage, type InsertChatMessage, type Instruction, type InsertInstruction, type Rewrite, type InsertRewrite, type Quiz, type InsertQuiz, type StudyGuide, type InsertStudyGuide, type StudentTest, type InsertStudentTest, type User, type InsertUser, type Session, type InsertSession, type Purchase, type InsertPurchase } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
 
@@ -17,6 +17,9 @@ export interface IStorage {
   createStudyGuide(studyGuide: InsertStudyGuide): Promise<StudyGuide>;
   getStudyGuides(): Promise<StudyGuide[]>;
   getStudyGuideById(id: number): Promise<StudyGuide | null>;
+  createStudentTest(studentTest: InsertStudentTest): Promise<StudentTest>;
+  getStudentTests(): Promise<StudentTest[]>;
+  getStudentTestById(id: number): Promise<StudentTest | null>;
   
   // User management
   createUser(user: InsertUser): Promise<User>;
@@ -46,6 +49,7 @@ export class MemStorage implements IStorage {
   private rewrites: Map<number, Rewrite>;
   private quizzes: Map<number, Quiz>;
   private studyGuides: Map<number, StudyGuide>;
+  private studentTests: Map<number, StudentTest>;
   private users: Map<number, User>;
   private usersByUsername: Map<string, User>;
   private sessions: Map<string, Session>;
@@ -55,6 +59,7 @@ export class MemStorage implements IStorage {
   private currentRewriteId: number;
   private currentQuizId: number;
   private currentStudyGuideId: number;
+  private currentStudentTestId: number;
   private currentUserId: number;
   private currentPurchaseId: number;
 
@@ -64,6 +69,7 @@ export class MemStorage implements IStorage {
     this.rewrites = new Map();
     this.quizzes = new Map();
     this.studyGuides = new Map();
+    this.studentTests = new Map();
     this.users = new Map();
     this.usersByUsername = new Map();
     this.sessions = new Map();
@@ -73,6 +79,7 @@ export class MemStorage implements IStorage {
     this.currentRewriteId = 1;
     this.currentQuizId = 1;
     this.currentStudyGuideId = 1;
+    this.currentStudentTestId = 1;
     this.currentUserId = 1;
     this.currentPurchaseId = 1;
   }
@@ -171,6 +178,26 @@ export class MemStorage implements IStorage {
 
   async getStudyGuideById(id: number): Promise<StudyGuide | null> {
     return this.studyGuides.get(id) || null;
+  }
+
+  async createStudentTest(insertStudentTest: InsertStudentTest): Promise<StudentTest> {
+    const id = this.currentStudentTestId++;
+    const studentTest: StudentTest = {
+      ...insertStudentTest,
+      id,
+      timestamp: new Date(),
+    };
+    this.studentTests.set(id, studentTest);
+    return studentTest;
+  }
+
+  async getStudentTests(): Promise<StudentTest[]> {
+    return Array.from(this.studentTests.values())
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  }
+
+  async getStudentTestById(id: number): Promise<StudentTest | null> {
+    return this.studentTests.get(id) || null;
   }
 
   // User management methods
@@ -366,6 +393,23 @@ export class DatabaseStorage implements IStorage {
   async getStudyGuideById(id: number): Promise<StudyGuide | null> {
     const [studyGuide] = await db.select().from(studyGuides).where(eq(studyGuides.id, id));
     return studyGuide || null;
+  }
+
+  async createStudentTest(insertStudentTest: InsertStudentTest): Promise<StudentTest> {
+    const [studentTest] = await db.insert(studentTests).values({
+      ...insertStudentTest,
+      chunkIndex: insertStudentTest.chunkIndex ?? null
+    }).returning();
+    return studentTest;
+  }
+
+  async getStudentTests(): Promise<StudentTest[]> {
+    return await db.select().from(studentTests).orderBy(desc(studentTests.timestamp));
+  }
+
+  async getStudentTestById(id: number): Promise<StudentTest | null> {
+    const [studentTest] = await db.select().from(studentTests).where(eq(studentTests.id, id));
+    return studentTest || null;
   }
 
   // User management methods with admin support

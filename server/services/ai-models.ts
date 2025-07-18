@@ -591,6 +591,92 @@ Please provide a well-structured study guide that helps students understand and 
   }
 }
 
+export async function generateStudentTest(model: AIModel, sourceText: string, instructions: string): Promise<{ testContent: string }> {
+  const paperContext = getPaperContext();
+  
+  const systemPrompt = `${paperContext}
+
+You are helping create a self-assessment test for students to check their understanding of the symbolic logic content. This is for student practice and self-evaluation, not formal grading.
+
+STUDENT TEST GENERATION INSTRUCTIONS:
+- Create questions that help students test their own understanding of logical concepts
+- Use easy to moderate difficulty level (unless specified otherwise)
+- Focus on comprehension, application, and basic analysis of logical principles
+- Make questions clear, accessible, and educational
+- Include a variety of question types (multiple choice, short answer, true/false, etc.)
+- Base all questions directly on the provided source text
+- Keep the tone supportive and educational rather than intimidating
+
+DEFAULT SETTINGS (when no specific instructions provided):
+- 5-7 questions total
+- Mix of multiple choice (3-4 questions) and short answer (2-3 questions)
+- Easy to moderate difficulty level
+- Focus on key concepts, definitions, and basic applications
+- Include some questions that test understanding of logical reasoning principles
+
+CRITICAL FORMATTING RULES:
+- Write in plain text format ONLY
+- Do NOT use any markdown formatting, headers (####), bold (**), italics, or special characters
+- Use natural paragraph breaks to separate questions and sections
+- Write as if for a friendly academic practice test
+- No bullet points, numbered lists, or formatting markup of any kind
+- Structure questions clearly with proper numbering (1. 2. 3. etc.)`;
+
+  const defaultInstructions = instructions || "Create a practice test with 5-7 questions (mix of multiple choice and short answer) at easy to moderate difficulty level. Focus on key concepts and basic understanding of logical principles.";
+
+  const fullPrompt = `Create a student practice test based on this content:
+
+SOURCE TEXT:
+${sourceText.substring(0, 8000)}
+
+INSTRUCTIONS:
+${defaultInstructions}
+
+Please provide a self-assessment test that helps students check their understanding of the material.`;
+
+  try {
+    let result: string;
+    switch (model) {
+      case "openai":
+        result = await generateOpenAIResponse(fullPrompt, systemPrompt);
+        break;
+      case "anthropic":
+        result = await generateAnthropicResponse(fullPrompt, systemPrompt);
+        break;
+      case "perplexity":
+        result = await generatePerplexityResponse(fullPrompt, systemPrompt);
+        break;
+      case "deepseek":
+        result = await generateDeepSeekResponse(fullPrompt, systemPrompt);
+        break;
+      default:
+        throw new Error(`Unsupported AI model: ${model}`);
+    }
+    
+    // Clean the result
+    const cleanedResult = cleanRewriteText(result);
+    return { testContent: cleanedResult };
+  } catch (error) {
+    const modelName = getModelDisplayName(model);
+    console.error(`Error generating student test with ${modelName}:`, error);
+    
+    // Fallback to OpenAI
+    if (model !== "openai") {
+      console.log(`Attempting fallback to OpenAI due to ${modelName} failure`);
+      try {
+        const fallbackResult = await generateOpenAIResponse(fullPrompt, systemPrompt);
+        const cleanedResult = cleanRewriteText(fallbackResult);
+        return { testContent: cleanedResult };
+      } catch (fallbackError) {
+        console.error("OpenAI fallback also failed:", fallbackError);
+        throw new Error("Unable to generate student test. Please try again with a different model.");
+      }
+    }
+    
+    throw new Error("Unable to generate student test. Please try again.");
+  }
+}
+
 async function generateDeepSeekResponse(prompt: string, systemPrompt: string): Promise<string> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10000); // Reduced to 10 second timeout for faster response

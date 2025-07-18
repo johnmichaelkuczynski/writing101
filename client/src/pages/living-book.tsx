@@ -11,6 +11,7 @@ import RewriteModal from "@/components/rewrite-modal";
 import PassageDiscussionModal from "@/components/passage-discussion-modal";
 import QuizModal from "@/components/quiz-modal";
 import StudyGuideModal from "@/components/study-guide-modal";
+import StudentTestModal from "@/components/student-test-modal";
 
 import ChunkingModal from "@/components/chunking-modal";
 import AuthModal from "@/components/auth-modal";
@@ -39,6 +40,9 @@ export default function LivingBook() {
   const [studyGuideModalOpen, setStudyGuideModalOpen] = useState(false);
   const [selectedTextForStudyGuide, setSelectedTextForStudyGuide] = useState<string>("");
   const [studyGuideChunkIndex, setStudyGuideChunkIndex] = useState<number | null>(null);
+  const [studentTestModalOpen, setStudentTestModalOpen] = useState(false);
+  const [selectedTextForStudentTest, setSelectedTextForStudentTest] = useState<string>("");
+  const [studentTestChunkIndex, setStudentTestChunkIndex] = useState<number | null>(null);
 
   const [chunkingModalOpen, setChunkingModalOpen] = useState(false);
   const [pendingChunkText, setPendingChunkText] = useState<string>("");
@@ -97,7 +101,7 @@ export default function LivingBook() {
 
 
 
-  const handleChunkAction = (chunk: string, chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite' | 'study-guide') => {
+  const handleChunkAction = (chunk: string, chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite' | 'study-guide' | 'student-test') => {
     if (action === 'quiz') {
       setSelectedTextForQuiz(chunk);
       setQuizChunkIndex(chunkIndex);
@@ -112,6 +116,10 @@ export default function LivingBook() {
       setSelectedTextForStudyGuide(chunk);
       setStudyGuideChunkIndex(chunkIndex);
       setStudyGuideModalOpen(true);
+    } else if (action === 'student-test') {
+      setSelectedTextForStudentTest(chunk);
+      setStudentTestChunkIndex(chunkIndex);
+      setStudentTestModalOpen(true);
     }
   };
 
@@ -128,10 +136,29 @@ export default function LivingBook() {
     }
   };
 
+  const handleTestMeFromSelection = (text: string) => {
+    const wordCount = text.split(/\s+/).length;
+    
+    if (wordCount > 1000) {
+      setPendingChunkText(text);
+      setChunkingModalOpen(true);
+    } else {
+      setSelectedTextForStudentTest(text);
+      setStudentTestChunkIndex(null);
+      setStudentTestModalOpen(true);
+    }
+  };
+
   const handleStudyGuideModalClose = () => {
     setStudyGuideModalOpen(false);
     setSelectedTextForStudyGuide("");
     setStudyGuideChunkIndex(null);
+  };
+
+  const handleStudentTestModalClose = () => {
+    setStudentTestModalOpen(false);
+    setSelectedTextForStudentTest("");
+    setStudentTestChunkIndex(null);
   };
 
 
@@ -290,9 +317,8 @@ export default function LivingBook() {
             onTextSelectedForChat={handleTextSelectedForChat}
             onRewriteFromSelection={handleRewriteFromSelection}
             onPassageDiscussion={handlePassageDiscussion}
-
             onCreateStudyGuide={handleCreateStudyGuideFromSelection}
-
+            onTestMe={handleTestMeFromSelection}
           />
         </main>
 
@@ -350,6 +376,16 @@ export default function LivingBook() {
         sourceText={selectedTextForStudyGuide}
         chunkIndex={studyGuideChunkIndex}
         selectedModel={selectedModel}
+      />
+
+      {/* Student Test Modal */}
+      <StudentTestModal
+        isOpen={studentTestModalOpen}
+        onClose={handleStudentTestModalClose}
+        selectedText={selectedTextForStudentTest}
+        selectedModel={selectedModel}
+        mathMode={mathMode}
+        chunkIndex={studentTestChunkIndex}
       />
 
 

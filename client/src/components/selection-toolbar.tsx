@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Highlighter, X, MessageSquare, Edit3, FileText, BookOpen } from "lucide-react";
+import { MessageCircle, Highlighter, X, MessageSquare, Edit3, FileText, BookOpen, GraduationCap } from "lucide-react";
 import { useState } from "react";
 
 interface SelectionToolbarProps {
@@ -7,8 +7,8 @@ interface SelectionToolbarProps {
   onAskQuestion: (text: string) => void;
   onSendToChat: (text: string) => void;
   onRewrite: (text: string) => void;
-
   onCreateStudyGuide: (text: string) => void;
+  onTestMe: (text: string) => void;
   onHighlight: () => void;
   onClear: () => void;
   position?: { x: number; y: number };
@@ -19,8 +19,8 @@ export default function SelectionToolbar({
   onAskQuestion, 
   onSendToChat,
   onRewrite,
-
   onCreateStudyGuide,
+  onTestMe,
   onHighlight, 
   onClear, 
   position 
@@ -48,6 +48,11 @@ export default function SelectionToolbar({
 
   const handleCreateStudyGuide = () => {
     onCreateStudyGuide(selectedText);
+    // Keep toolbar visible so user can try other actions
+  };
+
+  const handleTestMe = () => {
+    onTestMe(selectedText);
     // Keep toolbar visible so user can try other actions
   };
 
@@ -128,6 +133,16 @@ export default function SelectionToolbar({
       >
         <BookOpen className="w-3 h-3" />
         <span className="text-xs">Study Guide</span>
+      </Button>
+
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={handleTestMe}
+        className="flex items-center space-x-1 text-indigo-600 border-indigo-200 hover:bg-indigo-50"
+      >
+        <GraduationCap className="w-3 h-3" />
+        <span className="text-xs">Test Me</span>
       </Button>
 
 

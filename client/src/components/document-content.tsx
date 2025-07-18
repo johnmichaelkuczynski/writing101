@@ -15,12 +15,19 @@ interface DocumentContentProps {
   onTextSelectedForChat?: (text: string) => void;
   onRewriteFromSelection?: (text: string) => void;
   onPassageDiscussion?: (text: string) => void;
-
   onCreateStudyGuide?: (text: string) => void;
-
+  onTestMe?: (text: string) => void;
 }
 
-export default function DocumentContent({ mathMode = true, onQuestionFromSelection, onTextSelectedForChat, onRewriteFromSelection, onPassageDiscussion, onCreateStudyGuide }: DocumentContentProps) {
+export default function DocumentContent({ 
+  mathMode = true, 
+  onQuestionFromSelection, 
+  onTextSelectedForChat, 
+  onRewriteFromSelection, 
+  onPassageDiscussion, 
+  onCreateStudyGuide,
+  onTestMe
+}: DocumentContentProps) {
   const { selection, isSelecting, clearSelection, highlightSelection, removeHighlights } = useTextSelection();
   const [showChunkingModal, setShowChunkingModal] = useState(false);
   const [selectedTextForChunking, setSelectedTextForChunking] = useState("");
@@ -84,6 +91,13 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
   const handleCreateStudyGuide = (text: string) => {
     if (onCreateStudyGuide) {
       onCreateStudyGuide(text);
+    }
+    // Don't clear selection - let user choose other actions if needed
+  };
+
+  const handleTestMe = (text: string) => {
+    if (onTestMe) {
+      onTestMe(text);
     }
     // Don't clear selection - let user choose other actions if needed
   };
@@ -246,9 +260,8 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
           onAskQuestion={handleAskQuestion}
           onSendToChat={handleSendToChat}
           onRewrite={handleRewrite}
-
           onCreateStudyGuide={handleCreateStudyGuide}
-
+          onTestMe={handleTestMe}
           onHighlight={handleHighlight}
           onClear={clearSelection}
         />
