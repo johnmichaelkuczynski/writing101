@@ -44,8 +44,7 @@ const extractTableOfContents = () => {
 
 const tableOfContents = extractTableOfContents();
 
-// Debug: log the table of contents to see what we're getting
-console.log('Navigation table of contents:', tableOfContents);
+
 
 export default function NavigationSidebar() {
   const handleNavClick = (id: string) => {

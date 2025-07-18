@@ -254,7 +254,15 @@ Preferred communication style: Simple, everyday language.
   - Zero content modification - pure passthrough of uploaded PDF maintains academic integrity
   - Application now serves as comprehensive symbolic logic learning platform with AI-powered analysis
   - Uses user's chosen AI model with no filtering or interference from system
-  - AI provides brief philosophical explanations and engages in thoughtful dialogue about Wittgenstein concepts
+  - AI provides brief philosophical explanations and engages in thoughtful dialogue about symbolic logic concepts
+- July 18, 2025: NAVIGATION TABLE OF CONTENTS FIXES - Fixed duplicate navigation issues
+  - Fixed navigation sidebar showing duplicate table of contents sections
+  - Removed first (non-working) table of contents section, kept only second (working) section
+  - Navigation links now properly scroll to actual content sections in document body
+  - Removed table of contents from document content display, keeping only working navigation sidebar
+  - Clear chat functionality fully implemented with backend API endpoint
+  - Title display corrected to show "Introduction to Symbolic Logic" instead of previous content
+  - Single functional table of contents in navigation pane with proper anchor linking
 - July 10, 2025: CRITICAL TEXT INTEGRITY FIX - Complete document replacement with authentic PDF content
   - OBLITERATED all existing document content completely
   - Extracted complete 156,072 characters from user's uploaded authoritative PDF edition
