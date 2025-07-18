@@ -138,23 +138,28 @@ export default function DocumentContent({ mathMode = true, onQuestionFromSelecti
       let processedContent = content;
       let counter = 0;
       const seenTitles = new Set<string>(); // Track seen titles to avoid duplicates
-      processedContent = processedContent.replace(
-        /class="document-paragraph mb-6 mt-8 font-normal">([0-9]+\.[0-9]+(?:\.[0-9]+)?\s+[^<]+)/g,
-        (match, titleText) => {
-          const fullTitle = titleText.trim();
-          
-          // Skip duplicates - only add ID to the first occurrence
-          if (seenTitles.has(fullTitle)) {
-            return match; // Return original without ID
+      
+      // Split content to find where actual content starts (after table of contents)
+      const contentParts = processedContent.split('1.0 The concept of an inference');
+      
+      if (contentParts.length > 1) {
+        // Process only the actual content part (skip table of contents)
+        const actualContent = '1.0 The concept of an inference' + contentParts.slice(1).join('1.0 The concept of an inference');
+        
+        const processedActualContent = actualContent.replace(
+          /class="document-paragraph mb-6 mt-8 font-normal">([0-9]+\.[0-9]+(?:\.[0-9]+)?\s+[^<]+)/g,
+          (match, titleText) => {
+            const fullTitle = titleText.trim();
+            const sectionNumber = titleText.match(/^([0-9]+\.[0-9]+(?:\.[0-9]+)?)/)?.[1] || '';
+            const id = `section-${sectionNumber.replace(/\./g, '-')}-${counter}`;
+            counter++;
+            return `class="document-paragraph mb-6 mt-8 font-normal" id="${id}">${titleText}`;
           }
-          seenTitles.add(fullTitle);
-          
-          const sectionNumber = titleText.match(/^([0-9]+\.[0-9]+(?:\.[0-9]+)?)/)?.[1] || '';
-          const id = `section-${sectionNumber.replace(/\./g, '-')}-${counter}`;
-          counter++;
-          return `class="document-paragraph mb-6 mt-8 font-normal" id="${id}">${titleText}`;
-        }
-      );
+        );
+        
+        // Reconstruct the content with IDs only in the actual content sections
+        processedContent = contentParts[0] + processedActualContent;
+      }
       
       if (!mathMode) {
         // Remove LaTeX notation when math mode is off

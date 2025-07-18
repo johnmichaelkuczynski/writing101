@@ -4,38 +4,39 @@ import { paperContent } from "@shared/paper-content";
 // Extract table of contents from the document content
 const extractTableOfContents = () => {
   const tableOfContents: Array<{ id: string; title: string; level: number }> = [];
-  const seenTitles = new Set<string>(); // Track seen titles to avoid duplicates
   
   // Get the full content from the first section (which contains all the text)
   const content = paperContent.sections[0]?.content || '';
   
-  // Regular expressions to match section headings
-  const sectionPattern = /class="document-paragraph mb-6 mt-8 font-normal">([0-9]+\.[0-9]+(?:\.[0-9]+)?\s+[^<]+)</g;
+  // Split content to find where actual content starts (after table of contents)
+  const contentParts = content.split('1.0 The concept of an inference');
   
-  let match;
-  let counter = 0;
-  while ((match = sectionPattern.exec(content)) !== null) {
-    const fullTitle = match[1].trim();
-    const sectionNumber = fullTitle.match(/^([0-9]+\.[0-9]+(?:\.[0-9]+)?)/)?.[1] || '';
+  if (contentParts.length > 1) {
+    // Process only the actual content part (skip table of contents)
+    const actualContent = '1.0 The concept of an inference' + contentParts.slice(1).join('1.0 The concept of an inference');
     
-    // Skip duplicates - only include the first occurrence
-    if (seenTitles.has(fullTitle)) {
-      continue;
+    // Regular expressions to match section headings
+    const sectionPattern = /class="document-paragraph mb-6 mt-8 font-normal">([0-9]+\.[0-9]+(?:\.[0-9]+)?\s+[^<]+)/g;
+    
+    let match;
+    let counter = 0;
+    while ((match = sectionPattern.exec(actualContent)) !== null) {
+      const fullTitle = match[1].trim();
+      const sectionNumber = fullTitle.match(/^([0-9]+\.[0-9]+(?:\.[0-9]+)?)/)?.[1] || '';
+      
+      // Determine level based on section number depth
+      const level = (sectionNumber.match(/\./g) || []).length;
+      
+      // Create unique ID from section number and counter to avoid duplicates
+      const id = `section-${sectionNumber.replace(/\./g, '-')}-${counter}`;
+      counter++;
+      
+      tableOfContents.push({
+        id,
+        title: fullTitle,
+        level
+      });
     }
-    seenTitles.add(fullTitle);
-    
-    // Determine level based on section number depth
-    const level = (sectionNumber.match(/\./g) || []).length;
-    
-    // Create unique ID from section number and counter to avoid duplicates
-    const id = `section-${sectionNumber.replace(/\./g, '-')}-${counter}`;
-    counter++;
-    
-    tableOfContents.push({
-      id,
-      title: fullTitle,
-      level
-    });
   }
   
   return tableOfContents;
