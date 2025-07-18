@@ -569,3 +569,13 @@ Preferred communication style: Simple, everyday language.
   - OpenAI is now the default LLM that users see when first loading the application
   - All other AI models (DeepSeek, Anthropic, Perplexity) remain available for manual selection
   - Change applies immediately to new user sessions
+- July 18, 2025: CRITICAL PERFORMANCE OPTIMIZATION - Test generation speed dramatically improved
+  - RESOLVED critical performance issue: test generation reduced from 1+ hour to under 7 seconds
+  - Implemented aggressive content reduction: 500 characters maximum (from 1000)
+  - Reduced question count: 3-4 questions maximum (from 5-6)
+  - Simplified default instructions: basic coverage instead of comprehensive analysis
+  - Reduced AI token limits: 300 tokens (from 500-600) for faster generation
+  - Lowered temperature: 0.1 (from 0.3) for focused, faster responses
+  - Added clear chat button functionality with red trash icon for clearing conversation history
+  - Changed header title from "Unabomber Manifesto" to "Symbolic Logic"
+  - System now prioritizes speed over thoroughness to eliminate user frustration with long waits
