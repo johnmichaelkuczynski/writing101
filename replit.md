@@ -608,3 +608,8 @@ Preferred communication style: Simple, everyday language.
   - Answer key parsing now handles single letter format (B, B) and numbered formats (1. B, 2. A)
   - AI fallback system generates intelligent answers when parsing fails
   - Complete end-to-end testing workflow verified and production-ready
+  - CRITICAL SECURITY FIX: Removed answer key display from test preview - students no longer see answers before taking test
+  - CRITICAL UX FIX: Disabled auto-generation on modal open - users can now set custom instructions before generating test
+  - Enhanced multi-format testing with multiple choice, short answer, and long answer question types
+  - Added question type selection checkboxes and question count selector (5-25 questions)
+  - Implemented AI-powered grading for subjective questions with 0-10 scoring and detailed feedback

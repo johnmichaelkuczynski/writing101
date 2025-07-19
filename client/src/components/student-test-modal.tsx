@@ -419,39 +419,22 @@ ${currentStudentTest.testContent}`;
   };
 
   const resetTest = () => {
-    // Store the source text before resetting
-    const currentSourceText = selectedText;
-    const currentInstructions = customInstructions;
-    const currentModel = selectedModel;
-    
-    // Reset state
+    // Reset state only - do NOT auto-generate
     setViewMode("generate");
     setCurrentStudentTest(null);
     setUserAnswers({});
     setTestResult(null);
     setParsedQuestions([]);
-    
-    // Auto-generate new test with same parameters but fresh questions
-    setTimeout(() => {
-      const requestData: any = {
-        sourceText: currentSourceText,
-        instructions: currentInstructions.trim() || "Create a comprehensive practice test with 15-20 multiple choice questions at easy to moderate difficulty level. Generate DIFFERENT questions from the previous test to provide variety and comprehensive coverage.",
-        model: currentModel
-      };
-      
-      // Include chunkIndex if it was used before
-      if (typeof chunkIndex === 'number') {
-        requestData.chunkIndex = chunkIndex;
-      }
-      
-      studentTestMutation.mutate(requestData);
-    }, 100);
   };
 
-  // Auto-reset to generate mode when modal opens to force fresh test generation
+  // Reset state when modal opens but don't auto-generate
   useEffect(() => {
     if (isOpen) {
-      resetTest();
+      setViewMode("generate");
+      setCurrentStudentTest(null);
+      setUserAnswers({});
+      setTestResult(null);
+      setParsedQuestions([]);
     }
   }, [isOpen]);
 
