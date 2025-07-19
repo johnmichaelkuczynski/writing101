@@ -115,7 +115,40 @@ export default function StudentTestModal({
     while (i < lines.length) {
       const line = lines[i];
       
-      // Look for question patterns: numbered (1. 2. etc.) OR non-numbered questions that end with ?
+      // Check for [SHORT_ANSWER] or [LONG_ANSWER] tags first
+      if (line.includes('[SHORT_ANSWER]') || line.includes('[LONG_ANSWER]')) {
+        const questionType = line.includes('[SHORT_ANSWER]') ? "short_answer" : "long_answer";
+        let cleanText = line.replace(/\[SHORT_ANSWER\]|\[LONG_ANSWER\]/g, '').trim();
+        
+        // If the tag was on a line by itself, the question is on the next line
+        if (!cleanText && i + 1 < lines.length) {
+          i++;
+          cleanText = lines[i];
+        }
+        
+        if (cleanText) {
+          const questionObj = {
+            number: questionCounter.toString(),
+            text: cleanText,
+            type: questionType,
+            options: []
+          };
+          
+          questions.push(questionObj);
+          console.log("Found question:", { 
+            number: questionCounter.toString(), 
+            type: questionType,
+            text: cleanText.substring(0, 50) + "...", 
+            optionCount: 0 
+          });
+          
+          questionCounter++;
+        }
+        i++;
+        continue;
+      }
+      
+      // Look for traditional numbered questions (1. 2. etc.) OR questions ending with ?
       const numberedMatch = line.match(/^(\d+)\.\s*(.+)/);
       const questionMatch = line.match(/^(.+\?)\s*$/);
       
@@ -123,28 +156,17 @@ export default function StudentTestModal({
         const questionNumber = numberedMatch ? numberedMatch[1] : questionCounter.toString();
         const questionText = numberedMatch ? numberedMatch[2] : questionMatch[1];
         
-        // Determine question type based on content tags or structure
+        // Determine question type - check if next lines have A) B) C) D) options
         let questionType = "multiple_choice";
-        let cleanText = questionText;
-        
-        if (questionText.includes("[SHORT_ANSWER]")) {
-          questionType = "short_answer";
-          cleanText = questionText.replace("[SHORT_ANSWER]", "").trim();
-        } else if (questionText.includes("[LONG_ANSWER]")) {
-          questionType = "long_answer";
-          cleanText = questionText.replace("[LONG_ANSWER]", "").trim();
-        } else {
-          // Check if next few lines contain A) B) C) D) options
-          let hasOptions = false;
-          for (let j = i + 1; j < Math.min(i + 6, lines.length); j++) {
-            if (lines[j] && lines[j].trim().match(/^[A-D]\)/)) {
-              hasOptions = true;
-              break;
-            }
+        let hasOptions = false;
+        for (let j = i + 1; j < Math.min(i + 6, lines.length); j++) {
+          if (lines[j] && lines[j].trim().match(/^[A-D]\)/)) {
+            hasOptions = true;
+            break;
           }
-          if (!hasOptions) {
-            questionType = "short_answer"; // assume short answer if no multiple choice options
-          }
+        }
+        if (!hasOptions) {
+          questionType = "short_answer"; // assume short answer if no multiple choice options
         }
         
         const options: any[] = [];
@@ -177,7 +199,7 @@ export default function StudentTestModal({
         // Add question with type information
         const questionObj = {
           number: questionNumber,
-          text: cleanText,
+          text: questionText,
           type: questionType,
           options: options
         };
@@ -186,7 +208,7 @@ export default function StudentTestModal({
         console.log("Found question:", { 
           number: questionNumber, 
           type: questionType,
-          text: cleanText.substring(0, 50) + "...", 
+          text: questionText.substring(0, 50) + "...", 
           optionCount: options.length 
         });
         
@@ -200,7 +222,7 @@ export default function StudentTestModal({
       number: q.number, 
       type: q.type,
       text: q.text.substring(0, 50) + "...",
-      optionCount: q.options.length 
+      optionCount: q.options ? q.options.length : 0 
     })));
     
     return questions;
