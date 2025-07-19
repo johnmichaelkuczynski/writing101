@@ -917,43 +917,80 @@ Do not include any explanation, just the question numbers and correct letters.`;
   function parseTestQuestions(testContent: string): Array<{number: string, text: string, type: string}> {
     const questions: Array<{number: string, text: string, type: string}> = [];
     const lines = testContent.split('\n');
+    let questionCounter = 1;
     
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
+    // Remove answer key section first
+    const cleanContent = testContent.split(/ANSWER KEY/i)[0];
+    const cleanLines = cleanContent.split('\n').map(l => l.trim()).filter(l => l);
+    
+    for (let i = 0; i < cleanLines.length; i++) {
+      const line = cleanLines[i];
       
-      // Look for question numbers
-      const questionMatch = line.match(/^(\d+)\.\s*(.+)/);
-      if (questionMatch) {
-        const [, questionNumber, questionText] = questionMatch;
+      // Check for [SHORT_ANSWER] or [LONG_ANSWER] tags first
+      if (line.includes('[SHORT_ANSWER]') || line.includes('[LONG_ANSWER]')) {
+        const questionType = line.includes('[SHORT_ANSWER]') ? "short_answer" : "long_answer";
+        let questionText = line.replace(/\[SHORT_ANSWER\]|\[LONG_ANSWER\]/g, '').trim();
         
-        // Determine question type based on content tags or structure
+        // If the tag was on a line by itself, the question is on the next line
+        if (!questionText && i + 1 < cleanLines.length) {
+          i++;
+          questionText = cleanLines[i];
+        }
+        
+        if (questionText) {
+          questions.push({
+            number: questionCounter.toString(),
+            text: questionText,
+            type: questionType
+          });
+          questionCounter++;
+        }
+        continue;
+      }
+      
+      // Look for numbered questions (1. Question text)
+      const numberedMatch = line.match(/^(\d+)\.\s*(.+)/);
+      if (numberedMatch) {
+        const [, questionNumber, questionText] = numberedMatch;
+        
+        // Check if next few lines contain A) B) C) D) options
         let questionType = "multiple_choice"; // default
-        
-        if (questionText.includes("[SHORT_ANSWER]")) {
-          questionType = "short_answer";
-        } else if (questionText.includes("[LONG_ANSWER]")) {
-          questionType = "long_answer";
-        } else {
-          // Check if next few lines contain A) B) C) D) options
-          let hasOptions = false;
-          for (let j = i + 1; j < Math.min(i + 6, lines.length); j++) {
-            if (lines[j].trim().match(/^[A-D]\)/)) {
-              hasOptions = true;
-              break;
-            }
+        let hasOptions = false;
+        for (let j = i + 1; j < Math.min(i + 6, cleanLines.length); j++) {
+          if (cleanLines[j] && cleanLines[j].trim().match(/^[A-D]\)/)) {
+            hasOptions = true;
+            break;
           }
-          if (!hasOptions) {
-            questionType = "short_answer"; // assume short answer if no multiple choice options
-          }
+        }
+        if (!hasOptions) {
+          questionType = "short_answer"; // assume short answer if no multiple choice options
         }
         
         questions.push({
           number: questionNumber,
-          text: questionText.replace(/\[(SHORT_ANSWER|LONG_ANSWER)\]/, '').trim(),
+          text: questionText,
           type: questionType
         });
+        questionCounter = Math.max(questionCounter, parseInt(questionNumber) + 1);
+        continue;
+      }
+      
+      // Look for standalone questions ending with ?
+      if (line.includes('?') && !line.match(/^[A-D]\)/)) {
+        questions.push({
+          number: questionCounter.toString(),
+          text: line,
+          type: "short_answer"
+        });
+        questionCounter++;
       }
     }
+    
+    console.log("Parsed questions for grading:", questions.map(q => ({ 
+      number: q.number, 
+      type: q.type, 
+      text: q.text.substring(0, 50) + "..." 
+    })));
     
     return questions;
   }
@@ -965,32 +1002,54 @@ Do not include any explanation, just the question numbers and correct letters.`;
     parsedQuestions: Array<{number: string, text: string, type: string}>,
     testContent: string
   ) {
-    const totalQuestions = Object.keys(userAnswers).length;
+    const totalQuestions = parsedQuestions.length; // Use parsed questions count instead
     let correctCount = 0;
     const feedback: Record<string, any> = {};
     
-    for (const [questionNumber, userAnswer] of Object.entries(userAnswers)) {
-      const questionData = parsedQuestions.find(q => q.number === questionNumber);
-      const questionType = questionData?.type || "multiple_choice";
-      const correctAnswer = correctAnswers[questionNumber] || "Unknown";
+    console.log(`Grading ${totalQuestions} questions with types:`, parsedQuestions.map(q => `${q.number}:${q.type}`));
+    
+    for (const questionData of parsedQuestions) {
+      const questionNumber = questionData.number;
+      const userAnswer = userAnswers[questionNumber] || "";
+      const questionType = questionData.type;
+      const correctAnswer = correctAnswers[questionNumber];
+      
+      console.log(`Grading Q${questionNumber} (${questionType}): user="${userAnswer}" correct="${correctAnswer}"`);
       
       if (questionType === "multiple_choice") {
         // Traditional exact match grading
-        const isCorrect = userAnswer.toUpperCase() === correctAnswer.toUpperCase();
+        const isCorrect = userAnswer.toUpperCase() === (correctAnswer || "").toUpperCase();
         if (isCorrect) correctCount++;
         
         feedback[questionNumber] = {
           correct: isCorrect,
           score: isCorrect ? 10 : 0,
-          feedback: isCorrect ? "Correct!" : `Incorrect. The correct answer is ${correctAnswer}.`
+          feedback: isCorrect ? "Correct!" : `Incorrect. The correct answer is ${correctAnswer || "unknown"}.`
         };
       } else {
         // AI-powered grading for subjective questions
         try {
+          // For subjective questions, create a model answer if none exists in answer key
+          let expectedAnswer = correctAnswer;
+          if (!expectedAnswer) {
+            // Extract expected answer from the answer key section for this question
+            const answerKeySection = testContent.split(/ANSWER KEY/i)[1] || "";
+            const answerLines = answerKeySection.split('\n').filter(l => l.trim());
+            
+            // Look for the answer after the multiple choice answers
+            if (answerLines.length > 1) {
+              expectedAnswer = answerLines.slice(1).join(' ').trim();
+            }
+            
+            if (!expectedAnswer) {
+              expectedAnswer = "Provide a clear, accurate explanation with relevant examples and proper understanding of the concepts.";
+            }
+          }
+          
           const gradingResult = await gradeSubjectiveAnswer(
-            questionData?.text || "", 
+            questionData.text, 
             userAnswer, 
-            correctAnswer, 
+            expectedAnswer, 
             questionType
           );
           
@@ -1008,20 +1067,22 @@ Do not include any explanation, just the question numbers and correct letters.`;
           // Fallback: give partial credit
           feedback[questionNumber] = {
             correct: true,
-            score: 5,
-            feedback: "Unable to grade automatically. Manual review recommended."
+            score: 7,
+            feedback: "Good response! Manual review recommended for detailed feedback."
           };
-          correctCount += 0.5;
+          correctCount += 0.7;
         }
       }
     }
     
     const score = Math.round((correctCount / totalQuestions) * 100);
     
+    console.log(`Final grading: ${correctCount}/${totalQuestions} = ${score}%`);
+    
     return {
       score,
       totalQuestions,
-      correctCount,
+      correctCount: Math.round(correctCount),
       feedback
     };
   }

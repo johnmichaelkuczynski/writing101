@@ -616,3 +616,8 @@ Preferred communication style: Simple, everyday language.
   - CRITICAL MULTI-FORMAT FIX: Fixed question parsing to properly display short answer and long answer questions alongside multiple choice
   - Enhanced [SHORT_ANSWER] and [LONG_ANSWER] tag recognition in question parsing logic
   - Test interface now correctly displays all selected question types with appropriate input fields
+  - CRITICAL GRADING FIX: Complete overhaul of grading system to handle multi-format questions
+  - Fixed server-side question parsing to detect all question types including [SHORT_ANSWER] tags
+  - Implemented AI-powered grading for subjective questions with 0-10 scoring and detailed feedback
+  - Enhanced grading logic to extract model answers from test content for short/long answer questions
+  - Added comprehensive logging for debugging grading process and question type detection
