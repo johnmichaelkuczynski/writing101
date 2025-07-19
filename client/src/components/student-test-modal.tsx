@@ -86,17 +86,22 @@ export default function StudentTestModal({
 
   // Parse test content into structured questions
   const parseTestContent = (content: string) => {
+    console.log("Parsing test content:", content);
     const questions: any[] = [];
     const lines = content.split('\n');
     let currentQuestion: any = null;
     
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
+      if (line === '') continue; // Skip empty lines
       
-      // Look for question numbers (1., 2., 3., etc.)
-      const questionMatch = line.match(/^(\d+)\.\s*(.+)/);
+      // Look for question numbers - more flexible patterns
+      const questionMatch = line.match(/^(\d+)[\.\)]\s*(.+)/) || 
+                           line.match(/^Question\s+(\d+)[\:\.\s]\s*(.+)/i) ||
+                           line.match(/^Q(\d+)[\:\.\s]\s*(.+)/i);
+      
       if (questionMatch) {
-        if (currentQuestion) {
+        if (currentQuestion && currentQuestion.options.length > 0) {
           questions.push(currentQuestion);
         }
         currentQuestion = {
@@ -104,25 +109,44 @@ export default function StudentTestModal({
           text: questionMatch[2],
           options: []
         };
+        console.log("Found question:", currentQuestion);
         continue;
       }
       
-      // Look for answer choices (A), B), C), D))
+      // Look for answer choices - more flexible patterns
       if (currentQuestion) {
-        const choiceMatch = line.match(/^([A-Z])\)\s*(.+)/);
+        const choiceMatch = line.match(/^([A-Z])\)\s*(.+)/) ||
+                           line.match(/^([A-Z])[\.\:\-\s]\s*(.+)/) ||
+                           line.match(/^([a-z])\)\s*(.+)/);
+                           
         if (choiceMatch) {
-          currentQuestion.options.push({
-            letter: choiceMatch[1],
+          const option = {
+            letter: choiceMatch[1].toUpperCase(),
             text: choiceMatch[2]
-          });
+          };
+          currentQuestion.options.push(option);
+          console.log("Found option:", option);
+        } else if (line.includes('A)') || line.includes('B)') || line.includes('C)') || line.includes('D)')) {
+          // Handle cases where options are on the same line as other text
+          const multipleChoices = line.split(/(?=[A-Z]\))/);
+          for (const choice of multipleChoices) {
+            const choiceMatch = choice.trim().match(/^([A-Z])\)\s*(.+)/);
+            if (choiceMatch) {
+              currentQuestion.options.push({
+                letter: choiceMatch[1],
+                text: choiceMatch[2]
+              });
+            }
+          }
         }
       }
     }
     
-    if (currentQuestion) {
+    if (currentQuestion && currentQuestion.options.length > 0) {
       questions.push(currentQuestion);
     }
     
+    console.log("Parsed questions:", questions);
     return questions;
   };
 

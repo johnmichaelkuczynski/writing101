@@ -617,12 +617,25 @@ DEFAULT SETTINGS (when no specific instructions provided):
 CRITICAL FORMATTING RULES:
 - Write in plain text format ONLY
 - Do NOT use any markdown formatting, headers (####), bold (**), italics, or special characters
-- Use natural paragraph breaks to separate questions and sections
-- Write as if for a friendly academic practice test
-- No bullet points, numbered lists, or formatting markup of any kind
-- Structure questions clearly with proper numbering (1. 2. 3. etc.)`;
+- Structure multiple choice questions EXACTLY like this format:
+  1. What is the definition of a valid argument?
+  A) An argument with true premises
+  B) An argument where the conclusion follows logically from premises
+  C) An argument with a true conclusion
+  D) An argument that is persuasive
 
-  const defaultInstructions = instructions || "Create a practice test with 5-7 questions (mix of multiple choice and short answer) at easy to moderate difficulty level. Focus on key concepts and basic understanding of logical principles.";
+  2. Which of the following represents modus ponens?
+  A) If P then Q, not Q, therefore not P
+  B) If P then Q, P, therefore Q
+  C) P or Q, not P, therefore Q
+  D) P and Q, therefore P
+
+- Each question must start with a number followed by a period (1. 2. 3. etc.)
+- Each multiple choice option must start with a capital letter followed by a closing parenthesis (A) B) C) D))
+- Leave blank lines between questions for clear separation
+- No bullet points, numbered lists, or formatting markup of any kind`;
+
+  const defaultInstructions = instructions || "Create a practice test with 5-6 multiple choice questions at easy to moderate difficulty level. Each question should have exactly 4 answer choices (A, B, C, D). Focus on key concepts and basic understanding of logical principles. Format each question clearly with proper numbering and multiple choice options.";
 
   const fullPrompt = `Create a student practice test based on this content:
 
