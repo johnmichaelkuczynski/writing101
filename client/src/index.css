@@ -48,11 +48,6 @@
 }
 
 @layer base {
-  html, body {
-    padding: 0;
-    margin: 0;
-  }
-
   * {
     @apply border-border;
   }
@@ -101,119 +96,33 @@
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Document Content Professional Formatting */
-.document-content-formatted {
-  font-family: Georgia, serif;
-  font-size: 17px;
-  line-height: 1.5;
-  color: #1a202c;
-  max-width: none;
-}
-
-.document-content-formatted p {
-  margin-bottom: 0.8rem;
-  text-align: justify;
-  text-indent: 2rem;
-  font-size: 17px;
-  line-height: 1.5;
-}
-
-.document-content-formatted h1,
-.document-content-formatted h2,
-.document-content-formatted h3,
-.document-content-formatted h4 {
-  font-weight: bold;
-  margin-top: 1.2em;
-  margin-bottom: 0.4em;
-  text-indent: 0;
-  text-align: left;
-  color: #1a202c;
-  line-height: 1.2;
-}
-
-.document-content-formatted h1 {
-  font-size: 18px;
-}
-
-.document-content-formatted h2 {
-  font-size: 17px;
-}
-
-.document-content-formatted h3 {
-  font-size: 16px;
-}
-
-.document-content-formatted h4 {
-  font-size: 16px;
-}
-
-.document-content-formatted .document-paragraph {
-  text-indent: 1.5rem;
-  margin-bottom: 1.2rem;
-  line-height: 1.6;
-  text-align: justify;
-  font-family: Georgia, serif;
-  font-size: 16px;
-  color: #2d3748;
-}
-
-.document-content-formatted .document-paragraph:first-of-type {
-  text-indent: 0;
-}
-
-.document-content-formatted h1,
-.document-content-formatted h2,
-.document-content-formatted h3,
-.document-content-formatted h4 {
-  font-weight: normal;
-  margin-top: 1.5rem;
-  margin-bottom: 0.8rem;
-  text-indent: 0;
-  text-align: left;
-  color: #1a202c;
-  line-height: 1.5;
-  font-size: 17px;
-}
-
-/* Remove excessive spacing and improve readability */
-.document-content-formatted br {
-  display: none;
-}
-
-.document-content-formatted * {
-  max-width: none !important;
-}
-
-/* Document formatting styles - Updated */
+/* Document formatting styles - EXACT PDF MATCHING */
 .document-paragraph {
   text-indent: 2rem;
   margin-bottom: 0.8rem;
-  line-height: 1.5;
+  line-height: 1.7;
   text-align: justify;
   font-family: Georgia, serif;
-  font-size: 17px;
-  color: #1a202c;
+  font-size: 1rem;
 }
 
 .document-paragraph-no-indent {
   text-indent: 0;
   margin-bottom: 0.8rem;
-  line-height: 1.5;
+  line-height: 1.7;
   text-align: justify;
   font-family: Georgia, serif;
-  font-size: 17px;
-  color: #1a202c;
+  font-size: 1rem;
 }
 
 .document-proposition {
   text-indent: 0;
-  margin-bottom: 0.8rem;
-  line-height: 1.5;
+  margin-bottom: 1rem;
+  line-height: 1.7;
   text-align: left;
   font-family: Georgia, serif;
-  font-size: 17px;
+  font-size: 1rem;
   font-weight: normal;
-  color: #1a202c;
 }
 
 /* Dictionary entry styles */
