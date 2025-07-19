@@ -640,3 +640,7 @@ Preferred communication style: Simple, everyday language.
   - Eliminates dependency on broken answer key parsing for accurate subjective question grading
   - VERIFIED WORKING: User tested and confirmed AI grading works properly (60% score instead of "Unknown")
   - Complete end-to-end TEST ME functionality now operational with proper mixed question type grading
+  - CONTENT-FOCUSED GRADING FIX: Enhanced AI grading prompt to evaluate content accuracy over style
+  - System now focuses on conceptual understanding rather than academic writing style or jargon
+  - Brief, direct answers that capture core concepts receive high scores regardless of formality
+  - Eliminates bias against concise or informal language when content is accurate

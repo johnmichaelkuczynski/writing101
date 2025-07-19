@@ -1141,19 +1141,27 @@ FEEDBACK: [constructive feedback explaining the grade]`;
     return { score, feedback };
   }
 
-  // Direct AI grading - simple approach
+  // Direct AI grading - content-focused approach
   async function gradeSubjectiveAnswerDirect(questionText: string, userAnswer: string, testContext: string, maxPoints: number): Promise<{score: number, feedback: string}> {
-    const prompt = `GRADE THIS ANSWER TO THIS QUESTION:
+    const prompt = `GRADE THIS ANSWER FOR CONTENT ACCURACY, NOT STYLE:
 
 QUESTION: ${questionText}
 
 STUDENT ANSWER: ${userAnswer}
 
-Grade this answer out of ${maxPoints} points. Give a score and brief explanation.
+IMPORTANT GRADING INSTRUCTIONS:
+- Focus ONLY on whether the student demonstrates correct understanding of the concepts
+- Ignore writing style, length, formality, or academic jargon
+- A brief, direct answer that captures the core concepts should score highly
+- Do not penalize concise or informal language if the content is accurate
+- Do not require students to mirror academic vocabulary or lengthy explanations
+- Grade based on conceptual accuracy and logical understanding
+
+Grade this answer out of ${maxPoints} points based on CONTENT ACCURACY ONLY.
 
 Response format:
 SCORE: [number]
-FEEDBACK: [explanation]`;
+FEEDBACK: [explanation focusing on content accuracy]`;
 
     const response = await generateWithAI(prompt, "openai");
     
