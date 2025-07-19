@@ -621,3 +621,7 @@ Preferred communication style: Simple, everyday language.
   - Implemented AI-powered grading for subjective questions with 0-10 scoring and detailed feedback
   - Enhanced grading logic to extract model answers from test content for short/long answer questions
   - Added comprehensive logging for debugging grading process and question type detection
+  - GENERATE NEW TEST FUNCTIONALITY: Added "Generate New Test" button available immediately after test generation
+  - Users can now create fresh questions without completing current test to avoid repetitive questions
+  - Button appears in both test preview and test-taking modes for maximum flexibility
+  - State properly resets (answers, results, view mode) when generating new tests

@@ -229,6 +229,12 @@ export default function StudentTestModal({
   };
 
   const handleGenerateTest = () => {
+    // Reset state for fresh test generation
+    setViewMode("generate");
+    setUserAnswers({});
+    setTestResult(null);
+    setParsedQuestions([]);
+    
     const requestData: any = {
       sourceText: selectedText,
       instructions: customInstructions.trim() || undefined,
@@ -584,6 +590,24 @@ ${currentStudentTest.testContent}`;
                 <h3 className="font-semibold">Generated Practice Test</h3>
                 {currentStudentTest && (
                   <div className="flex space-x-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={handleGenerateTest}
+                      disabled={studentTestMutation.isPending}
+                    >
+                      {studentTestMutation.isPending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <RotateCcw className="h-4 w-4 mr-1" />
+                          Generate New Test
+                        </>
+                      )}
+                    </Button>
                     <Button variant="outline" size="sm" onClick={handleTakeTest}>
                       <BookOpen className="h-4 w-4 mr-1" />
                       Take Test
@@ -615,9 +639,29 @@ ${currentStudentTest.testContent}`;
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Take Your Practice Test</h3>
-              <Button variant="outline" size="sm" onClick={() => setViewMode("generate")}>
-                Back to Test
-              </Button>
+              <div className="flex space-x-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleGenerateTest}
+                  disabled={studentTestMutation.isPending}
+                >
+                  {studentTestMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <RotateCcw className="h-4 w-4 mr-1" />
+                      Generate New Test
+                    </>
+                  )}
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setViewMode("generate")}>
+                  Back to Test
+                </Button>
+              </div>
             </div>
             
             <ScrollArea className="h-[500px] w-full border rounded-md p-4">
