@@ -48,6 +48,11 @@
 }
 
 @layer base {
+  html, body {
+    padding: 0;
+    margin: 0;
+  }
+
   * {
     @apply border-border;
   }
@@ -96,21 +101,26 @@
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Document Content Professional Formatting */
+/* Document Content Professional Formatting - OPTIMIZED DENSITY */
 .document-content-formatted {
-  font-family: Georgia, serif;
+  font-family: Georgia, 'Merriweather', serif;
   font-size: 16px;
-  line-height: 1.6;
+  line-height: 1.45;
   color: #2d3748;
-  max-width: none;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 20px;
+  letter-spacing: 0.01em;
+  word-spacing: 0.05em;
 }
 
 .document-content-formatted p {
-  margin-bottom: 1.2rem;
+  margin-top: 0;
+  margin-bottom: 0.8em;
   text-align: justify;
-  text-indent: 1.5rem;
+  text-indent: 1.2em;
   font-size: 16px;
-  line-height: 1.6;
+  line-height: 1.45;
 }
 
 .document-content-formatted h1,
@@ -118,24 +128,24 @@
 .document-content-formatted h3,
 .document-content-formatted h4 {
   font-weight: bold;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
+  margin-top: 1.2em;
+  margin-bottom: 0.4em;
   text-indent: 0;
   text-align: left;
   color: #1a202c;
-  line-height: 1.4;
+  line-height: 1.2;
 }
 
 .document-content-formatted h1 {
-  font-size: 24px;
+  font-size: 18px;
 }
 
 .document-content-formatted h2 {
-  font-size: 20px;
+  font-size: 17px;
 }
 
 .document-content-formatted h3 {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .document-content-formatted h4 {
@@ -165,11 +175,12 @@
   max-width: none !important;
 }
 
-/* Old styles for backward compatibility */
+/* Legacy styles updated for optimal density */
 .document-paragraph {
-  text-indent: 1.5rem;
-  margin-bottom: 1.2rem;
-  line-height: 1.6;
+  text-indent: 1.2em;
+  margin-top: 0;
+  margin-bottom: 0.8em;
+  line-height: 1.45;
   text-align: justify;
   font-family: Georgia, serif;
   font-size: 16px;
@@ -177,8 +188,9 @@
 
 .document-paragraph-no-indent {
   text-indent: 0;
-  margin-bottom: 1.2rem;
-  line-height: 1.6;
+  margin-top: 0;
+  margin-bottom: 0.8em;
+  line-height: 1.45;
   text-align: justify;
   font-family: Georgia, serif;
   font-size: 16px;
@@ -186,8 +198,9 @@
 
 .document-proposition {
   text-indent: 0;
-  margin-bottom: 1.2rem;
-  line-height: 1.6;
+  margin-top: 1.2em;
+  margin-bottom: 0.4em;
+  line-height: 1.2;
   text-align: left;
   font-family: Georgia, serif;
   font-size: 16px;
