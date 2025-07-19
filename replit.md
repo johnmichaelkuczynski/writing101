@@ -644,9 +644,10 @@ Preferred communication style: Simple, everyday language.
   - System now focuses on conceptual understanding rather than academic writing style or jargon
   - Brief, direct answers that capture core concepts receive high scores regardless of formality
   - Eliminates bias against concise or informal language when content is accurate
-- July 19, 2025: CRITICAL MOBILE LAYOUT FIX - Mobile-only responsive design preserving desktop layout
-  - Navigation sidebar: 8px width on mobile (ultra-narrow), 60px on desktop (unchanged)
+- July 19, 2025: CRITICAL MOBILE LAYOUT FIX - Balanced mobile design for optimal readability
+  - Navigation sidebar: 20px width on mobile (readable, no text cutoff), 60px on desktop (unchanged)
   - Main content area: Maximum width on mobile (no constraints), normal max-w-5xl on desktop
-  - Chat panel: 8px width on mobile (minimal), 96px on desktop (unchanged)
+  - Chat panel: 4px width on mobile (minimal interface), 96px on desktop (unchanged)
+  - Navigation text: Multi-line wrapping on mobile, truncated on desktop for better readability
   - Mobile-specific responsive classes: changes only affect screens below md breakpoint
-  - Desktop layout completely preserved while maximizing mobile reading space (~92% screen width)
+  - Desktop layout completely preserved while maximizing mobile reading space (~88% screen width)
