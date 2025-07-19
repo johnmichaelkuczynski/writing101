@@ -104,17 +104,24 @@ export default function StudentTestModal({
     console.log("Parsing test content:", content);
     const questions: any[] = [];
     
+    // Remove answer key before parsing
+    const cleanContent = removeAnswerKey(content);
+    
     // Split content into lines and clean up
-    const lines = content.split('\n').map(l => l.trim()).filter(l => l);
+    const lines = cleanContent.split('\n').map(l => l.trim()).filter(l => l);
     let i = 0;
+    let questionCounter = 1;
     
     while (i < lines.length) {
       const line = lines[i];
       
-      // Look for numbered questions (1. 2. 3. etc.)
-      const questionMatch = line.match(/^(\d+)\.\s*(.+)/);
-      if (questionMatch) {
-        const [, questionNumber, questionText] = questionMatch;
+      // Look for question patterns: numbered (1. 2. etc.) OR non-numbered questions that end with ?
+      const numberedMatch = line.match(/^(\d+)\.\s*(.+)/);
+      const questionMatch = line.match(/^(.+\?)\s*$/);
+      
+      if (numberedMatch || questionMatch) {
+        const questionNumber = numberedMatch ? numberedMatch[1] : questionCounter.toString();
+        const questionText = numberedMatch ? numberedMatch[2] : questionMatch[1];
         
         // Determine question type based on content tags or structure
         let questionType = "multiple_choice";
@@ -130,7 +137,7 @@ export default function StudentTestModal({
           // Check if next few lines contain A) B) C) D) options
           let hasOptions = false;
           for (let j = i + 1; j < Math.min(i + 6, lines.length); j++) {
-            if (lines[j].trim().match(/^[A-D]\)/)) {
+            if (lines[j] && lines[j].trim().match(/^[A-D]\)/)) {
               hasOptions = true;
               break;
             }
@@ -147,6 +154,11 @@ export default function StudentTestModal({
           // Collect consecutive option lines (A) B) C) D))
           while (i < lines.length) {
             const optionLine = lines[i];
+            if (!optionLine) {
+              i++;
+              continue;
+            }
+            
             const optionMatch = optionLine.match(/^([A-D])\)\s*(.+)/);
             
             if (optionMatch) {
@@ -177,6 +189,8 @@ export default function StudentTestModal({
           text: cleanText.substring(0, 50) + "...", 
           optionCount: options.length 
         });
+        
+        questionCounter++;
       } else {
         i++; // Move to next line if current line is not a question
       }
@@ -324,6 +338,24 @@ ${currentStudentTest.testContent}`;
         .replace(/\\times/g, '×');
     }
     return content;
+  };
+
+  // Remove answer key from test content to prevent cheating
+  const removeAnswerKey = (content: string) => {
+    // Remove everything after "ANSWER KEY:" or similar patterns
+    const answerKeyPatterns = [
+      /ANSWER\s*KEY\s*:[\s\S]*$/i,
+      /ANSWERS?\s*:[\s\S]*$/i,
+      /CORRECT\s*ANSWERS?\s*:[\s\S]*$/i,
+      /SOLUTION\s*:[\s\S]*$/i
+    ];
+    
+    let cleanContent = content;
+    for (const pattern of answerKeyPatterns) {
+      cleanContent = cleanContent.replace(pattern, '');
+    }
+    
+    return cleanContent.trim();
   };
 
   const renderContent = (content: string) => {
@@ -561,7 +593,7 @@ ${currentStudentTest.testContent}`;
               
               <ScrollArea className="h-[400px] w-full border rounded-md p-4">
                 {currentStudentTest ? (
-                  <div dangerouslySetInnerHTML={renderContent(currentStudentTest.testContent)} />
+                  <div dangerouslySetInnerHTML={renderContent(removeAnswerKey(currentStudentTest.testContent))} />
                 ) : (
                   <div className="text-center text-muted-foreground py-8">
                     <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
