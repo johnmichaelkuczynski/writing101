@@ -89,90 +89,120 @@ export default function StudentTestModal({
     console.log("Parsing test content:", content);
     const questions: any[] = [];
     
-    // Handle the case where questions aren't numbered but start with text followed by options
-    // Split by pattern that looks like question followed by options
-    const questionBlocks = content.split(/(?=\n[A-Z]\))/);
+    // The content appears to be formatted without line breaks between questions
+    // Pattern: "Question text?\nA) Option A\nB) Option B\nC) Option C\nD) Option D\nNext question..."
     
-    for (let i = 0; i < questionBlocks.length; i++) {
-      const block = questionBlocks[i].trim();
-      if (!block) continue;
+    // Split by looking ahead for the next question pattern (text ending with ?)
+    const questionSplits = content.split(/(?=\w[^?]*\?\n[A-Z]\))/);
+    
+    for (const section of questionSplits) {
+      if (!section.trim()) continue;
       
-      const lines = block.split('\n');
+      const lines = section.split('\n');
       let questionText = '';
-      let options: any[] = [];
+      const options: any[] = [];
       
       for (const line of lines) {
-        const trimmedLine = line.trim();
-        if (!trimmedLine) continue;
+        const trimmed = line.trim();
+        if (!trimmed) continue;
         
-        // Check if this line is an option (A), B), C), D))
-        const optionMatch = trimmedLine.match(/^([A-Z])\)\s*(.+)/);
+        // Check if this is an option line
+        const optionMatch = trimmed.match(/^([A-Z])\)\s*(.+)/);
         if (optionMatch) {
           options.push({
             letter: optionMatch[1],
             text: optionMatch[2]
           });
-        } else if (!options.length) {
-          // This is part of the question text
-          questionText += (questionText ? ' ' : '') + trimmedLine;
+        } else if (!optionMatch && !questionText) {
+          // This should be the question text
+          questionText = trimmed;
         }
       }
       
-      // If we found a question with options, add it
-      if (questionText && options.length > 0) {
+      if (questionText && options.length >= 2) {
         questions.push({
           number: (questions.length + 1).toString(),
           text: questionText,
           options: options
         });
-        console.log("Found question:", { number: questions.length, text: questionText, options });
+        console.log("Found question:", { number: questions.length + 1, text: questionText, optionCount: options.length });
       }
     }
     
-    // Fallback: Try the original numbered question approach
+    // Alternative approach: Split by pattern that indicates start of new question
     if (questions.length === 0) {
-      const lines = content.split('\n');
-      let currentQuestion: any = null;
+      // Look for pattern: text ending with ?\nA) 
+      const altSplits = content.split(/(?=.+\?\s*\n[A-Z]\))/);
       
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (line === '') continue;
+      for (const section of altSplits) {
+        if (!section.trim()) continue;
         
-        // Look for numbered questions
-        const questionMatch = line.match(/^(\d+)[\.\)]\s*(.+)/) || 
-                             line.match(/^Question\s+(\d+)[\:\.\s]\s*(.+)/i) ||
-                             line.match(/^Q(\d+)[\:\.\s]\s*(.+)/i);
+        const lines = section.split('\n').map(l => l.trim()).filter(l => l);
+        if (lines.length < 5) continue; // Need at least question + 4 options
         
-        if (questionMatch) {
-          if (currentQuestion && currentQuestion.options.length > 0) {
-            questions.push(currentQuestion);
-          }
-          currentQuestion = {
-            number: questionMatch[1],
-            text: questionMatch[2],
-            options: []
-          };
-          continue;
-        }
+        const questionText = lines[0];
+        const options: any[] = [];
         
-        // Look for answer choices
-        if (currentQuestion) {
-          const choiceMatch = line.match(/^([A-Z])\)\s*(.+)/);
-          if (choiceMatch) {
-            currentQuestion.options.push({
-              letter: choiceMatch[1],
-              text: choiceMatch[2]
+        for (let i = 1; i < lines.length; i++) {
+          const optionMatch = lines[i].match(/^([A-Z])\)\s*(.+)/);
+          if (optionMatch) {
+            options.push({
+              letter: optionMatch[1],
+              text: optionMatch[2]
             });
           }
         }
-      }
-      
-      if (currentQuestion && currentQuestion.options.length > 0) {
-        questions.push(currentQuestion);
+        
+        if (questionText.includes('?') && options.length >= 2) {
+          questions.push({
+            number: (questions.length + 1).toString(),
+            text: questionText,
+            options: options
+          });
+        }
       }
     }
     
-    console.log("Parsed questions:", questions);
+    // Last resort: Manual parsing line by line
+    if (questions.length === 0) {
+      const lines = content.split('\n').map(l => l.trim()).filter(l => l);
+      let i = 0;
+      
+      while (i < lines.length) {
+        const line = lines[i];
+        
+        // If this looks like a question (contains ? and doesn't start with letter))
+        if (line.includes('?') && !line.match(/^[A-Z]\)/)) {
+          const questionText = line;
+          const options: any[] = [];
+          i++;
+          
+          // Collect the next few lines as options
+          while (i < lines.length && lines[i].match(/^[A-Z]\)/)) {
+            const optionMatch = lines[i].match(/^([A-Z])\)\s*(.+)/);
+            if (optionMatch) {
+              options.push({
+                letter: optionMatch[1],
+                text: optionMatch[2]
+              });
+            }
+            i++;
+          }
+          
+          if (options.length >= 2) {
+            questions.push({
+              number: (questions.length + 1).toString(),
+              text: questionText,
+              options: options
+            });
+          }
+        } else {
+          i++;
+        }
+      }
+    }
+    
+    console.log("Final parsed questions:", questions.length, questions);
     return questions;
   };
 
