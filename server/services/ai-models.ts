@@ -591,7 +591,7 @@ Please provide a well-structured study guide that helps students understand and 
   }
 }
 
-export async function generateStudentTest(model: AIModel, sourceText: string, instructions: string): Promise<{ testContent: string }> {
+export async function generateStudentTest(model: AIModel, sourceText: string, instructions: string, questionTypes?: string[], questionCount?: number): Promise<{ testContent: string }> {
   const paperContext = getPaperContext();
   
   const systemPrompt = `${paperContext}
@@ -611,36 +611,59 @@ STUDENT TEST GENERATION INSTRUCTIONS:
 - Do not limit yourself to just a few questions - the goal is thorough assessment
 
 DEFAULT SETTINGS (when no specific instructions provided):
-- 15-20 questions total (comprehensive coverage of the source material)
-- Primarily multiple choice questions (12-16 questions) with some short answer (3-4 questions)
+- ${questionCount || 15} questions total (comprehensive coverage of the source material)
+- Question types: ${questionTypes?.join(', ') || 'multiple choice'}
 - Easy to moderate difficulty level
 - Focus on key concepts, definitions, and basic applications
 - Include questions that test understanding of logical reasoning principles
 - Ensure thorough coverage of all major points and concepts in the source text
 
-CRITICAL FORMATTING RULES:
+CRITICAL FORMATTING RULES FOR QUESTION TYPES:
+
+MULTIPLE CHOICE FORMAT:
+1. What is the definition of a valid argument?
+A) An argument with true premises
+B) An argument where the conclusion follows logically from premises
+C) An argument with a true conclusion
+D) An argument that is persuasive
+
+SHORT ANSWER FORMAT:
+2. [SHORT_ANSWER] Explain the difference between deductive and inductive reasoning.
+
+LONG ANSWER FORMAT:
+3. [LONG_ANSWER] Analyze the role of premises in logical argumentation and discuss how they contribute to the validity of an argument.
+
+FORMATTING REQUIREMENTS:
 - Write in plain text format ONLY
 - Do NOT use any markdown formatting, headers (####), bold (**), italics, or special characters
-- Structure multiple choice questions EXACTLY like this format:
-  1. What is the definition of a valid argument?
-  A) An argument with true premises
-  B) An argument where the conclusion follows logically from premises
-  C) An argument with a true conclusion
-  D) An argument that is persuasive
-
-  2. Which of the following represents modus ponens?
-  A) If P then Q, not Q, therefore not P
-  B) If P then Q, P, therefore Q
-  C) P or Q, not P, therefore Q
-  D) P and Q, therefore P
-
 - Each question must start with a number followed by a period (1. 2. 3. etc.)
-- Each multiple choice option must start with a capital letter followed by a closing parenthesis (A) B) C) D))
+- For multiple choice: Each option starts with capital letter and closing parenthesis (A) B) C) D))
+- For short/long answer: Include [SHORT_ANSWER] or [LONG_ANSWER] tag after question number
 - Leave blank lines between questions for clear separation
 - No bullet points, numbered lists, or formatting markup of any kind
-- ALWAYS include an "ANSWER KEY:" section at the end with correct answers (1. A, 2. C, 3. B, etc.)`;
+- ALWAYS include comprehensive "ANSWER KEY:" section at the end with:
+  * Multiple choice: 1. A, 2. C, etc.
+  * Short answer: Expected key points or sample answer
+  * Long answer: Rubric with key concepts that should be addressed`;
 
-  const defaultInstructions = instructions || "Create a comprehensive practice test with 15-20 multiple choice questions at easy to moderate difficulty level. Each question should have exactly 4 answer choices (A, B, C, D). Thoroughly cover all major concepts, definitions, and principles from the source text. Generate questions that test understanding of different aspects and details throughout the entire passage. Format each question clearly with proper numbering and multiple choice options.";
+  // Build question type specific instructions
+  const types = questionTypes || ["multiple_choice"];
+  const totalQuestions = questionCount || 15;
+  
+  let typeInstructions = "";
+  if (types.includes("multiple_choice")) {
+    typeInstructions += "- Include multiple choice questions with exactly 4 options (A, B, C, D)\n";
+  }
+  if (types.includes("short_answer")) {
+    typeInstructions += "- Include short answer questions requiring 1-3 sentence responses\n";
+  }
+  if (types.includes("long_answer")) {
+    typeInstructions += "- Include long answer questions requiring paragraph-length responses\n";
+  }
+  
+  const defaultInstructions = instructions || `Create a comprehensive practice test with ${totalQuestions} questions using the following types:
+${typeInstructions}
+Thoroughly cover all major concepts, definitions, and principles from the source text. Generate questions that test understanding of different aspects and details throughout the entire passage. Format each question clearly with proper numbering and question type tags.`;
 
   const fullPrompt = `Create a student practice test based on this content:
 

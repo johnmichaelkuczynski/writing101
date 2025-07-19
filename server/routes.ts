@@ -655,10 +655,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Student test generation endpoint with authentication
   app.post("/api/generate-student-test", async (req, res) => {
     try {
-      const { sourceText, instructions, chunkIndex, model } = studentTestRequestSchema.parse(req.body);
+      const { sourceText, instructions, chunkIndex, model, questionTypes, questionCount } = studentTestRequestSchema.parse(req.body);
       const user = await getCurrentUser(req);
       
-      const fullStudentTest = await generateStudentTest(model, sourceText, instructions);
+      const fullStudentTest = await generateStudentTest(model, sourceText, instructions, questionTypes, questionCount);
       console.log("Generated test content:", fullStudentTest.testContent.substring(0, 1500));
       
       // Check if user has access to full features
@@ -712,7 +712,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Submit test answers for grading
   app.post("/api/submit-test", async (req, res) => {
     try {
-      const { studentTestId, userAnswers } = submitTestRequestSchema.parse(req.body);
+      const { studentTestId, userAnswers, questionTypes } = submitTestRequestSchema.parse(req.body);
       const user = await getCurrentUser(req);
       
       if (!user) {
@@ -748,8 +748,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Grade the test
-      const gradeResult = gradeTest(userAnswers, correctAnswers);
+      // Parse questions to determine types
+      const parsedQuestions = parseTestQuestions(testContent);
+      
+      // Grade the test with question type awareness
+      const gradeResult = await gradeTestAdvanced(userAnswers, correctAnswers, parsedQuestions, testContent);
       
       // Save the test result
       const testResult = await storage.createTestResult({
@@ -908,6 +911,175 @@ Do not include any explanation, just the question numbers and correct letters.`;
     
     console.log("Generated fallback answers:", correctAnswers);
     return correctAnswers;
+  }
+
+  // Parse test questions to determine their types
+  function parseTestQuestions(testContent: string): Array<{number: string, text: string, type: string}> {
+    const questions: Array<{number: string, text: string, type: string}> = [];
+    const lines = testContent.split('\n');
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      
+      // Look for question numbers
+      const questionMatch = line.match(/^(\d+)\.\s*(.+)/);
+      if (questionMatch) {
+        const [, questionNumber, questionText] = questionMatch;
+        
+        // Determine question type based on content tags or structure
+        let questionType = "multiple_choice"; // default
+        
+        if (questionText.includes("[SHORT_ANSWER]")) {
+          questionType = "short_answer";
+        } else if (questionText.includes("[LONG_ANSWER]")) {
+          questionType = "long_answer";
+        } else {
+          // Check if next few lines contain A) B) C) D) options
+          let hasOptions = false;
+          for (let j = i + 1; j < Math.min(i + 6, lines.length); j++) {
+            if (lines[j].trim().match(/^[A-D]\)/)) {
+              hasOptions = true;
+              break;
+            }
+          }
+          if (!hasOptions) {
+            questionType = "short_answer"; // assume short answer if no multiple choice options
+          }
+        }
+        
+        questions.push({
+          number: questionNumber,
+          text: questionText.replace(/\[(SHORT_ANSWER|LONG_ANSWER)\]/, '').trim(),
+          type: questionType
+        });
+      }
+    }
+    
+    return questions;
+  }
+
+  // Advanced grading with AI for subjective questions
+  async function gradeTestAdvanced(
+    userAnswers: Record<string, string>, 
+    correctAnswers: Record<string, string>,
+    parsedQuestions: Array<{number: string, text: string, type: string}>,
+    testContent: string
+  ) {
+    const totalQuestions = Object.keys(userAnswers).length;
+    let correctCount = 0;
+    const feedback: Record<string, any> = {};
+    
+    for (const [questionNumber, userAnswer] of Object.entries(userAnswers)) {
+      const questionData = parsedQuestions.find(q => q.number === questionNumber);
+      const questionType = questionData?.type || "multiple_choice";
+      const correctAnswer = correctAnswers[questionNumber] || "Unknown";
+      
+      if (questionType === "multiple_choice") {
+        // Traditional exact match grading
+        const isCorrect = userAnswer.toUpperCase() === correctAnswer.toUpperCase();
+        if (isCorrect) correctCount++;
+        
+        feedback[questionNumber] = {
+          correct: isCorrect,
+          score: isCorrect ? 10 : 0,
+          feedback: isCorrect ? "Correct!" : `Incorrect. The correct answer is ${correctAnswer}.`
+        };
+      } else {
+        // AI-powered grading for subjective questions
+        try {
+          const gradingResult = await gradeSubjectiveAnswer(
+            questionData?.text || "", 
+            userAnswer, 
+            correctAnswer, 
+            questionType
+          );
+          
+          // Convert AI score (0-10) to pass/fail for counting (60% threshold)
+          const passed = gradingResult.score >= 6;
+          if (passed) correctCount++;
+          
+          feedback[questionNumber] = {
+            correct: passed,
+            score: gradingResult.score,
+            feedback: gradingResult.feedback
+          };
+        } catch (error) {
+          console.error(`Failed to grade question ${questionNumber}:`, error);
+          // Fallback: give partial credit
+          feedback[questionNumber] = {
+            correct: true,
+            score: 5,
+            feedback: "Unable to grade automatically. Manual review recommended."
+          };
+          correctCount += 0.5;
+        }
+      }
+    }
+    
+    const score = Math.round((correctCount / totalQuestions) * 100);
+    
+    return {
+      score,
+      totalQuestions,
+      correctCount,
+      feedback
+    };
+  }
+
+  // Generic AI response generation helper
+  async function generateWithAI(prompt: string, model: string = "openai"): Promise<string> {
+    try {
+      const { default: OpenAI } = await import('openai');
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 1000,
+        temperature: 0.3
+      });
+      
+      return completion.choices[0]?.message?.content || 'Unable to generate response.';
+    } catch (error) {
+      console.error("AI generation error:", error);
+      return 'Unable to generate response due to error.';
+    }
+  }
+
+  // AI-powered subjective answer grading
+  async function gradeSubjectiveAnswer(questionText: string, userAnswer: string, expectedAnswer: string, questionType: string): Promise<{score: number, feedback: string}> {
+    const prompt = `You are an expert instructor grading a ${questionType} response.
+
+QUESTION: ${questionText}
+
+STUDENT ANSWER: ${userAnswer}
+
+EXPECTED ANSWER/RUBRIC: ${expectedAnswer}
+
+Please grade this answer on a scale of 0-10 and provide constructive feedback.
+
+Grading criteria:
+- 9-10: Excellent, comprehensive, demonstrates deep understanding
+- 7-8: Good, covers main points with minor gaps
+- 5-6: Satisfactory, basic understanding with some missing elements
+- 3-4: Below average, significant gaps in understanding
+- 1-2: Poor, major misunderstandings or very incomplete
+- 0: No answer or completely incorrect
+
+Return your response in this exact format:
+SCORE: [number 0-10]
+FEEDBACK: [constructive feedback explaining the grade]`;
+
+    const response = await generateWithAI(prompt, "openai");
+    
+    // Parse the AI response
+    const scoreMatch = response.match(/SCORE:\s*(\d+)/);
+    const feedbackMatch = response.match(/FEEDBACK:\s*(.+)/s);
+    
+    const score = scoreMatch ? parseInt(scoreMatch[1]) : 5; // default to 5 if parsing fails
+    const feedback = feedbackMatch ? feedbackMatch[1].trim() : "Grade assigned automatically.";
+    
+    return { score, feedback };
   }
   
   function gradeTest(userAnswers: Record<string, string>, correctAnswers: Record<string, string>) {

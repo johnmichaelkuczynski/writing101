@@ -250,11 +250,14 @@ export const studentTestRequestSchema = z.object({
   instructions: z.string().optional(),
   model: z.enum(["deepseek", "openai", "anthropic", "perplexity"]),
   chunkIndex: z.number().optional(),
+  questionTypes: z.array(z.enum(["multiple_choice", "short_answer", "long_answer"])).optional(),
+  questionCount: z.number().min(1).max(30).optional(),
 });
 
 export const submitTestRequestSchema = z.object({
   studentTestId: z.number(),
   userAnswers: z.record(z.string()), // question index -> user answer
+  questionTypes: z.record(z.enum(["multiple_choice", "short_answer", "long_answer"])).optional(),
 });
 
 

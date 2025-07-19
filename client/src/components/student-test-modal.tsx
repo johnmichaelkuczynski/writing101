@@ -5,6 +5,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Download, FileText, Printer, X, Loader2, BookOpen, Trophy, CheckCircle, RotateCcw } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -37,10 +39,19 @@ export default function StudentTestModal({
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [testResult, setTestResult] = useState<any>(null);
   const [parsedQuestions, setParsedQuestions] = useState<any[]>([]);
+  const [questionTypes, setQuestionTypes] = useState<string[]>(["multiple_choice"]);
+  const [questionCount, setQuestionCount] = useState<number>(15);
   const { toast } = useToast();
 
   const studentTestMutation = useMutation({
-    mutationFn: async (data: { sourceText: string; instructions?: string; model: AIModel; chunkIndex?: number }) => {
+    mutationFn: async (data: { 
+      sourceText: string; 
+      instructions?: string; 
+      model: AIModel; 
+      chunkIndex?: number;
+      questionTypes?: string[];
+      questionCount?: number;
+    }) => {
       const response = await apiRequest("/api/generate-student-test", {
         method: "POST",
         body: JSON.stringify(data)
@@ -63,7 +74,11 @@ export default function StudentTestModal({
   });
 
   const submitTestMutation = useMutation({
-    mutationFn: async (data: { studentTestId: number; userAnswers: Record<string, string> }) => {
+    mutationFn: async (data: { 
+      studentTestId: number; 
+      userAnswers: Record<string, string>;
+      questionTypes?: Record<string, string>;
+    }) => {
       const response = await apiRequest("/api/submit-test", {
         method: "POST",
         body: JSON.stringify(data)
@@ -84,7 +99,7 @@ export default function StudentTestModal({
     },
   });
 
-  // Parse test content into structured questions
+  // Parse test content into structured questions with type detection
   const parseTestContent = (content: string) => {
     console.log("Parsing test content:", content);
     const questions: any[] = [];
@@ -96,42 +111,72 @@ export default function StudentTestModal({
     while (i < lines.length) {
       const line = lines[i];
       
-      // Look for lines that end with a question mark and don't start with A) B) C) D)
-      if (line.includes('?') && !line.match(/^[A-Z]\)/)) {
-        const questionText = line;
-        const options: any[] = [];
-        i++; // Move to next line to look for options
+      // Look for numbered questions (1. 2. 3. etc.)
+      const questionMatch = line.match(/^(\d+)\.\s*(.+)/);
+      if (questionMatch) {
+        const [, questionNumber, questionText] = questionMatch;
         
-        // Collect consecutive option lines (A) B) C) D))
-        while (i < lines.length) {
-          const optionLine = lines[i];
-          const optionMatch = optionLine.match(/^([A-Z])\)\s*(.+)/);
-          
-          if (optionMatch) {
-            options.push({
-              letter: optionMatch[1],
-              text: optionMatch[2]
-            });
-            i++;
-          } else {
-            // No more options for this question, stop collecting
-            break;
+        // Determine question type based on content tags or structure
+        let questionType = "multiple_choice";
+        let cleanText = questionText;
+        
+        if (questionText.includes("[SHORT_ANSWER]")) {
+          questionType = "short_answer";
+          cleanText = questionText.replace("[SHORT_ANSWER]", "").trim();
+        } else if (questionText.includes("[LONG_ANSWER]")) {
+          questionType = "long_answer";
+          cleanText = questionText.replace("[LONG_ANSWER]", "").trim();
+        } else {
+          // Check if next few lines contain A) B) C) D) options
+          let hasOptions = false;
+          for (let j = i + 1; j < Math.min(i + 6, lines.length); j++) {
+            if (lines[j].trim().match(/^[A-D]\)/)) {
+              hasOptions = true;
+              break;
+            }
+          }
+          if (!hasOptions) {
+            questionType = "short_answer"; // assume short answer if no multiple choice options
           }
         }
         
-        // Only add question if it has at least 2 options
-        if (options.length >= 2) {
-          questions.push({
-            number: (questions.length + 1).toString(),
-            text: questionText,
-            options: options
-          });
-          console.log("Found complete question:", { 
-            number: questions.length, 
-            text: questionText.substring(0, 50) + "...", 
-            optionCount: options.length 
-          });
+        const options: any[] = [];
+        i++; // Move to next line to look for options
+        
+        if (questionType === "multiple_choice") {
+          // Collect consecutive option lines (A) B) C) D))
+          while (i < lines.length) {
+            const optionLine = lines[i];
+            const optionMatch = optionLine.match(/^([A-D])\)\s*(.+)/);
+            
+            if (optionMatch) {
+              options.push({
+                letter: optionMatch[1],
+                text: optionMatch[2]
+              });
+              i++;
+            } else {
+              // No more options for this question, stop collecting
+              break;
+            }
+          }
         }
+        
+        // Add question with type information
+        const questionObj = {
+          number: questionNumber,
+          text: cleanText,
+          type: questionType,
+          options: options
+        };
+        
+        questions.push(questionObj);
+        console.log("Found question:", { 
+          number: questionNumber, 
+          type: questionType,
+          text: cleanText.substring(0, 50) + "...", 
+          optionCount: options.length 
+        });
       } else {
         i++; // Move to next line if current line is not a question
       }
@@ -139,6 +184,7 @@ export default function StudentTestModal({
     
     console.log("Final parsed questions:", questions.length, questions.map(q => ({ 
       number: q.number, 
+      type: q.type,
       text: q.text.substring(0, 50) + "...",
       optionCount: q.options.length 
     })));
@@ -150,7 +196,9 @@ export default function StudentTestModal({
     const requestData: any = {
       sourceText: selectedText,
       instructions: customInstructions.trim() || undefined,
-      model: selectedModel
+      model: selectedModel,
+      questionTypes,
+      questionCount
     };
     
     // Only include chunkIndex if it's a valid number
@@ -315,9 +363,19 @@ ${currentStudentTest.testContent}`;
   const handleSubmitTest = () => {
     if (!currentStudentTest) return;
     
+    // Extract question types from parsed questions for grading
+    const questionTypeMap: Record<string, string> = {};
+    parsedQuestions.forEach((q, index) => {
+      const questionNumber = (index + 1).toString();
+      if (q.type) {
+        questionTypeMap[questionNumber] = q.type;
+      }
+    });
+    
     submitTestMutation.mutate({
       studentTestId: currentStudentTest.id,
-      userAnswers: userAnswers
+      userAnswers: userAnswers,
+      questionTypes: questionTypeMap
     });
   };
 
@@ -381,15 +439,79 @@ ${currentStudentTest.testContent}`;
             {/* Left Column - Instructions */}
             <div className="space-y-4">
               <div>
+                <h3 className="font-semibold mb-2">Question Types</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="multiple_choice"
+                      checked={questionTypes.includes("multiple_choice")}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setQuestionTypes([...questionTypes, "multiple_choice"]);
+                        } else {
+                          setQuestionTypes(questionTypes.filter(t => t !== "multiple_choice"));
+                        }
+                      }}
+                    />
+                    <Label htmlFor="multiple_choice">Multiple Choice</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="short_answer"
+                      checked={questionTypes.includes("short_answer")}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setQuestionTypes([...questionTypes, "short_answer"]);
+                        } else {
+                          setQuestionTypes(questionTypes.filter(t => t !== "short_answer"));
+                        }
+                      }}
+                    />
+                    <Label htmlFor="short_answer">Short Answer (1-3 sentences)</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="long_answer"
+                      checked={questionTypes.includes("long_answer")}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setQuestionTypes([...questionTypes, "long_answer"]);
+                        } else {
+                          setQuestionTypes(questionTypes.filter(t => t !== "long_answer"));
+                        }
+                      }}
+                    />
+                    <Label htmlFor="long_answer">Long Answer (paragraph)</Label>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-2">Number of Questions</h3>
+                <Select value={questionCount.toString()} onValueChange={(value) => setQuestionCount(parseInt(value))}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">5 Questions</SelectItem>
+                    <SelectItem value="10">10 Questions</SelectItem>
+                    <SelectItem value="15">15 Questions</SelectItem>
+                    <SelectItem value="20">20 Questions</SelectItem>
+                    <SelectItem value="25">25 Questions</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
                 <h3 className="font-semibold mb-2">Custom Instructions (Optional)</h3>
                 <Textarea
                   value={customInstructions}
                   onChange={(e) => setCustomInstructions(e.target.value)}
-                  placeholder="e.g., 'Three multiple choice questions, one short answer, focus on logical reasoning, moderate difficulty'"
-                  className="min-h-[120px]"
+                  placeholder="e.g., 'Focus on logical reasoning, moderate difficulty, include practical examples'"
+                  className="min-h-[100px]"
                 />
                 <p className="text-sm text-muted-foreground mt-1">
-                  Leave blank for default: 5-7 multiple choice questions at easy to moderate difficulty level.
+                  Specify difficulty level, topics to focus on, or other requirements.
                 </p>
               </div>
               
@@ -467,9 +589,14 @@ ${currentStudentTest.testContent}`;
                   <div key={index} className="space-y-3">
                     <h4 className="font-semibold text-lg">
                       {question.number}. {question.text}
+                      <span className="ml-2 px-2 py-1 text-xs bg-gray-100 rounded">
+                        {question.type === "multiple_choice" ? "Multiple Choice" : 
+                         question.type === "short_answer" ? "Short Answer" : "Long Answer"}
+                      </span>
                     </h4>
                     
-                    {question.options.length > 0 && (
+                    {/* Multiple Choice Questions */}
+                    {question.type === "multiple_choice" && question.options.length > 0 && (
                       <RadioGroup
                         value={userAnswers[question.number] || ""}
                         onValueChange={(value) => handleAnswerSelect(question.number, value)}
@@ -483,6 +610,26 @@ ${currentStudentTest.testContent}`;
                           </div>
                         ))}
                       </RadioGroup>
+                    )}
+                    
+                    {/* Short Answer Questions */}
+                    {question.type === "short_answer" && (
+                      <Textarea
+                        value={userAnswers[question.number] || ""}
+                        onChange={(e) => handleAnswerSelect(question.number, e.target.value)}
+                        placeholder="Enter your answer (1-3 sentences)..."
+                        className="min-h-[80px]"
+                      />
+                    )}
+                    
+                    {/* Long Answer Questions */}
+                    {question.type === "long_answer" && (
+                      <Textarea
+                        value={userAnswers[question.number] || ""}
+                        onChange={(e) => handleAnswerSelect(question.number, e.target.value)}
+                        placeholder="Enter your detailed answer (paragraph-length response)..."
+                        className="min-h-[150px]"
+                      />
                     )}
                   </div>
                 ))}
