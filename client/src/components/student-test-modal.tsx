@@ -545,11 +545,25 @@ ${currentStudentTest.testContent}`;
                         
                         <div className="mt-2 space-y-1">
                           <p className="text-sm">
-                            <span className="font-medium">Your answer:</span> {userAnswer || "Not answered"}
+                            <span className="font-medium">Your answer:</span> {
+                              userAnswer ? (
+                                (() => {
+                                  const option = question.options.find((opt: any) => opt.letter === userAnswer);
+                                  return option ? `${userAnswer}) ${option.text}` : userAnswer;
+                                })()
+                              ) : "Not answered"
+                            }
                           </p>
                           {!isCorrect && (
                             <p className="text-sm">
-                              <span className="font-medium">Correct answer:</span> {correctAnswer}
+                              <span className="font-medium">Correct answer:</span> {
+                                correctAnswer ? (
+                                  (() => {
+                                    const option = question.options.find((opt: any) => opt.letter === correctAnswer);
+                                    return option ? `${correctAnswer}) ${option.text}` : correctAnswer;
+                                  })()
+                                ) : "Unknown"
+                              }
                             </p>
                           )}
                         </div>

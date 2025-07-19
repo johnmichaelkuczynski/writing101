@@ -637,7 +637,8 @@ CRITICAL FORMATTING RULES:
 - Each question must start with a number followed by a period (1. 2. 3. etc.)
 - Each multiple choice option must start with a capital letter followed by a closing parenthesis (A) B) C) D))
 - Leave blank lines between questions for clear separation
-- No bullet points, numbered lists, or formatting markup of any kind`;
+- No bullet points, numbered lists, or formatting markup of any kind
+- ALWAYS include an "ANSWER KEY:" section at the end with correct answers (1. A, 2. C, 3. B, etc.)`;
 
   const defaultInstructions = instructions || "Create a comprehensive practice test with 15-20 multiple choice questions at easy to moderate difficulty level. Each question should have exactly 4 answer choices (A, B, C, D). Thoroughly cover all major concepts, definitions, and principles from the source text. Generate questions that test understanding of different aspects and details throughout the entire passage. Format each question clearly with proper numbering and multiple choice options.";
 
@@ -649,7 +650,20 @@ ${sourceText.substring(0, 8000)}
 INSTRUCTIONS:
 ${defaultInstructions}
 
-Please provide a self-assessment test that helps students check their understanding of the material.`;
+CRITICAL: After generating all the questions, you MUST provide an ANSWER KEY section that lists the correct answer for each question. Format the answer key exactly like this:
+
+ANSWER KEY:
+1. B
+2. A
+3. C
+4. D
+5. A
+6. B
+(continue for all questions)
+
+The answer key is essential for automatic grading. Make sure every question number has a corresponding correct answer letter.
+
+Please provide a self-assessment test that helps students check their understanding of the material, followed by the complete answer key.`;
 
   try {
     let result: string;

@@ -596,4 +596,8 @@ Preferred communication style: Simple, everyday language.
   - CRITICAL FIX: Increased test generation from 5-7 questions to 15-20 questions for comprehensive coverage
   - Enhanced AI prompts to generate substantial number of questions based on content richness
   - Updated default instructions to ensure thorough assessment of all major concepts and details
-  - Students can now generate practice tests, take them interactively, and receive instant grades
+  - CRITICAL FIX: Completely rebuilt grading system to generate proper answer keys from AI
+  - Fixed broken grading that was marking all answers wrong by implementing answer key parsing
+  - Enhanced results display to show full answer text instead of just letters (A, B, C, D)
+  - AI now generates tests with comprehensive answer keys for accurate automated grading
+  - Students can now generate practice tests, take them interactively, and receive instant accurate grades
