@@ -195,23 +195,23 @@ export default function LivingBook() {
     <div className="bg-background text-foreground min-h-screen">
       {/* Header */}
       <header className="bg-card shadow-sm border-b border-border sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <BookOpen className="text-primary text-lg" />
+            <div className="flex items-center space-x-1 sm:space-x-3">
+              <BookOpen className="text-primary text-base sm:text-lg" />
               <div className="flex flex-col">
-                <h1 className="font-inter font-semibold text-base text-foreground">
+                <h1 className="font-inter font-semibold text-sm sm:text-base text-foreground">
                   Introduction to Symbolic Logic
                 </h1>
                 <a 
                   href="mailto:contact@zhisystems.ai"
-                  className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
+                  className="text-xs text-blue-600 hover:text-blue-800 hover:underline hidden sm:block"
                 >
                   Contact Us
                 </a>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4 overflow-x-auto">
               <MathToggle 
                 mathMode={mathMode} 
                 onToggle={setMathMode} 
@@ -221,13 +221,12 @@ export default function LivingBook() {
                 variant="outline"
                 size="sm"
                 onClick={handleChunkRewrite}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-1 sm:space-x-2"
               >
                 <Edit3 className="w-4 h-4" />
-                <span>Rewrite Document</span>
+                <span className="hidden sm:inline">Rewrite Document</span>
+                <span className="sm:hidden">Rewrite</span>
               </Button>
-              
-
               
               <Button
                 variant="outline"
@@ -236,10 +235,11 @@ export default function LivingBook() {
                   const fullText = getFullDocumentContent();
                   handleCreateStudyGuideFromSelection(fullText);
                 }}
-                className="flex items-center space-x-2 text-blue-600 border-blue-200 hover:bg-blue-50"
+                className="flex items-center space-x-1 sm:space-x-2 text-blue-600 border-blue-200 hover:bg-blue-50"
               >
                 <BookOpen className="w-4 h-4" />
-                <span>Study Guide</span>
+                <span className="hidden sm:inline">Study Guide</span>
+                <span className="sm:hidden">Guide</span>
               </Button>
 
               <ModelSelector 
@@ -247,14 +247,17 @@ export default function LivingBook() {
                 onModelChange={setSelectedModel} 
               />
 
-              {/* Authentication section */}
+              {/* Authentication section - MOBILE RESPONSIVE */}
               {isAuthenticated && user ? (
-                <div className="flex items-center space-x-2 border-l pl-2 ml-2">
-                  <div className="text-sm">
+                <div className="flex items-center space-x-1 sm:space-x-2 border-l pl-1 sm:pl-2 ml-1 sm:ml-2">
+                  <div className="text-xs sm:text-sm hidden md:block">
                     <span className="font-medium">{user.username}</span>
                     <div className="text-xs text-muted-foreground">
                       {(user.credits || 0).toLocaleString()} credits
                     </div>
+                  </div>
+                  <div className="text-xs block md:hidden">
+                    <span className="font-medium">{(user.credits || 0).toLocaleString()}</span>
                   </div>
 
                   <Button
@@ -264,7 +267,8 @@ export default function LivingBook() {
                     className="flex items-center space-x-1"
                   >
                     <CreditCard className="h-4 w-4" />
-                    <span>Buy Credits</span>
+                    <span className="hidden sm:inline">Buy Credits</span>
+                    <span className="sm:hidden">Buy</span>
                   </Button>
 
                   <Button
@@ -277,7 +281,7 @@ export default function LivingBook() {
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center space-x-2 border-l pl-2 ml-2">
+                <div className="flex items-center space-x-1 sm:space-x-2 border-l pl-1 sm:pl-2 ml-1 sm:ml-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -285,7 +289,7 @@ export default function LivingBook() {
                     className="flex items-center space-x-1"
                   >
                     <User className="h-4 w-4" />
-                    <span>Login</span>
+                    <span className="hidden sm:inline">Login</span>
                   </Button>
                   <Button
                     size="sm"
@@ -293,7 +297,7 @@ export default function LivingBook() {
                     className="flex items-center space-x-1"
                   >
                     <User className="h-4 w-4" />
-                    <span>Register</span>
+                    <span className="hidden sm:inline">Register</span>
                   </Button>
                 </div>
               )}
@@ -303,13 +307,13 @@ export default function LivingBook() {
       </header>
 
       <div className="flex max-w-none w-full main-content-with-bottom-bar">
-        {/* Navigation Sidebar - Narrower */}
-        <div className="w-60 flex-shrink-0">
+        {/* Navigation Sidebar - MOBILE RESPONSIVE: Much narrower on mobile */}
+        <div className="w-16 sm:w-24 md:w-40 lg:w-60 flex-shrink-0">
           <NavigationSidebar />
         </div>
 
-        {/* Main Content Area - MUCH WIDER FOR DOCUMENT READING */}
-        <main className="flex-1 max-w-5xl mx-4">
+        {/* Main Content Area - MOBILE RESPONSIVE: Much wider on mobile */}
+        <main className="flex-1 max-w-none sm:max-w-3xl md:max-w-4xl lg:max-w-5xl mx-2 sm:mx-4">
           {/* Document Content */}
           <DocumentContent 
             mathMode={mathMode}
@@ -322,8 +326,8 @@ export default function LivingBook() {
           />
         </main>
 
-        {/* Chat Panel - Fixed Width */}
-        <div className="w-96 flex-shrink-0">
+        {/* Chat Panel - MOBILE RESPONSIVE: Hidden on small screens, smaller on medium */}
+        <div className="hidden sm:block sm:w-72 md:w-80 lg:w-96 flex-shrink-0">
           <ChatInterface 
             selectedModel={selectedModel} 
             mathMode={mathMode}
