@@ -230,10 +230,10 @@ export default function DocumentContent({
           <article className="prose prose-xl max-w-none text-foreground w-full leading-relaxed select-text">
             {/* Document Title */}
             <header className="text-center mb-12">
-              <h1 className="text-lg font-normal text-foreground mb-2" style={{color: '#1a202c'}}>
+              <h1 className="text-2xl font-bold text-foreground mb-2">
                 {paperContent.title}
               </h1>
-              <p className="text-base font-normal text-muted-foreground text-center">
+              <p className="text-lg text-muted-foreground text-center">
                 by {paperContent.author}
               </p>
             </header>

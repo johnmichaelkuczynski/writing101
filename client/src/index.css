@@ -101,27 +101,21 @@
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Document Content Professional Formatting - FORCE INDENTATION */
+/* Document Content Professional Formatting */
 .document-content-formatted {
-  font-family: Georgia, serif !important;
-  font-size: 17px !important;
-  line-height: 1.5 !important;
-  color: #1a202c !important;
+  font-family: Georgia, serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #2d3748;
   max-width: none;
 }
 
-.document-content-formatted p,
-.document-content-formatted .document-paragraph,
-.document-content-formatted .mb-4,
-.document-content-formatted .mb-6 {
-  margin-bottom: 0.8rem !important;
-  text-align: justify !important;
-  text-indent: 2rem !important;
-  font-size: 17px !important;
-  line-height: 1.5 !important;
-  color: #1a202c !important;
-  padding: 0 !important;
-  margin-top: 0 !important;
+.document-content-formatted p {
+  margin-bottom: 1.2rem;
+  text-align: justify;
+  text-indent: 1.5rem;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 .document-content-formatted h1,
@@ -171,14 +165,11 @@
 .document-content-formatted h2,
 .document-content-formatted h3,
 .document-content-formatted h4 {
-  font-weight: normal;
-  margin-top: 1.5rem;
-  margin-bottom: 0.8rem;
+  font-weight: bold;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
   text-indent: 0;
   text-align: left;
-  color: #1a202c;
-  line-height: 1.5;
-  font-size: 17px;
 }
 
 /* Remove excessive spacing and improve readability */
@@ -190,57 +181,33 @@
   max-width: none !important;
 }
 
-/* FORCE PARAGRAPH INDENTATION - MAXIMUM SPECIFICITY */
-.document-paragraph,
-.mb-4,
-.mb-6,
-.mt-8,
-p.document-paragraph,
-p.mb-4,
-p.mb-6,
-div[data-document-content] p,
-div[data-document-content] .document-paragraph,
-div[data-document-content] .mb-4,
-div[data-document-content] .mb-6,
-.document-math-content p,
-.document-text-content p,
-.document-math-content .document-paragraph,
-.document-text-content .document-paragraph,
-.document-math-content .mb-4,
-.document-text-content .mb-4,
-.document-math-content .mb-6,
-.document-text-content .mb-6,
-section .document-paragraph,
-section .mb-4,
-section .mb-6,
-section p {
-  text-indent: 2rem !important;
-  margin-bottom: 0.8rem !important;
-  margin-top: 0 !important;
-  line-height: 1.5 !important;
-  text-align: justify !important;
-  font-family: Georgia, serif !important;
-  font-size: 17px !important;
-  color: #1a202c !important;
-  padding: 0 !important;
+/* Document formatting styles */
+.document-paragraph {
+  text-indent: 2rem;
+  margin-bottom: 1.2rem;
+  line-height: 1.7;
+  text-align: justify;
+  font-family: Georgia, serif;
+  font-size: 1rem;
 }
 
-/* Section headings - NO INDENT */
-.font-normal,
-p.font-normal,
-.document-paragraph.font-normal,
-div[data-document-content] .font-normal,
-.document-math-content .font-normal,
-.document-text-content .font-normal,
-section .font-normal,
-.document-paragraph.mb-6.mt-8.font-normal,
-p.document-paragraph.mb-6.mt-8.font-normal {
-  text-indent: 0 !important;
-  font-weight: normal !important;
-  margin-top: 1.5rem !important;
-  margin-bottom: 0.8rem !important;
-  font-size: 17px !important;
-  color: #1a202c !important;
+.document-paragraph-no-indent {
+  text-indent: 0;
+  margin-bottom: 1.2rem;
+  line-height: 1.7;
+  text-align: justify;
+  font-family: Georgia, serif;
+  font-size: 1rem;
+}
+
+.document-proposition {
+  text-indent: 0;
+  margin-bottom: 1rem;
+  line-height: 1.7;
+  text-align: left;
+  font-family: Georgia, serif;
+  font-size: 1rem;
+  font-weight: normal;
 }
 
 /* Dictionary entry styles */
