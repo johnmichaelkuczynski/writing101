@@ -919,15 +919,14 @@ Do not include any explanation, just the question numbers and correct letters.`;
   // Parse test questions to determine their types
   function parseTestQuestions(testContent: string): Array<{number: string, text: string, type: string}> {
     const questions: Array<{number: string, text: string, type: string}> = [];
-    const lines = testContent.split('\n');
-    let questionCounter = 1;
     
     // Remove answer key section first
     const cleanContent = testContent.split(/ANSWER KEY/i)[0];
-    const cleanLines = cleanContent.split('\n').map(l => l.trim()).filter(l => l);
+    const lines = cleanContent.split('\n');
     
-    for (let i = 0; i < cleanLines.length; i++) {
-      const line = cleanLines[i];
+    let i = 0;
+    while (i < lines.length) {
+      const line = lines[i].trim();
       
       // Check for [SHORT_ANSWER] or [LONG_ANSWER] tags first
       if (line.includes('[SHORT_ANSWER]') || line.includes('[LONG_ANSWER]')) {
@@ -935,19 +934,21 @@ Do not include any explanation, just the question numbers and correct letters.`;
         let questionText = line.replace(/\[SHORT_ANSWER\]|\[LONG_ANSWER\]/g, '').trim();
         
         // If the tag was on a line by itself, the question is on the next line
-        if (!questionText && i + 1 < cleanLines.length) {
+        if (!questionText && i + 1 < lines.length) {
           i++;
-          questionText = cleanLines[i];
+          questionText = lines[i].trim();
         }
         
         if (questionText) {
+          // Get question number from existing questions + 1
+          const questionNumber = (questions.length + 1).toString();
           questions.push({
-            number: questionCounter.toString(),
+            number: questionNumber,
             text: questionText,
             type: questionType
           });
-          questionCounter++;
         }
+        i++;
         continue;
       }
       
@@ -956,37 +957,36 @@ Do not include any explanation, just the question numbers and correct letters.`;
       if (numberedMatch) {
         const [, questionNumber, questionText] = numberedMatch;
         
-        // Check if next few lines contain A) B) C) D) options
-        let questionType = "multiple_choice"; // default
+        // Check if this is followed by multiple choice options A) B) C) D)
         let hasOptions = false;
-        for (let j = i + 1; j < Math.min(i + 6, cleanLines.length); j++) {
-          if (cleanLines[j] && cleanLines[j].trim().match(/^[A-D]\)/)) {
+        let j = i + 1;
+        while (j < lines.length && j < i + 6) {
+          const nextLine = lines[j].trim();
+          if (!nextLine) {
+            j++;
+            continue;
+          }
+          if (nextLine.match(/^[A-D]\)/)) {
             hasOptions = true;
             break;
           }
+          if (nextLine.match(/^\d+\./) || nextLine.includes('[SHORT_ANSWER]') || nextLine.includes('[LONG_ANSWER]')) {
+            // Next question found, stop looking
+            break;
+          }
+          j++;
         }
-        if (!hasOptions) {
-          questionType = "short_answer"; // assume short answer if no multiple choice options
-        }
+        
+        const questionType = hasOptions ? "multiple_choice" : "short_answer";
         
         questions.push({
           number: questionNumber,
           text: questionText,
           type: questionType
         });
-        questionCounter = Math.max(questionCounter, parseInt(questionNumber) + 1);
-        continue;
       }
       
-      // Look for standalone questions ending with ?
-      if (line.includes('?') && !line.match(/^[A-D]\)/)) {
-        questions.push({
-          number: questionCounter.toString(),
-          text: line,
-          type: "short_answer"
-        });
-        questionCounter++;
-      }
+      i++;
     }
     
     console.log("Parsed questions for grading:", questions.map(q => ({ 

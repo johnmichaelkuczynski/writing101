@@ -674,28 +674,19 @@ INSTRUCTIONS:
 ${defaultInstructions}
 
 CRITICAL REQUIREMENTS:
-1. Create each question with exactly 4 answer choices (A, B, C, D)
-2. Make sure ONE AND ONLY ONE choice is correct for each question
-3. After ALL questions, you MUST include an "ANSWER KEY:" section
+1. Follow the specific instructions provided above EXACTLY
+2. Generate the requested question types and format them correctly
+3. Include proper question type tags: [SHORT_ANSWER] and [LONG_ANSWER] where requested
+4. After ALL questions, you MUST include an "ANSWER KEY:" section
+5. For multiple choice questions, provide exactly 4 options (A, B, C, D)
+6. For short/long answer questions, provide model answers or key points in the answer key
 
-Example format:
-1. What is logic?
-A) The study of emotions
-B) The study of correct reasoning
-C) The study of language
-D) The study of mathematics
+ANSWER KEY FORMAT REQUIREMENTS:
+- Multiple choice answers: List correct letters (1. B, 2. C, etc.)
+- Short answer key points: Provide expected key concepts or sample answers
+- Long answer rubrics: List main points that should be addressed
 
-2. What is validity?
-A) Truth of premises
-B) Truth of conclusion  
-C) Logical structure preserves truth
-D) Persuasive argument
-
-ANSWER KEY:
-1. B
-2. C
-
-This format is MANDATORY. The answer key must list the correct letter for every question. Without the answer key, grading will fail.`;
+This answer key is MANDATORY for proper grading functionality.`;
 
   try {
     let result: string;

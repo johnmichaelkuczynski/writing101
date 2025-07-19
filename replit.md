@@ -625,3 +625,9 @@ Preferred communication style: Simple, everyday language.
   - Users can now create fresh questions without completing current test to avoid repetitive questions
   - Button appears in both test preview and test-taking modes for maximum flexibility
   - State properly resets (answers, results, view mode) when generating new tests
+  - CRITICAL QUESTION TYPE DETECTION FIX: Fixed server-side parsing to correctly identify multiple choice vs subjective questions
+  - Resolved grading system treating all questions as subjective (causing incorrect 100% scores)
+  - Multiple choice questions now use exact answer matching, subjective questions use AI grading
+  - CUSTOM INSTRUCTIONS COMPLIANCE FIX: Removed hardcoded prompt requirements that ignored user instructions
+  - System now properly follows user's custom instructions (e.g., calculus problems, specific topics)
+  - AI models receive and process user's exact instructions without filtering or override
