@@ -226,23 +226,23 @@ export default function DocumentContent({
       </div>
       
       <ScrollArea className="h-[calc(100vh-280px)]">
-        <div className="py-5 w-full" data-document-content>
-          <article className="max-w-none text-foreground w-full select-text">
+        <div className="p-8 w-full max-w-5xl mx-auto" data-document-content>
+          <article className="prose prose-xl max-w-none text-foreground w-full leading-relaxed select-text">
             {/* Document Title */}
-            <header className="text-center mb-6 max-w-700px mx-auto px-5">
-              <h1 className="text-xl font-bold text-foreground mb-2">
+            <header className="text-center mb-12">
+              <h1 className="text-base font-normal text-foreground mb-2">
                 {paperContent.title}
               </h1>
-              <p className="text-base font-medium text-muted-foreground">
+              <p className="text-base font-normal text-muted-foreground text-center">
                 by {paperContent.author}
               </p>
             </header>
 
-            {/* Full Document Content - Optimized Density */}
+            {/* Full Document Content - No Paywall */}
             {paperContent.sections.map((section, index) => (
-              <section key={section.id} id={section.id} className="mb-4">
+              <section key={section.id} id={section.id} className="mb-12">
                 <div 
-                  className={`text-foreground document-content-formatted ${mathMode ? 'document-math-content' : 'document-text-content'}`}
+                  className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
                   dangerouslySetInnerHTML={{ 
                     __html: processContentForMathMode(section.content) 
                   }}
