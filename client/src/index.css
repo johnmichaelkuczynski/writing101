@@ -101,9 +101,9 @@
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Document Content Professional Formatting - OPTIMIZED DENSITY */
+/* Document Content Professional Formatting - FORCED INDENTATION */
 .document-content-formatted {
-  font-family: Georgia, 'Merriweather', serif;
+  font-family: Georgia, 'Times New Roman', serif;
   font-size: 16px;
   line-height: 1.45;
   color: #2d3748;
@@ -115,12 +115,18 @@
 }
 
 .document-content-formatted p {
-  margin-top: 0;
-  margin-bottom: 0.8em;
-  text-align: justify;
-  text-indent: 1.2em;
-  font-size: 16px;
-  line-height: 1.45;
+  margin-top: 0 !important;
+  margin-bottom: 0.8em !important;
+  text-align: justify !important;
+  text-indent: 2em !important;
+  font-size: 16px !important;
+  line-height: 1.45 !important;
+  padding: 0 !important;
+}
+
+.document-content-formatted p:first-child,
+.document-content-formatted p:first-of-type {
+  text-indent: 0 !important;
 }
 
 .document-content-formatted h1,
@@ -166,13 +172,35 @@
   text-indent: 0;
 }
 
-/* Remove excessive spacing and improve readability */
-.document-content-formatted br {
-  display: none;
+/* NUCLEAR OPTION - FORCE ALL PARAGRAPH STYLING */
+div[data-document-content] p,
+div[data-document-content] .document-paragraph,
+.document-content-formatted p,
+.document-content-formatted .document-paragraph,
+.mb-4, .mb-6, .mt-8 {
+  margin: 0 0 0.6em 0 !important;
+  padding: 0 !important;
+  text-align: justify !important;
+  text-indent: 2em !important;
+  font-size: 16px !important;
+  line-height: 1.45 !important;
+  font-family: Georgia, serif !important;
+  color: #2d3748 !important;
 }
 
-.document-content-formatted * {
-  max-width: none !important;
+/* Headings/sections get no indent and bold */
+div[data-document-content] .font-normal,
+.document-content-formatted .font-normal {
+  font-weight: bold !important;
+  margin: 1.2em 0 0.4em 0 !important;
+  text-indent: 0 !important;
+  font-size: 16px !important;
+}
+
+/* First paragraph gets no indent */
+div[data-document-content] p:first-child,
+.document-content-formatted p:first-child {
+  text-indent: 0 !important;
 }
 
 /* Legacy styles updated for optimal density */
