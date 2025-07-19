@@ -634,3 +634,7 @@ Preferred communication style: Simple, everyday language.
   - CRITICAL SHORT ANSWER GRADING FIX: Fixed parseCorrectAnswers function to properly extract model answers for short answer questions
   - Resolved "Correct answer: Unknown" issue that incorrectly marked short answer questions as wrong
   - System now properly stores and uses model answers from AI-generated answer keys for subjective questions
+  - SIMPLIFIED AI GRADING SYSTEM: Implemented direct AI grading for short/long answer questions
+  - System sends question and user answer directly to LLM with simple "GRADE THIS ANSWER" prompt
+  - AI returns numerical score (0-10) and feedback explanation for each subjective question
+  - Eliminates dependency on broken answer key parsing for accurate subjective question grading

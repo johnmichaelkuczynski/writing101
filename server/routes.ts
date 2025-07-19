@@ -1039,39 +1039,25 @@ Do not include any explanation, just the question numbers and correct letters.`;
           feedback: isCorrect ? "Correct!" : `Incorrect. The correct answer is ${correctAnswer || "unknown"}.`
         };
       } else {
-        // AI-powered grading for subjective questions
+        // AI-powered grading for short/long answer questions
         try {
-          // For subjective questions, create a model answer if none exists in answer key
-          let expectedAnswer = correctAnswer;
-          if (!expectedAnswer) {
-            // Extract expected answer from the answer key section for this question
-            const answerKeySection = testContent.split(/ANSWER KEY/i)[1] || "";
-            const answerLines = answerKeySection.split('\n').filter(l => l.trim());
-            
-            // Look for the answer after the multiple choice answers
-            if (answerLines.length > 1) {
-              expectedAnswer = answerLines.slice(1).join(' ').trim();
-            }
-            
-            if (!expectedAnswer) {
-              expectedAnswer = "Provide a clear, accurate explanation with relevant examples and proper understanding of the concepts.";
-            }
-          }
-          
-          const gradingResult = await gradeSubjectiveAnswer(
+          const gradingResult = await gradeSubjectiveAnswerDirect(
             questionData.text, 
             userAnswer, 
-            expectedAnswer, 
-            questionType
+            testContent,
+            10 // max points
           );
           
-          // Convert AI score (0-10) to pass/fail for counting (60% threshold)
-          const passed = gradingResult.score >= 6;
-          if (passed) correctCount++;
+          // Use the AI score directly (0-10 scale)
+          const normalizedScore = Math.max(0, Math.min(10, gradingResult.score));
+          const passed = normalizedScore >= 6; // 60% threshold for "correct"
+          
+          // Add to correct count based on the score (proportional)
+          correctCount += normalizedScore / 10;
           
           feedback[questionNumber] = {
             correct: passed,
-            score: gradingResult.score,
+            score: normalizedScore,
             feedback: gradingResult.feedback
           };
         } catch (error) {
@@ -1151,6 +1137,32 @@ FEEDBACK: [constructive feedback explaining the grade]`;
     
     const score = scoreMatch ? parseInt(scoreMatch[1]) : 5; // default to 5 if parsing fails
     const feedback = feedbackMatch ? feedbackMatch[1].trim() : "Grade assigned automatically.";
+    
+    return { score, feedback };
+  }
+
+  // Direct AI grading - simple approach
+  async function gradeSubjectiveAnswerDirect(questionText: string, userAnswer: string, testContext: string, maxPoints: number): Promise<{score: number, feedback: string}> {
+    const prompt = `GRADE THIS ANSWER TO THIS QUESTION:
+
+QUESTION: ${questionText}
+
+STUDENT ANSWER: ${userAnswer}
+
+Grade this answer out of ${maxPoints} points. Give a score and brief explanation.
+
+Response format:
+SCORE: [number]
+FEEDBACK: [explanation]`;
+
+    const response = await generateWithAI(prompt, "openai");
+    
+    // Parse the AI response
+    const scoreMatch = response.match(/SCORE:\s*(\d+)/);
+    const feedbackMatch = response.match(/FEEDBACK:\s*(.+)/s);
+    
+    const score = scoreMatch ? parseInt(scoreMatch[1]) : Math.floor(maxPoints * 0.5);
+    const feedback = feedbackMatch ? feedbackMatch[1].trim() : "Automatically graded.";
     
     return { score, feedback };
   }
