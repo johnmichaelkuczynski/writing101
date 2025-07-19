@@ -600,4 +600,7 @@ Preferred communication style: Simple, everyday language.
   - Fixed broken grading that was marking all answers wrong by implementing answer key parsing
   - Enhanced results display to show full answer text instead of just letters (A, B, C, D)
   - AI now generates tests with comprehensive answer keys for accurate automated grading
-  - Students can now generate practice tests, take them interactively, and receive instant accurate grades
+  - CRITICAL FIX: Implemented AI-powered answer generation as failsafe when answer keys missing from test generation
+  - Added recursive testing functionality - "Take New Test" button generates fresh questions from same source material
+  - Enhanced test generation with explicit instructions to create different questions for variety
+  - Students can now generate practice tests, take them interactively, receive accurate grades, and immediately take new tests

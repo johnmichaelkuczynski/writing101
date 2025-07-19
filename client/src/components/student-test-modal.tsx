@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Download, FileText, Printer, X, Loader2, BookOpen, Trophy, CheckCircle } from "lucide-react";
+import { Download, FileText, Printer, X, Loader2, BookOpen, Trophy, CheckCircle, RotateCcw } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -329,12 +329,33 @@ ${currentStudentTest.testContent}`;
   };
 
   const resetTest = () => {
+    // Store the source text before resetting
+    const currentSourceText = selectedText;
+    const currentInstructions = customInstructions;
+    const currentModel = selectedModel;
+    
+    // Reset state
     setViewMode("generate");
     setCurrentStudentTest(null);
     setUserAnswers({});
     setTestResult(null);
     setParsedQuestions([]);
-    setCustomInstructions("");
+    
+    // Auto-generate new test with same parameters but fresh questions
+    setTimeout(() => {
+      const requestData: any = {
+        sourceText: currentSourceText,
+        instructions: currentInstructions.trim() || "Create a comprehensive practice test with 15-20 multiple choice questions at easy to moderate difficulty level. Generate DIFFERENT questions from the previous test to provide variety and comprehensive coverage.",
+        model: currentModel
+      };
+      
+      // Include chunkIndex if it was used before
+      if (typeof chunkIndex === 'number') {
+        requestData.chunkIndex = chunkIndex;
+      }
+      
+      studentTestMutation.mutate(requestData);
+    }, 100);
   };
 
   // Auto-reset to generate mode when modal opens to force fresh test generation
@@ -498,8 +519,18 @@ ${currentStudentTest.testContent}`;
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Test Results</h3>
-              <Button variant="outline" size="sm" onClick={resetTest}>
-                Take New Test
+              <Button variant="outline" size="sm" onClick={resetTest} disabled={studentTestMutation.isPending}>
+                {studentTestMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <RotateCcw className="mr-2 h-4 w-4" />
+                    Take New Test
+                  </>
+                )}
               </Button>
             </div>
             

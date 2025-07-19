@@ -728,8 +728,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Parse the test content to extract questions and correct answers
       const testContent = studentTest.test;
       console.log("Raw test content for grading:", testContent);
-      const correctAnswers = parseCorrectAnswers(testContent);
+      let correctAnswers = parseCorrectAnswers(testContent);
       console.log("Parsed correct answers:", correctAnswers);
+      
+      // If no correct answers found, use AI to generate them
+      if (Object.keys(correctAnswers).length === 0) {
+        console.log("Generating correct answers using AI...");
+        correctAnswers = await generateCorrectAnswersWithAI(testContent, "openai");
+        console.log("AI-generated correct answers:", correctAnswers);
+      }
       
       // Grade the test
       const gradeResult = gradeTest(userAnswers, correctAnswers);
@@ -799,6 +806,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     return correctAnswers;
+  }
+
+  // Use AI to generate correct answers for test questions
+  async function generateCorrectAnswersWithAI(testContent: string, model: string): Promise<Record<string, string>> {
+    try {
+      const prompt = `Analyze this multiple choice test and determine the correct answer for each question based on logic and the source material about symbolic logic.
+
+TEST CONTENT:
+${testContent}
+
+For each question, carefully analyze the options and determine which one is logically correct based on the principles of symbolic logic, deductive/inductive reasoning, and logical inference.
+
+Respond with ONLY the answer key in this exact format:
+1. B
+2. A  
+3. C
+4. D
+5. B
+(etc.)
+
+Do not include any explanation, just the question numbers and correct letters.`;
+
+      const aiModel = model as AIModel;
+      let response = '';
+      
+      // Use the same AI models as the rest of the app
+      const { default: OpenAI } = await import('openai');
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 500,
+        temperature: 0.1
+      });
+      
+      response = completion.choices[0]?.message?.content || '';
+      
+      // Parse the AI response to extract answers
+      const answers: Record<string, string> = {};
+      const lines = response.split('\n');
+      
+      for (const line of lines) {
+        const match = line.trim().match(/^(\d+)\.?\s*([A-D])/);
+        if (match) {
+          const [, questionNumber, correctLetter] = match;
+          answers[questionNumber] = correctLetter.toUpperCase();
+        }
+      }
+      
+      return answers;
+    } catch (error) {
+      console.error("Failed to generate answers with AI:", error);
+      return generateAnswersFromAI(testContent);
+    }
   }
 
   // Helper function to generate answers using AI analysis
