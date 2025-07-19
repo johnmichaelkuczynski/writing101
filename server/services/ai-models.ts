@@ -650,20 +650,29 @@ ${sourceText.substring(0, 8000)}
 INSTRUCTIONS:
 ${defaultInstructions}
 
-CRITICAL: After generating all the questions, you MUST provide an ANSWER KEY section that lists the correct answer for each question. Format the answer key exactly like this:
+CRITICAL REQUIREMENTS:
+1. Create each question with exactly 4 answer choices (A, B, C, D)
+2. Make sure ONE AND ONLY ONE choice is correct for each question
+3. After ALL questions, you MUST include an "ANSWER KEY:" section
+
+Example format:
+1. What is logic?
+A) The study of emotions
+B) The study of correct reasoning
+C) The study of language
+D) The study of mathematics
+
+2. What is validity?
+A) Truth of premises
+B) Truth of conclusion  
+C) Logical structure preserves truth
+D) Persuasive argument
 
 ANSWER KEY:
 1. B
-2. A
-3. C
-4. D
-5. A
-6. B
-(continue for all questions)
+2. C
 
-The answer key is essential for automatic grading. Make sure every question number has a corresponding correct answer letter.
-
-Please provide a self-assessment test that helps students check their understanding of the material, followed by the complete answer key.`;
+This format is MANDATORY. The answer key must list the correct letter for every question. Without the answer key, grading will fail.`;
 
   try {
     let result: string;
