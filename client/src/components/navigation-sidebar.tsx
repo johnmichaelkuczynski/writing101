@@ -58,24 +58,24 @@ export default function NavigationSidebar() {
 
   return (
     <aside className="w-full bg-card shadow-sm border-r border-border sticky top-16 h-[calc(100vh-280px)]">
-      <div className="p-1 sm:p-2 md:p-3 lg:p-4 h-full flex flex-col">
-        <h3 className="font-inter font-semibold text-xs sm:text-sm text-foreground mb-2 sm:mb-3 flex-shrink-0 hidden md:block">
+      <div className="p-0 md:p-4 h-full flex flex-col">
+        <h3 className="font-inter font-semibold text-sm text-foreground mb-3 flex-shrink-0 hidden md:block">
           Table of Contents
         </h3>
         <h3 className="font-inter font-semibold text-xs text-foreground mb-1 flex-shrink-0 block md:hidden text-center">
           ≡
         </h3>
         <ScrollArea className="flex-1 h-full">
-          <div className="pr-1 sm:pr-2 md:pr-4">
-            <nav className="space-y-1">
+          <div className="pr-0 md:pr-4">
+            <nav className="space-y-0 md:space-y-1">
               {tableOfContents.slice(Math.floor(tableOfContents.length / 2)).map((entry) => (
                 <button
                   key={entry.id}
                   onClick={() => handleNavClick(entry.id)}
-                  className={`block w-full text-left px-0 sm:px-1 md:px-2 py-0.5 sm:py-1 text-xs text-muted-foreground hover:bg-accent hover:text-primary rounded-sm transition-colors overflow-hidden ${
-                    entry.level === 1 ? 'pl-0 sm:pl-1 md:pl-2' : 
-                    entry.level === 2 ? 'pl-1 sm:pl-2 md:pl-4' : 
-                    'pl-2 sm:pl-3 md:pl-6'
+                  className={`block w-full text-left px-0 md:px-3 py-0 md:py-2 text-xs text-muted-foreground hover:bg-accent hover:text-primary rounded-sm transition-colors overflow-hidden ${
+                    entry.level === 1 ? 'pl-0 md:pl-3' : 
+                    entry.level === 2 ? 'pl-0 md:pl-6' : 
+                    'pl-0 md:pl-9'
                   }`}
                   title={entry.title}
                 >
