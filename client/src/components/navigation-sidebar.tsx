@@ -58,28 +58,25 @@ export default function NavigationSidebar() {
 
   return (
     <aside className="w-full bg-card shadow-sm border-r border-border sticky top-16 h-[calc(100vh-280px)]">
-      <div className="p-1 sm:p-2 md:p-3 lg:p-4 h-full flex flex-col">
-        <h3 className="font-inter font-semibold text-xs sm:text-sm text-foreground mb-2 sm:mb-3 flex-shrink-0 hidden sm:block">
+      <div className="p-2 sm:p-3 md:p-4 h-full flex flex-col">
+        <h3 className="font-inter font-semibold text-sm text-foreground mb-3 flex-shrink-0">
           Table of Contents
         </h3>
-        <h3 className="font-inter font-semibold text-xs text-foreground mb-2 flex-shrink-0 block sm:hidden text-center">
-          TOC
-        </h3>
         <ScrollArea className="flex-1 h-full">
-          <div className="pr-1 sm:pr-2 md:pr-4">
+          <div className="pr-4">
             <nav className="space-y-1">
               {tableOfContents.slice(Math.floor(tableOfContents.length / 2)).map((entry) => (
                 <button
                   key={entry.id}
                   onClick={() => handleNavClick(entry.id)}
-                  className={`block w-full text-left px-1 sm:px-2 md:px-3 py-1 sm:py-2 text-xs text-muted-foreground hover:bg-accent hover:text-primary rounded-md transition-colors overflow-hidden ${
-                    entry.level === 1 ? 'pl-1 sm:pl-3' : 
-                    entry.level === 2 ? 'pl-2 sm:pl-6' : 
-                    'pl-3 sm:pl-9'
+                  className={`block w-full text-left px-3 py-2 text-xs text-muted-foreground hover:bg-accent hover:text-primary rounded-md transition-colors ${
+                    entry.level === 1 ? 'pl-3' : 
+                    entry.level === 2 ? 'pl-6' : 
+                    'pl-9'
                   }`}
                   title={entry.title}
                 >
-                  <span className="block truncate text-xs leading-tight">
+                  <span className="block text-xs leading-tight">
                     {entry.title}
                   </span>
                 </button>

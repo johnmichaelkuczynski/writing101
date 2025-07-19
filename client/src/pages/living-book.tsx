@@ -307,13 +307,13 @@ export default function LivingBook() {
       </header>
 
       <div className="flex max-w-none w-full main-content-with-bottom-bar">
-        {/* Navigation Sidebar - MOBILE RESPONSIVE: Much narrower on mobile */}
-        <div className="w-16 sm:w-24 md:w-40 lg:w-60 flex-shrink-0">
+        {/* Navigation Sidebar - MOBILE FIX: Wider on mobile, narrower on desktop */}
+        <div className="w-24 sm:w-32 md:w-48 lg:w-60 flex-shrink-0">
           <NavigationSidebar />
         </div>
 
-        {/* Main Content Area - MOBILE RESPONSIVE: Much wider on mobile */}
-        <main className="flex-1 max-w-none sm:max-w-3xl md:max-w-4xl lg:max-w-5xl mx-2 sm:mx-4">
+        {/* Main Content Area - MOBILE FIX: MAXIMUM WIDTH FOR DOCUMENT */}
+        <main className="flex-1 max-w-none">
           {/* Document Content */}
           <DocumentContent 
             mathMode={mathMode}
@@ -326,8 +326,8 @@ export default function LivingBook() {
           />
         </main>
 
-        {/* Chat Panel - MOBILE RESPONSIVE: Hidden on small screens, smaller on medium */}
-        <div className="hidden sm:block sm:w-72 md:w-80 lg:w-96 flex-shrink-0">
+        {/* Chat Panel - MOBILE FIX: Much narrower on mobile */}
+        <div className="w-64 sm:w-72 md:w-80 lg:w-96 flex-shrink-0">
           <ChatInterface 
             selectedModel={selectedModel} 
             mathMode={mathMode}
