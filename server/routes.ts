@@ -749,9 +749,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Parse questions to determine types
+      console.log("Parsing questions to determine types...");
       const parsedQuestions = parseTestQuestions(testContent);
+      console.log("Parsed questions for grading:", parsedQuestions);
       
       // Grade the test with question type awareness
+      console.log("Starting advanced grading with AI support...");
       const gradeResult = await gradeTestAdvanced(userAnswers, correctAnswers, parsedQuestions, testContent);
       
       // Save the test result
