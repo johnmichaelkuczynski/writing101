@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -89,120 +89,60 @@ export default function StudentTestModal({
     console.log("Parsing test content:", content);
     const questions: any[] = [];
     
-    // The content appears to be formatted without line breaks between questions
-    // Pattern: "Question text?\nA) Option A\nB) Option B\nC) Option C\nD) Option D\nNext question..."
+    // Split content into lines and clean up
+    const lines = content.split('\n').map(l => l.trim()).filter(l => l);
+    let i = 0;
     
-    // Split by looking ahead for the next question pattern (text ending with ?)
-    const questionSplits = content.split(/(?=\w[^?]*\?\n[A-Z]\))/);
-    
-    for (const section of questionSplits) {
-      if (!section.trim()) continue;
+    while (i < lines.length) {
+      const line = lines[i];
       
-      const lines = section.split('\n');
-      let questionText = '';
-      const options: any[] = [];
-      
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed) continue;
-        
-        // Check if this is an option line
-        const optionMatch = trimmed.match(/^([A-Z])\)\s*(.+)/);
-        if (optionMatch) {
-          options.push({
-            letter: optionMatch[1],
-            text: optionMatch[2]
-          });
-        } else if (!optionMatch && !questionText) {
-          // This should be the question text
-          questionText = trimmed;
-        }
-      }
-      
-      if (questionText && options.length >= 2) {
-        questions.push({
-          number: (questions.length + 1).toString(),
-          text: questionText,
-          options: options
-        });
-        console.log("Found question:", { number: questions.length + 1, text: questionText, optionCount: options.length });
-      }
-    }
-    
-    // Alternative approach: Split by pattern that indicates start of new question
-    if (questions.length === 0) {
-      // Look for pattern: text ending with ?\nA) 
-      const altSplits = content.split(/(?=.+\?\s*\n[A-Z]\))/);
-      
-      for (const section of altSplits) {
-        if (!section.trim()) continue;
-        
-        const lines = section.split('\n').map(l => l.trim()).filter(l => l);
-        if (lines.length < 5) continue; // Need at least question + 4 options
-        
-        const questionText = lines[0];
+      // Look for lines that end with a question mark and don't start with A) B) C) D)
+      if (line.includes('?') && !line.match(/^[A-Z]\)/)) {
+        const questionText = line;
         const options: any[] = [];
+        i++; // Move to next line to look for options
         
-        for (let i = 1; i < lines.length; i++) {
-          const optionMatch = lines[i].match(/^([A-Z])\)\s*(.+)/);
+        // Collect consecutive option lines (A) B) C) D))
+        while (i < lines.length) {
+          const optionLine = lines[i];
+          const optionMatch = optionLine.match(/^([A-Z])\)\s*(.+)/);
+          
           if (optionMatch) {
             options.push({
               letter: optionMatch[1],
               text: optionMatch[2]
             });
+            i++;
+          } else {
+            // No more options for this question, stop collecting
+            break;
           }
         }
         
-        if (questionText.includes('?') && options.length >= 2) {
+        // Only add question if it has at least 2 options
+        if (options.length >= 2) {
           questions.push({
             number: (questions.length + 1).toString(),
             text: questionText,
             options: options
           });
+          console.log("Found complete question:", { 
+            number: questions.length, 
+            text: questionText.substring(0, 50) + "...", 
+            optionCount: options.length 
+          });
         }
+      } else {
+        i++; // Move to next line if current line is not a question
       }
     }
     
-    // Last resort: Manual parsing line by line
-    if (questions.length === 0) {
-      const lines = content.split('\n').map(l => l.trim()).filter(l => l);
-      let i = 0;
-      
-      while (i < lines.length) {
-        const line = lines[i];
-        
-        // If this looks like a question (contains ? and doesn't start with letter))
-        if (line.includes('?') && !line.match(/^[A-Z]\)/)) {
-          const questionText = line;
-          const options: any[] = [];
-          i++;
-          
-          // Collect the next few lines as options
-          while (i < lines.length && lines[i].match(/^[A-Z]\)/)) {
-            const optionMatch = lines[i].match(/^([A-Z])\)\s*(.+)/);
-            if (optionMatch) {
-              options.push({
-                letter: optionMatch[1],
-                text: optionMatch[2]
-              });
-            }
-            i++;
-          }
-          
-          if (options.length >= 2) {
-            questions.push({
-              number: (questions.length + 1).toString(),
-              text: questionText,
-              options: options
-            });
-          }
-        } else {
-          i++;
-        }
-      }
-    }
+    console.log("Final parsed questions:", questions.length, questions.map(q => ({ 
+      number: q.number, 
+      text: q.text.substring(0, 50) + "...",
+      optionCount: q.options.length 
+    })));
     
-    console.log("Final parsed questions:", questions.length, questions);
     return questions;
   };
 
@@ -396,6 +336,13 @@ ${currentStudentTest.testContent}`;
     setParsedQuestions([]);
     setCustomInstructions("");
   };
+
+  // Auto-reset to generate mode when modal opens to force fresh test generation
+  useEffect(() => {
+    if (isOpen) {
+      resetTest();
+    }
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

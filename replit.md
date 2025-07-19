@@ -591,4 +591,9 @@ Preferred communication style: Simple, everyday language.
   - CRITICAL FIX: Enhanced question parsing logic to handle various AI-generated test formats
   - Fixed blank test issue with multiple parsing strategies for different question formatting patterns
   - Added robust parsing for questions without line breaks and various AI response formats
+  - Fixed test display showing truncated questions by implementing proper line-by-line parsing
+  - Added auto-reset functionality to force fresh test generation with corrected parsing
+  - CRITICAL FIX: Increased test generation from 5-7 questions to 15-20 questions for comprehensive coverage
+  - Enhanced AI prompts to generate substantial number of questions based on content richness
+  - Updated default instructions to ensure thorough assessment of all major concepts and details
   - Students can now generate practice tests, take them interactively, and receive instant grades

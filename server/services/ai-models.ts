@@ -606,13 +606,17 @@ STUDENT TEST GENERATION INSTRUCTIONS:
 - Include a variety of question types (multiple choice, short answer, true/false, etc.)
 - Base all questions directly on the provided source text
 - Keep the tone supportive and educational rather than intimidating
+- Generate a substantial number of questions to thoroughly assess understanding of ALL content provided
+- For rich, detailed passages, create 15-25 questions to ensure comprehensive coverage
+- Do not limit yourself to just a few questions - the goal is thorough assessment
 
 DEFAULT SETTINGS (when no specific instructions provided):
-- 5-7 questions total
-- Mix of multiple choice (3-4 questions) and short answer (2-3 questions)
+- 15-20 questions total (comprehensive coverage of the source material)
+- Primarily multiple choice questions (12-16 questions) with some short answer (3-4 questions)
 - Easy to moderate difficulty level
 - Focus on key concepts, definitions, and basic applications
-- Include some questions that test understanding of logical reasoning principles
+- Include questions that test understanding of logical reasoning principles
+- Ensure thorough coverage of all major points and concepts in the source text
 
 CRITICAL FORMATTING RULES:
 - Write in plain text format ONLY
@@ -635,7 +639,7 @@ CRITICAL FORMATTING RULES:
 - Leave blank lines between questions for clear separation
 - No bullet points, numbered lists, or formatting markup of any kind`;
 
-  const defaultInstructions = instructions || "Create a practice test with 5-6 multiple choice questions at easy to moderate difficulty level. Each question should have exactly 4 answer choices (A, B, C, D). Focus on key concepts and basic understanding of logical principles. Format each question clearly with proper numbering and multiple choice options.";
+  const defaultInstructions = instructions || "Create a comprehensive practice test with 15-20 multiple choice questions at easy to moderate difficulty level. Each question should have exactly 4 answer choices (A, B, C, D). Thoroughly cover all major concepts, definitions, and principles from the source text. Generate questions that test understanding of different aspects and details throughout the entire passage. Format each question clearly with proper numbering and multiple choice options.";
 
   const fullPrompt = `Create a student practice test based on this content:
 
