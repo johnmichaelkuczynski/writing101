@@ -798,6 +798,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const lines = testContent.split('\n');
     let inAnswerKeySection = false;
     let questionCounter = 1; // Track questions for single letter answers
+    let currentAnswerText = ""; // For collecting multi-line answers
     
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
@@ -826,6 +827,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
             correctAnswers[questionCounter.toString()] = singleLetterMatch[1].toUpperCase();
             console.log(`Found single letter answer: Question ${questionCounter} = ${singleLetterMatch[1].toUpperCase()}`);
             questionCounter++;
+          } else {
+            // Handle longer text answers for short answer questions
+            // If this line doesn't start with a number or single letter, it's likely a model answer
+            if (line.length > 10 && !line.match(/^[A-D]$/i) && !line.match(/^\d+[\.\)]/)) {
+              correctAnswers[questionCounter.toString()] = line;
+              console.log(`Found text answer for Question ${questionCounter}: ${line.substring(0, 50)}...`);
+              questionCounter++;
+            }
           }
         }
       }

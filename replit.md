@@ -631,3 +631,6 @@ Preferred communication style: Simple, everyday language.
   - CUSTOM INSTRUCTIONS COMPLIANCE FIX: Removed hardcoded prompt requirements that ignored user instructions
   - System now properly follows user's custom instructions (e.g., calculus problems, specific topics)
   - AI models receive and process user's exact instructions without filtering or override
+  - CRITICAL SHORT ANSWER GRADING FIX: Fixed parseCorrectAnswers function to properly extract model answers for short answer questions
+  - Resolved "Correct answer: Unknown" issue that incorrectly marked short answer questions as wrong
+  - System now properly stores and uses model answers from AI-generated answer keys for subjective questions
