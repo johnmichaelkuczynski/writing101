@@ -638,3 +638,5 @@ Preferred communication style: Simple, everyday language.
   - System sends question and user answer directly to LLM with simple "GRADE THIS ANSWER" prompt
   - AI returns numerical score (0-10) and feedback explanation for each subjective question
   - Eliminates dependency on broken answer key parsing for accurate subjective question grading
+  - VERIFIED WORKING: User tested and confirmed AI grading works properly (60% score instead of "Unknown")
+  - Complete end-to-end TEST ME functionality now operational with proper mixed question type grading
