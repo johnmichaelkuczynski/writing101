@@ -5,6 +5,7 @@ import { renderMathInElement, renderMathString } from "@/lib/math-renderer";
 import { useTextSelection } from "@/hooks/use-text-selection";
 import SelectionToolbar from "@/components/selection-toolbar";
 import ChunkingModal from "@/components/chunking-modal";
+import { FormattingToolbar, DocumentStyles, defaultStyles } from "@/components/formatting-toolbar";
 
 import { paperContent } from "@shared/paper-content";
 import { Copy, Lock } from "lucide-react";
@@ -31,7 +32,76 @@ export default function DocumentContent({
   const { selection, isSelecting, clearSelection, highlightSelection, removeHighlights } = useTextSelection();
   const [showChunkingModal, setShowChunkingModal] = useState(false);
   const [selectedTextForChunking, setSelectedTextForChunking] = useState("");
+  const [documentStyles, setDocumentStyles] = useState<DocumentStyles>(defaultStyles);
 
+
+  // Generate dynamic CSS styles from user preferences
+  const generateDynamicStyles = (styles: DocumentStyles): string => {
+    return `
+      .user-formatted-content,
+      .user-formatted-content p,
+      .user-formatted-content .document-paragraph,
+      .user-formatted-content .mb-4,
+      .user-formatted-content .mb-6 {
+        font-family: ${styles.fontFamily}, serif !important;
+        font-size: ${styles.fontSize}px !important;
+        line-height: ${styles.lineHeight} !important;
+        color: ${styles.textColor} !important;
+        text-align: ${styles.textAlign} !important;
+        font-weight: ${styles.fontWeight} !important;
+        font-style: ${styles.fontStyle} !important;
+        text-decoration: ${styles.textDecoration} !important;
+        margin-bottom: ${styles.paragraphSpacing}rem !important;
+        text-indent: ${styles.textIndent}rem !important;
+        letter-spacing: ${styles.letterSpacing}px !important;
+        margin-top: 0 !important;
+        padding: 0 !important;
+      }
+      
+      .user-formatted-content {
+        background-color: ${styles.backgroundColor} !important;
+      }
+      
+      .user-formatted-content .font-normal,
+      .user-formatted-content p.font-normal,
+      .user-formatted-content .document-paragraph.font-normal {
+        text-indent: 0 !important;
+        font-weight: normal !important;
+        margin-top: 1.5rem !important;
+        margin-bottom: 0.8rem !important;
+      }
+      
+      .user-formatted-content h1,
+      .user-formatted-content h2,
+      .user-formatted-content h3,
+      .user-formatted-content h4 {
+        font-family: ${styles.fontFamily}, serif !important;
+        color: ${styles.textColor} !important;
+        text-align: ${styles.textAlign} !important;
+        text-indent: 0 !important;
+      }
+    `;
+  };
+
+  // Apply dynamic styles by injecting CSS
+  useEffect(() => {
+    const styleId = 'user-formatting-styles';
+    let styleElement = document.getElementById(styleId) as HTMLStyleElement;
+    
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = styleId;
+      document.head.appendChild(styleElement);
+    }
+    
+    styleElement.textContent = generateDynamicStyles(documentStyles);
+    
+    return () => {
+      // Clean up on unmount
+      const el = document.getElementById(styleId);
+      if (el) el.remove();
+    };
+  }, [documentStyles]);
 
   // Math rendering is handled in processContentForMathMode function
 
@@ -212,8 +282,14 @@ export default function DocumentContent({
 
   return (
     <div className="bg-card overflow-hidden relative">
+      {/* Formatting Toolbar */}
+      <FormattingToolbar 
+        currentStyles={documentStyles}
+        onFormatChange={setDocumentStyles}
+      />
+      
       {/* Select All Button */}
-      <div className="absolute top-16 right-6 z-10">
+      <div className="absolute top-20 right-6 z-10">
         <Button
           variant="outline"
           size="sm"
@@ -225,7 +301,7 @@ export default function DocumentContent({
         </Button>
       </div>
       
-      <ScrollArea className="h-[calc(100vh-280px)]">
+      <ScrollArea className="h-[calc(100vh-340px)]">
         <div className="p-8 w-full max-w-5xl mx-auto" data-document-content>
           <article className="prose prose-xl max-w-none text-foreground w-full leading-relaxed select-text">
             {/* Document Title */}
@@ -242,7 +318,7 @@ export default function DocumentContent({
             {paperContent.sections.map((section, index) => (
               <section key={section.id} id={section.id} className="mb-12">
                 <div 
-                  className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
+                  className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none user-formatted-content ${mathMode ? 'document-math-content' : 'document-text-content'}`}
                   dangerouslySetInnerHTML={{ 
                     __html: processContentForMathMode(section.content) 
                   }}
