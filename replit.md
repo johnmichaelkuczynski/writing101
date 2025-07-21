@@ -1,8 +1,15 @@
-# Living Book: Introduction to Symbolic Logic
+# Philosophical Learning Platform
 
 ## Overview
 
-This is an interactive AI-augmented interface for exploring "Introduction to Symbolic Logic" by J.-M. Kuczynski. The application transforms a static academic document into a dynamic, conversational learning experience with mathematical notation support and multiple AI model integration.
+An advanced philosophical learning platform leveraging cutting-edge AI technologies to create an engaging, personalized educational experience. The platform is now ready for integration with any philosophical text or book content.
+
+### Recent Changes (July 21, 2025)
+✓ Removed all existing book content (Kaczynski, Tractatus, Art of War, Symbolic Logic, Russell, Dictionary)
+✓ Created generic book content structure ready for new material
+✓ Maintained all AI functionality (discussion, rewriting, study guides, testing)
+✓ Updated all imports and references to use new generic structure
+✓ Preserved complete platform functionality while cleaning content dependencies
 
 ## System Architecture
 

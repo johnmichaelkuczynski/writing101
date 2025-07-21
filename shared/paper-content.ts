@@ -1,1 +1,0 @@
-export { symbolicLogicContent as paperContent } from './symbolic-logic-content';

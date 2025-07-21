@@ -6,7 +6,7 @@ import { useTextSelection } from "@/hooks/use-text-selection";
 import SelectionToolbar from "@/components/selection-toolbar";
 import ChunkingModal from "@/components/chunking-modal";
 
-import { paperContent } from "@shared/paper-content";
+import { bookContent as paperContent } from "@shared/book-content";
 import { Copy, Lock } from "lucide-react";
 
 interface DocumentContentProps {
@@ -271,19 +271,11 @@ export default function DocumentContent({
       <ChunkingModal
         isOpen={showChunkingModal}
         onClose={() => setShowChunkingModal(false)}
-        selectedText={selectedTextForChunking}
-        onChunkSelected={(chunk) => {
-          if (onTextSelectedForChat) {
+        text={selectedTextForChunking}
+        onChunkAction={(chunk: string, chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite' | 'study-guide' | 'student-test') => {
+          if (action === 'chat' && onTextSelectedForChat) {
             onTextSelectedForChat(chunk);
-          }
-        }}
-        onChunkDiscussion={(chunk) => {
-          if (onPassageDiscussion) {
-            onPassageDiscussion(chunk);
-          }
-        }}
-        onChunkRewrite={(chunk) => {
-          if (onRewriteFromSelection) {
+          } else if (action === 'rewrite' && onRewriteFromSelection) {
             onRewriteFromSelection(chunk);
           }
         }}

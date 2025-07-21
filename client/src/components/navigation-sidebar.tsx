@@ -1,5 +1,5 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { paperContent } from "@shared/paper-content";
+import { bookContent as paperContent } from "@shared/book-content";
 
 // Extract table of contents from the document content
 const extractTableOfContents = () => {

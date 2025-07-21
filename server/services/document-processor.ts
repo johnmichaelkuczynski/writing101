@@ -1,4 +1,4 @@
-import { paperContent } from "@shared/paper-content";
+import { bookContent as paperContent } from "@shared/book-content";
 
 export interface DocumentSection {
   id: string;

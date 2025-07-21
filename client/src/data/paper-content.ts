@@ -1,1 +1,1 @@
-export { paperContent } from "@shared/paper-content";
+export { bookContent as paperContent } from "@shared/book-content";

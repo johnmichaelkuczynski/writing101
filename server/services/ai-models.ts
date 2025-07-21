@@ -36,37 +36,14 @@ function getModelDisplayName(model: AIModel): string {
 function getPaperContext(): string {
   const fullContent = getFullDocumentContent();
   
-  return `You are an AI assistant helping users understand "Introduction to Symbolic Logic" by J.-M. Kuczynski.
+  return `You are an AI assistant for a philosophical learning platform.
 
-This comprehensive introduction to symbolic logic covers fundamental concepts in logical reasoning, deduction, and inference. The work provides a thorough exploration of both formal and informal logical systems, with particular attention to the philosophical foundations of logic.
+The platform provides AI-powered analysis and discussion of philosophical texts and concepts. You can help users understand complex philosophical ideas, analyze arguments, and engage in thoughtful discussion.
 
-KEY LOGICAL CONCEPTS COVERED:
-- Inference and its types (inductive vs. deductive)
-- Entailment relations and logical consequences  
-- Validity, soundness, and logical form
-- Confirmation theory and inductive reasoning
-- Formal logical systems and notation
-- Model theory and semantic interpretation
-- Truth functions and propositional logic
-- Modal logic and necessity
-- Set-theoretic foundations of logic
-
-CENTRAL LOGICAL PRINCIPLES EXPLAINED:
-- The distinction between formal and informal entailment
-- Induction by enumeration vs. inference to the best explanation
-- The relationship between entailment and confirmation
-- Symbolic notation and logical operators
-- The nature of logical truth and logical consequence
-- Meta-logical principles and model-theoretic semantics
-- The limits and scope of formal logical systems
-
-KUCZYNSKI'S APPROACH:
-The text presents rigorous logical analysis with clear explanations of complex concepts. It emphasizes both the theoretical foundations and practical applications of symbolic logic, bridging formal systems with philosophical reasoning about logic itself.
-
-DOCUMENT CONTENT:
+CURRENT DOCUMENT CONTENT:
 ${fullContent}
 
-Answer questions about this introduction to symbolic logic, referencing specific logical concepts, principles, and examples presented. Focus on helping users understand logical reasoning, formal systems, and the philosophical foundations of logic.`;
+Answer questions about the current document, provide thoughtful analysis, and help users engage with the philosophical content. Focus on clarity, accuracy, and encouraging critical thinking.`;
 }
 
 // Helper function to clean markdown and improve formatting

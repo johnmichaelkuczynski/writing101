@@ -19,7 +19,7 @@ import PaymentModal from "@/components/payment-modal";
 
 
 import { initializeMathRenderer } from "@/lib/math-renderer";
-import { tractatusContent, getFullDocumentContent } from "@shared/tractatus-content";
+import { bookContent, getFullDocumentContent } from "@shared/book-content";
 import { useAuth } from "@/hooks/use-auth";
 import type { AIModel } from "@shared/schema";
 
@@ -184,7 +184,7 @@ export default function LivingBook() {
 
 
   const getFullDocumentText = () => {
-    return tractatusContent.sections
+    return bookContent.sections
       .map(section => section.content)
       .join('\n\n');
   };
@@ -389,7 +389,7 @@ export default function LivingBook() {
         selectedText={selectedTextForStudentTest}
         selectedModel={selectedModel}
         mathMode={mathMode}
-        chunkIndex={studentTestChunkIndex}
+        chunkIndex={studentTestChunkIndex ?? undefined}
       />
 
 
