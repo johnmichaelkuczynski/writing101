@@ -130,7 +130,8 @@ Please rewrite the text according to these instructions:`;
   } catch (error) {
     const modelName = getModelDisplayName(model);
     console.error(`Error generating rewrite with ${modelName}:`, error);
-    throw new Error(`Failed to generate rewrite with ${modelName}: ${error.message}`);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to generate rewrite with ${modelName}: ${errorMessage}`);
   }
 }
 
@@ -742,7 +743,7 @@ async function generateDeepSeekResponse(prompt: string, systemPrompt: string): P
     return data.choices[0].message.content || "I apologize, but I couldn't generate a response.";
   } catch (error) {
     clearTimeout(timeoutId);
-    if (error.name === 'AbortError') {
+    if (error instanceof Error && error.name === 'AbortError') {
       throw new Error('Request timed out. Please try again.');
     }
     throw error;

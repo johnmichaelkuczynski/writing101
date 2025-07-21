@@ -619,7 +619,7 @@ Applications in Digital Logic
 Boolean algebra is fundamental to digital circuit design:
 
 AND Gate
-```
+\`\`\`
 
 A
 
@@ -629,10 +629,10 @@ Output = A∧B
 
 ---| B
 
-```
+\`\`\`
 
 OR Gate
-```
+\`\`\`
 
 A
 
@@ -642,14 +642,14 @@ Output = A∨B
 
 ---| B
 
-```
+\`\`\`
 
 NOT Gate
-```
+\`\`\`
 
 Input ---|>o--- Output
 
-```
+\`\`\`
 
 Key Takeaways
 
@@ -783,7 +783,7 @@ f(x,y) = (x ∧ ¬y) ∨ (¬x ∧ y)
 
 Answer:
 
-```
+\`\`\`
 
 x |AND|
 
@@ -795,7 +795,7 @@ x |AND|
 
 y ---|AND|----
 
-```
+\`\`\`
 
 This is known as the XOR (exclusive or) function.
 
@@ -974,7 +974,7 @@ Answer:
 (50 points) Design a Boolean circuit for: f(x,y,z) = (x ∧ y) ∨ (¬x ∧ z)
 Answer:
 
-```
+\`\`\`
 
 x |AND|
 
@@ -990,7 +990,7 @@ x ---|NOT|------|AND|----
 
 z
 
-```
+\`\`\`
 
 Explanation:
 
@@ -2402,7 +2402,7 @@ f(x,y,z) = (x ∧ ¬y) ∨ (¬x ∧ y ∧ z)
 
 Answer:
 
-```
+\`\`\`
 
 x ---|AND|----
 
@@ -2422,7 +2422,7 @@ y ---|AND| |
 
 z |
 
-```
+\`\`\`
 
 Part III: Quantiﬁcation and Models (150 points)
 
