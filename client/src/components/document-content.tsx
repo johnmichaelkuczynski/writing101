@@ -198,7 +198,7 @@ export default function DocumentContent({
           
           // Check if this is a code block (contains ASCII art or circuit diagrams)
           if (paragraph.includes('```') || paragraph.includes('---|') || paragraph.includes('|AND|') || paragraph.includes('|OR|') || paragraph.includes('|NOT|')) {
-            return `<pre class="bg-gray-100 dark:bg-gray-800 p-4 rounded-md my-4 overflow-x-auto text-sm font-mono">${paragraph.trim()}</pre>`;
+            return `<pre class="bg-gray-100 dark:bg-gray-800 p-4 rounded-md my-4 overflow-x-auto text-sm font-mono text-slate-900 dark:text-slate-100">${paragraph.trim()}</pre>`;
           }
           
           // Check if this is a table (contains multiple | characters)
