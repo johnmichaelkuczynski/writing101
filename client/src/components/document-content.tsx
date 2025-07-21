@@ -121,7 +121,7 @@ export default function DocumentContent({
       selection?.addRange(range);
       
       // Get the full document text
-      const fullText = paperContent.sections.map(section => 
+      const fullText = paperContent.sections.map((section: any) => 
         `${section.title}\n\n${section.content}`
       ).join('\n\n');
       
@@ -239,7 +239,7 @@ export default function DocumentContent({
             </header>
 
             {/* Full Document Content - No Paywall */}
-            {paperContent.sections.map((section, index) => (
+            {paperContent.sections.map((section: any, index: number) => (
               <section key={section.id} id={section.id} className="mb-12">
                 <div 
                   className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}

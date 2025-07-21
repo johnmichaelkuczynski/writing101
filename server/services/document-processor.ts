@@ -8,7 +8,7 @@ export interface DocumentSection {
 }
 
 export function extractDocumentSections(): DocumentSection[] {
-  return paperContent.sections.map(section => ({
+  return paperContent.sections.map((section: any) => ({
     ...section,
     level: 1
   }));

@@ -185,7 +185,7 @@ export default function LivingBook() {
 
   const getFullDocumentText = () => {
     return bookContent.sections
-      .map(section => section.content)
+      .map((section: any) => section.content)
       .join('\n\n');
   };
 
