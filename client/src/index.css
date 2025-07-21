@@ -173,3 +173,27 @@
   line-height: 1.7;
   text-align: justify;
 }
+
+/* Enhanced table styling for better readability */
+table {
+  background-color: white !important;
+  border: 1px solid #94a3b8 !important;
+}
+
+.dark table {
+  background-color: #1e293b !important;
+  border: 1px solid #64748b !important;
+}
+
+table td, table th {
+  color: #1e293b !important;
+  background-color: white !important;
+  border: 1px solid #94a3b8 !important;
+  padding: 8px 12px !important;
+}
+
+.dark table td, .dark table th {
+  color: #f1f5f9 !important;
+  background-color: #1e293b !important;
+  border: 1px solid #64748b !important;
+}

@@ -207,13 +207,13 @@ export default function DocumentContent({
             const tableRows = lines.map(line => {
               if (line.includes('|')) {
                 const cells = line.split('|').map(cell => cell.trim()).filter(cell => cell);
-                return `<tr>${cells.map(cell => `<td class="border border-gray-300 px-2 py-1 text-center">${cell}</td>`).join('')}</tr>`;
+                return `<tr>${cells.map(cell => `<td class="border border-slate-400 dark:border-slate-600 px-3 py-2 text-center bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">${cell}</td>`).join('')}</tr>`;
               }
               return '';
             }).filter(row => row);
             
             if (tableRows.length > 0) {
-              return `<table class="border-collapse border border-gray-300 my-4 mx-auto"><tbody>${tableRows.join('')}</tbody></table>`;
+              return `<table class="border-collapse border border-slate-400 dark:border-slate-600 my-6 mx-auto bg-white dark:bg-slate-800 shadow-sm"><tbody>${tableRows.join('')}</tbody></table>`;
             }
           }
           
