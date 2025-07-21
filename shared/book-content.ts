@@ -11,16 +11,12 @@ export interface BookContent {
 
 export const bookContent: BookContent = {
   title: "Introduction to Symbolic Logic",
-  author: "J.-M. K",
+  author: "J.-M. Kuczynski",
   sections: [
     {
       id: "section-1",
       title: "Section 1",
       content: `Week 1: Basic Concepts, Notation, and Logical Operators
-
-Week 1: Basic Concepts, Notation, and Logical Operators
-
-Introduction to Logic
 
 Logic is the study of valid reasoning. In this course, we'll focus on symbolic logic, which uses special symbols and precise rules to analyze and evaluate arguments. Unlike informal logic, symbolic logic gives us tools to determine validity with mathematical precision.
 
