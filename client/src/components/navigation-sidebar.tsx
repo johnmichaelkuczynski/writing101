@@ -212,8 +212,8 @@ export default function NavigationSidebar() {
                 <button
                   key={entry.id}
                   onClick={() => handleNavClick(entry.id)}
-                  className={`block w-full text-left px-2 py-1.5 text-xs text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-300 rounded transition-colors font-medium ${
-                    entry.level === 0 ? 'font-semibold text-slate-900 dark:text-slate-100' : 
+                  className={`block w-full text-left px-2 py-1.5 text-xs text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-300 rounded transition-colors font-normal ${
+                    entry.level === 0 ? 'text-slate-900 dark:text-slate-100' : 
                     entry.level === 1 ? 'pl-4' : 
                     'pl-6'
                   }`}
