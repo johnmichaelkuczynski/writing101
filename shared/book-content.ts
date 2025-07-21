@@ -10,13 +10,13 @@ export interface BookContent {
 }
 
 export const bookContent: BookContent = {
-  title: "Introduction to Symbolic Logic J.-M. Kuczynski PhD",
-  author: "Converted Document",
+  title: "Introduction to Symbolic Logic",
+  author: "J.-M. K",
   sections: [
     {
       id: "section-1",
       title: "Section 1",
-      content: `Introduction to Symbolic Logic J.-M. Kuczynski PhD
+      content: `Week 1: Basic Concepts, Notation, and Logical Operators
 
 Week 1: Basic Concepts, Notation, and Logical Operators
 
