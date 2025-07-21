@@ -663,3 +663,13 @@ Preferred communication style: Simple, everyday language.
   - Navigation text: Multi-line wrapping on mobile, truncated on desktop for better readability
   - Mobile-specific responsive classes: changes only affect screens below md breakpoint
   - Desktop layout completely preserved while maximizing mobile reading space (~88% screen width)
+- July 21, 2025: COMPREHENSIVE TABLE OF CONTENTS AND LAYOUT ENHANCEMENT - Complete navigation overhaul
+  - Created comprehensive clickable table of contents covering entire symbolic logic textbook
+  - Includes all major sections: Week 1-6, Truth Tables, Boolean Algebra, Predicate Logic, Advanced Quantification, Models/Proofs, Final Exam
+  - Hierarchical structure with 3 levels: major topics (level 0), sections (level 1), subsections (level 2)
+  - Navigation sidebar optimized to 192px width for better content/navigation balance
+  - Main content area expanded to max-w-6xl for improved readability
+  - Enhanced typography with darker text colors (slate-800/200) for better visibility
+  - Improved font styling with proper weights and spacing for document headers
+  - Smart text-based navigation fallback system when exact ID matches aren't found
+  - Table of contents now spans complete document without explanatory content - just clean section titles
