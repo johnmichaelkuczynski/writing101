@@ -678,3 +678,5 @@ Preferred communication style: Simple, everyday language.
   - Standardized font weights - all table of contents entries now use consistent normal (non-bold) formatting
   - TABLE STYLING ENHANCEMENT: Added comprehensive CSS overrides for table readability with proper contrast
   - Enhanced table borders, padding, and backgrounds for better visual clarity in both light and dark modes
+  - CODE BLOCK FORMATTING: Maintained grey background code blocks with proper text contrast for ASCII art and diagrams
+  - All document formatting elements now provide optimal readability while preserving essential visual structure
