@@ -92,8 +92,11 @@ const tableOfContents = createTableOfContents();
 
 export default function NavigationSidebar() {
   const handleNavClick = (id: string) => {
+    console.log(`Clicking navigation item: ${id}`);
+    
     // First try to find exact ID match
     let element = document.getElementById(id);
+    console.log(`Found element by ID: ${!!element}`);
     
     // If not found, try to find the content by searching text
     if (!element) {
@@ -163,21 +166,36 @@ export default function NavigationSidebar() {
       };
       
       const searchText = titleMap[id];
+      console.log(`Searching for text: ${searchText}`);
+      
       if (searchText) {
-        // Find all elements containing this text
-        const allElements = document.querySelectorAll('*');
-        for (let i = 0; i < allElements.length; i++) {
-          const el = allElements[i];
-          if (el.textContent?.includes(searchText)) {
-            element = el as HTMLElement;
-            break;
+        // Find all elements containing this text in the document content area
+        const contentArea = document.querySelector('[data-document-content]');
+        if (contentArea) {
+          const allElements = contentArea.querySelectorAll('h1, h2, h3, p');
+          for (let i = 0; i < allElements.length; i++) {
+            const el = allElements[i];
+            if (el.textContent?.includes(searchText)) {
+              element = el as HTMLElement;
+              console.log(`Found element by text search: ${el.tagName}`);
+              break;
+            }
           }
         }
       }
     }
     
     if (element) {
+      console.log(`Scrolling to element: ${element.tagName}#${element.id || 'no-id'}`);
       element.scrollIntoView({ behavior: "smooth", block: "start" });
+      
+      // Add a temporary highlight to show the user where they landed
+      element.style.backgroundColor = '#fef3c7';
+      setTimeout(() => {
+        element.style.backgroundColor = '';
+      }, 2000);
+    } else {
+      console.log(`No element found for navigation ID: ${id}`);
     }
   };
 
