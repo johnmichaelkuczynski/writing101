@@ -18,192 +18,222 @@ export const bookContent: BookContent = {
       id: "main",
       title: "Full Text",
       content: `<div class="document-content">
-Introduction to Symbolic Logic J.-M. Kuczynski PhD
+<h1 class="text-2xl font-bold mb-6">Introduction to Symbolic Logic</h1>
+<p class="text-lg font-semibold mb-4">J.-M. Kuczynski PhD</p>
 
-Week 1: Basic Concepts, Notation, and Logical Operators
+<h2 class="text-xl font-bold mb-4 mt-8">Week 1: Basic Concepts, Notation, and Logical Operators</h2>
 
-Introduction to Logic
+<h3 class="text-lg font-semibold mb-3 mt-6">Introduction to Logic</h3>
 
-Logic is the study of valid reasoning. In this course, we'll focus on symbolic logic, which uses special symbols and precise rules to analyze and evaluate arguments. Unlike informal logic, symbolic logic gives us tools to determine validity with mathematical precision.
+<p class="mb-4">Logic is the study of valid reasoning. In this course, we'll focus on symbolic logic, which uses special symbols and precise rules to analyze and evaluate arguments. Unlike informal logic, symbolic logic gives us tools to determine validity with mathematical precision.</p>
 
-Basic Concepts
+<h3 class="text-lg font-semibold mb-3 mt-6">Basic Concepts</h3>
 
-Statement (Proposition): A sentence that is either true or false, but not both
+<p class="mb-2"><strong>Statement (Proposition):</strong> A sentence that is either true or false, but not both</p>
 
-Argument: A sequence of statements where one (the conclusion) is claimed to follow from the others (the premises)
+<p class="mb-2"><strong>Argument:</strong> A sequence of statements where one (the conclusion) is claimed to follow from the others (the premises)</p>
 
-Validity: An argument is valid if it's impossible for all premises to be true while the conclusion is false
+<p class="mb-2"><strong>Validity:</strong> An argument is valid if it's impossible for all premises to be true while the conclusion is false</p>
 
-Soundness: A valid argument with true premises
+<p class="mb-4"><strong>Soundness:</strong> A valid argument with true premises</p>
 
-Basic Logical Symbols
+<h3 class="text-lg font-semibold mb-3 mt-6">Basic Logical Symbols</h3>
 
-Negation (¬): "not" Example: If p = "It is raining" Then ¬p = "It is not raining"
-Conjunction (∧): "and"
-Example: If p = "It is cold" and q = "It is windy" Then p ∧ q = "It is cold and windy"
+<p class="mb-2"><strong>Negation (¬):</strong> "not"</p>
+<p class="mb-3">Example: If p = "It is raining" Then ¬p = "It is not raining"</p>
 
-Disjunction (∨): "or"
-Example: If p = "I will study" and q = "I will fail" Then p ∨ q = "I will study or I will fail"
+<p class="mb-2"><strong>Conjunction (∧):</strong> "and"</p>
+<p class="mb-3">Example: If p = "It is cold" and q = "It is windy" Then p ∧ q = "It is cold and windy"</p>
 
-Conditional (→): "if...then"
-Example: If p = "It rains" and q = "The ground is wet"
+<p class="mb-2"><strong>Disjunction (∨):</strong> "or"</p>
+<p class="mb-3">Example: If p = "I will study" and q = "I will fail" Then p ∨ q = "I will study or I will fail"</p>
 
-Then p → q = "If it rains, then the ground is wet"
+<p class="mb-2"><strong>Conditional (→):</strong> "if...then"</p>
+<p class="mb-2">Example: If p = "It rains" and q = "The ground is wet"</p>
+<p class="mb-4">Then p → q = "If it rains, then the ground is wet"</p>
 
-Material vs. Strict Implication
+<h3 class="text-lg font-semibold mb-3 mt-6">Material vs. Strict Implication</h3>
 
-Material Implication (→)
-Truth-functional: deﬁned purely by truth values
+<h4 class="text-base font-semibold mb-2">Material Implication (→)</h4>
+<p class="mb-2">Truth-functional: defined purely by truth values</p>
+<p class="mb-4">False only when antecedent is true and consequent is false. Example: "If it rains, then the ground is wet"</p>
 
-False only when antecedent is true and consequent is false Example: "If it rains, then the ground is wet"
+<h4 class="text-base font-semibold mb-2">Strict Implication (⊃)</h4>
+<p class="mb-2">Modal: involves necessary connection. Example: "If x is a bachelor, then x is unmarried"</p>
+<p class="mb-4">Represents logical necessity rather than mere material implication</p>
 
-Strict Implication (⊃)
-Modal: involves necessary connection Example: "If x is a bachelor, then x is unmarried"
+<h3 class="text-lg font-semibold mb-3 mt-6">Translation Practice</h3>
 
-Represents logical necessity rather than mere material implication Translation Practice
+<h4 class="text-base font-semibold mb-2">From English to Symbolic Notation:</h4>
 
-From English to Symbolic Notation:
+<p class="mb-2">"It's not both sunny and warm"</p>
+<p class="mb-2">Let p = "It's sunny", q = "It's warm"</p>
+<p class="mb-3">Translation: ¬(p ∧ q)</p>
 
-"It's not both sunny and warm" Let p = "It's sunny", q = "It's warm" Translation: ¬(p ∧ q)
-"Either I'll go to the party or I'll stay home and study"
-Let p = "I'll go to the party", q = "I'll stay home", r = "I'll study" Translation: p ∨ (q ∧ r)
+<p class="mb-2">"Either I'll go to the party or I'll stay home and study"</p>
+<p class="mb-2">Let p = "I'll go to the party", q = "I'll stay home", r = "I'll study"</p>
+<p class="mb-4">Translation: p ∨ (q ∧ r)</p>
 
-From Symbolic Notation to English:
+<h4 class="text-base font-semibold mb-2">From Symbolic Notation to English:</h4>
 
-p → (q ∨ r)
-Let p = "It rains", q = "I take an umbrella", r = "I stay inside" Translation: "If it rains, then I'll either take an umbrella or stay inside"
+<p class="mb-2">p → (q ∨ r)</p>
+<p class="mb-2">Let p = "It rains", q = "I take an umbrella", r = "I stay inside"</p>
+<p class="mb-4">Translation: "If it rains, then I'll either take an umbrella or stay inside"</p>
 
-Practice Exercises
+<h3 class="text-lg font-semibold mb-3 mt-6">Practice Exercises</h3>
 
-Translate these statements into symbolic notation:
+<p class="mb-3">Translate these statements into symbolic notation:</p>
 
-"If I study hard and get enough sleep, then I'll pass the exam"
-"It's not true that I'll both go to the movies and save money"
-"Either I'll ﬁnish my homework or I won't watch TV"
-[Solutions will be discussed next class] Key Takeaways
+<ol class="list-decimal list-inside mb-4 space-y-2">
+<li>"If I study hard and get enough sleep, then I'll pass the exam"</li>
+<li>"It's not true that I'll both go to the movies and save money"</li>
+<li>"Either I'll finish my homework or I won't watch TV"</li>
+</ol>
+<p class="mb-6">[Solutions will be discussed next class]</p>
 
-Symbolic logic provides precise tools for analyzing arguments
-Basic operators (¬, ∧, ∨, →) can combine to express complex statements
-Translation between natural language and logical notation requires careful attention to meaning
-Material implication differs from strict implication in important ways
-Next week, we'll explore truth tables and begin formal proofs using these concepts.
+<h3 class="text-lg font-semibold mb-3 mt-6">Key Takeaways</h3>
 
-Symbolic Logic - Homework 1 Basic Concepts and Notation Total Points: 50
+<ul class="list-disc list-inside mb-6 space-y-2">
+<li>Symbolic logic provides precise tools for analyzing arguments</li>
+<li>Basic operators (¬, ∧, ∨, →) can combine to express complex statements</li>
+<li>Translation between natural language and logical notation requires careful attention to meaning</li>
+<li>Material implication differs from strict implication in important ways</li>
+<li>Next week, we'll explore truth tables and begin formal proofs using these concepts.</li>
+</ul>
 
-Part 1: Translation (20 points)
+<h2 class="text-xl font-bold mb-4 mt-8">Symbolic Logic - Homework 1</h2>
+<h3 class="text-lg font-semibold mb-3">Basic Concepts and Notation</h3>
+<p class="mb-6"><strong>Total Points: 50</strong></p>
 
-Translate the following English statements into symbolic logic notation. Let:
+<h4 class="text-base font-semibold mb-3">Part 1: Translation (20 points)</h4>
 
-p = "It rains"
+<p class="mb-3">Translate the following English statements into symbolic logic notation. Let:</p>
 
-q = "The streets are wet"
+<ul class="list-disc list-inside mb-4 space-y-1">
+<li>p = "It rains"</li>
+<li>q = "The streets are wet"</li>
+<li>r = "People use umbrellas"</li>
+<li>s = "Traffic slows down"</li>
+</ul>
 
-r = "People use umbrellas"
-
-s = "Traffic slows down"
-
-"If it rains, then the streets are wet and people use umbrellas." (5 points)
-"Either traffic slows down or it's not raining." (5 points)
-"It's not true that when it rains, traffic slows down." (5 points)
-"If the streets are wet and people use umbrellas, then it must be raining." (5 points) Part 2: Symbolization (20 points)
-Create appropriate symbols and translate these statements into logical notation:
-
-"If John studies and gets tutoring, then he will pass the class. John studies and gets tutoring. Therefore, John will pass the class." (10 points)
-"Either Mary goes to the gym or she goes for a run, but not both. If she goes for a run, she will be tired." (10 points)
-Part 3: Analysis (10 points)
-
-Explain the difference between material implication and strict implication using an
-example of each. (10 points)
-
-Grading Rubric:
-
-Part 1: 5 points per correct translation
-
-Part 2: 10 points per correct symbolization and translation Part 3:
-
-5 points for correct explanation of the difference
-
-5 points for appropriate examples
-
-Symbolic Logic - Homework 1
-
-Basic Concepts and Notation (WITH ANSWERS) Total Points: 50
-
-Part 1: Translation (20 points)
-
-Translate the following English statements into symbolic logic notation. Let:
-
-p = "It rains"
-
-q = "The streets are wet"
-
-r = "People use umbrellas"
-
-s = "Traffic slows down"
-
-"If it rains, then the streets are wet and people use umbrellas." (5 points)
-Answer: p → (q ∧ r)
-
-"Either traffic slows down or it's not raining." (5 points)
-Answer: s ∨ ¬p
-
-"It's not true that when it rains, traffic slows down." (5 points) Answer: ¬(p → s)
-"If the streets are wet and people use umbrellas, then it must be raining." (5 points) Answer: (q ∧ r) → p
-Part 2: Symbolization (20 points)
-
-Create appropriate symbols and translate these statements into logical notation:
-
-"If John studies and gets tutoring, then he will pass the class. John studies and gets tutoring. Therefore, John will pass the class." (10 points)
-Answer:
-
-Let s = "John studies"
-
-Let t = "John gets tutoring"
-
-Let p = "John will pass the class" Translation: ((s ∧ t) → p) ∧ (s ∧ t) → p
-
-"Either Mary goes to the gym or she goes for a run, but not both. If she goes for a run, she will be tired." (10 points)
-Answer:
-
-Let g = "Mary goes to the gym" Let r = "Mary goes for a run" Let t = "Mary will be tired"
-
-Translation: ((g ∨ r) ∧ ¬(g ∧ r)) ∧ (r → t)
-
-Part 3: Analysis (10 points)
-
-Explain the difference between material implication and strict implication using an example of each. (10 points)
-Answer:
-
-Material implication (→) is truth-functional and is false only when the antecedent is true and the consequent is false. Example: "If it rains, then the ground is wet" (p → q). This is a material implication because it's based on observed correlation.
-
-Strict implication (⊃) involves logical necessity. Example: "If x is a square, then x has four equal sides." This is a strict implication because it's based on the deﬁnition of a square - it's impossible for the antecedent to be true and the consequent false by logical necessity.
-
-Grading Rubric:
-
-Part 1: 5 points per correct translation
-
-Part 2: 10 points per correct symbolization and translation
-
-Part 3:
-
-5 points for correct explanation of the difference
-
-5 points for appropriate examples
-
-Propositional Calculus and Truth Tables Week 2: Truth Tables and Elementary Proofs
-
-The Propositional Calculus
-
-Propositional calculus is a formal system for representing and analyzing logical relationships between propositions. It provides rules for:
-
-Constructing well-formed formulas
-Evaluating truth values
-Making valid inferences
-Truth Tables
-
-Truth tables systematically show all possible truth value combinations for propositional statements.
-
-Basic Truth Tables Negation (¬)
+<ol class="list-decimal list-inside mb-6 space-y-2">
+<li>"If it rains, then the streets are wet and people use umbrellas." (5 points)</li>
+<li>"Either traffic slows down or it's not raining." (5 points)</li>
+<li>"It's not true that when it rains, traffic slows down." (5 points)</li>
+<li>"If the streets are wet and people use umbrellas, then it must be raining." (5 points)</li>
+</ol>
+
+<h4 class="text-base font-semibold mb-3">Part 2: Symbolization (20 points)</h4>
+<p class="mb-3">Create appropriate symbols and translate these statements into logical notation:</p>
+
+<ol class="list-decimal list-inside mb-6 space-y-2">
+<li>"If John studies and gets tutoring, then he will pass the class. John studies and gets tutoring. Therefore, John will pass the class." (10 points)</li>
+<li>"Either Mary goes to the gym or she goes for a run, but not both. If she goes for a run, she will be tired." (10 points)</li>
+</ol>
+
+<h4 class="text-base font-semibold mb-3">Part 3: Analysis (10 points)</h4>
+
+<p class="mb-6">Explain the difference between material implication and strict implication using an example of each. (10 points)</p>
+
+<h4 class="text-base font-semibold mb-3">Grading Rubric:</h4>
+
+<ul class="list-disc list-inside mb-6 space-y-1">
+<li>Part 1: 5 points per correct translation</li>
+<li>Part 2: 10 points per correct symbolization and translation</li>
+<li>Part 3: 5 points for correct explanation of the difference</li>
+</ul>
+
+<li>5 points for appropriate examples</li>
+</ul>
+
+<h2 class="text-xl font-bold mb-4 mt-8">Symbolic Logic - Homework 1</h2>
+<h3 class="text-lg font-semibold mb-3">Basic Concepts and Notation (WITH ANSWERS)</h3>
+<p class="mb-6"><strong>Total Points: 50</strong></p>
+
+<h4 class="text-base font-semibold mb-3">Part 1: Translation (20 points)</h4>
+<p class="mb-3">Translate the following English statements into symbolic logic notation. Let:</p>
+
+<ul class="list-disc list-inside mb-4 space-y-1">
+<li>p = "It rains"</li>
+<li>q = "The streets are wet"</li>
+<li>r = "People use umbrellas"</li>
+<li>s = "Traffic slows down"</li>
+</ul>
+
+<ol class="list-decimal list-inside mb-6 space-y-3">
+<li>"If it rains, then the streets are wet and people use umbrellas." (5 points)<br>
+<strong>Answer:</strong> p → (q ∧ r)</li>
+
+<li>"Either traffic slows down or it's not raining." (5 points)<br>
+<strong>Answer:</strong> s ∨ ¬p</li>
+
+<li>"It's not true that when it rains, traffic slows down." (5 points)<br>
+<strong>Answer:</strong> ¬(p → s)</li>
+
+<li>"If the streets are wet and people use umbrellas, then it must be raining." (5 points)<br>
+<strong>Answer:</strong> (q ∧ r) → p</li>
+</ol>
+
+<h4 class="text-base font-semibold mb-3">Part 2: Symbolization (20 points)</h4>
+<p class="mb-3">Create appropriate symbols and translate these statements into logical notation:</p>
+
+<div class="mb-4">
+<p class="mb-2"><strong>1.</strong> "If John studies and gets tutoring, then he will pass the class. John studies and gets tutoring. Therefore, John will pass the class." (10 points)</p>
+<p class="mb-2"><strong>Answer:</strong></p>
+<ul class="list-disc list-inside mb-2 ml-4">
+<li>Let s = "John studies"</li>
+<li>Let t = "John gets tutoring"</li>
+<li>Let p = "John will pass the class"</li>
+</ul>
+<p class="mb-4"><strong>Translation:</strong> ((s ∧ t) → p) ∧ (s ∧ t) → p</p>
+</div>
+
+<div class="mb-6">
+<p class="mb-2"><strong>2.</strong> "Either Mary goes to the gym or she goes for a run, but not both. If she goes for a run, she will be tired." (10 points)</p>
+<p class="mb-2"><strong>Answer:</strong></p>
+<ul class="list-disc list-inside mb-2 ml-4">
+<li>Let g = "Mary goes to the gym"</li>
+<li>Let r = "Mary goes for a run"</li>
+<li>Let t = "Mary will be tired"</li>
+</ul>
+<p class="mb-4"><strong>Translation:</strong> ((g ∨ r) ∧ ¬(g ∧ r)) ∧ (r → t)</p>
+</div>
+
+<h4 class="text-base font-semibold mb-3">Part 3: Analysis (10 points)</h4>
+<p class="mb-3">Explain the difference between material implication and strict implication using an example of each. (10 points)</p>
+<p class="mb-4"><strong>Answer:</strong></p>
+<p class="mb-3">Material implication (→) is truth-functional and is false only when the antecedent is true and the consequent is false. Example: "If it rains, then the ground is wet" (p → q). This is a material implication because it's based on observed correlation.</p>
+<p class="mb-6">Strict implication (⊃) involves logical necessity. Example: "If x is a square, then x has four equal sides." This is a strict implication because it's based on the definition of a square - it's impossible for the antecedent to be true and the consequent false by logical necessity.</p>
+
+<h4 class="text-base font-semibold mb-3">Grading Rubric:</h4>
+<ul class="list-disc list-inside mb-6 space-y-1">
+<li>Part 1: 5 points per correct translation</li>
+<li>Part 2: 10 points per correct symbolization and translation</li>
+<li>Part 3: 5 points for correct explanation of the difference</li>
+<li>5 points for appropriate examples</li>
+</ul>
+
+<h2 class="text-xl font-bold mb-4 mt-8">Propositional Calculus and Truth Tables</h2>
+<h3 class="text-lg font-semibold mb-3">Week 2: Truth Tables and Elementary Proofs</h3>
+
+<h4 class="text-base font-semibold mb-3">The Propositional Calculus</h4>
+
+<p class="mb-4">Propositional calculus is a formal system for representing and analyzing logical relationships between propositions. It provides rules for:</p>
+
+<ul class="list-disc list-inside mb-6 space-y-1">
+<li>Constructing well-formed formulas</li>
+<li>Evaluating truth values</li>
+<li>Making valid inferences</li>
+</ul>
+
+<h4 class="text-base font-semibold mb-3">Truth Tables</h4>
+
+<p class="mb-4">Truth tables systematically show all possible truth value combinations for propositional statements.</p>
+
+<h5 class="text-sm font-semibold mb-3">Basic Truth Tables</h5>
+
+<div class="mb-4">
+<p class="font-semibold mb-2">Negation (¬)</p>
 
 | p | ¬p |
 
