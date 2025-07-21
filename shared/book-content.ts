@@ -1,3 +1,14 @@
+export interface BookContent {
+  title: string;
+  author: string;
+  sections: {
+    id: string;
+    title: string;
+    content: string;
+    level?: number;
+  }[];
+}
+
 export const bookContent: BookContent = {
   title: "Introduction to Symbolic",
   author: "Converted Document",
@@ -855,39 +866,27 @@ Boolean algebra is fundamental to digital circuit design:
 
 AND Gate
 
-\\`\\`\\`
-
+\`\`\`
 A
-
 ---|
-
-Output = A∧B
-
+    Output = A∧B
 ---| B
-
-\\`\\`\\`
+\`\`\`
 
 OR Gate
 
-\\`\\`\\`
-
+\`\`\`
 A
-
 ---|
-
-Output = A∨B
-
+    Output = A∨B
 ---| B
-
-\\`\\`\\`
+\`\`\`
 
 NOT Gate
 
-\\`\\`\\`
-
+\`\`\`
 Input ---|>o--- Output
-
-\\`\\`\\`
+\`\`\`
 
 Key Takeaways
 
@@ -1061,19 +1060,13 @@ f(x,y) = (x ∧ ¬y) ∨ (¬x ∧ y)
 
 Answer:
 
-\\`\\`\\`
-
+\`\`\`
 x |AND|
-
-| |
-
+  | |
 |NOT| |OR| Output
-
-| |
-
+  | |
 y ---|AND|----
-
-\\`\\`\\`
+\`\`\`
 
 This is known as the XOR (exclusive or) function.
 
@@ -1315,23 +1308,15 @@ Answer:
 
 Answer:
 
-\\`\\`\\`
-
+\`\`\`
 x |AND|
-
-| |
-
+  | |
 y ---- |OR| Output
-
-| |
-
+  | |
 x ---|NOT|------|AND|----
-
-|
-
-z
-
-\\`\\`\\`
+       |
+       z
+\`\`\`
 
 Explanation:
 
@@ -3339,27 +3324,17 @@ f(x,y,z) = (x ∧ ¬y) ∨ (¬x ∧ y ∧ z)
 
 Answer:
 
-\\`\\`\\`
-
+\`\`\`
 x ---|AND|----
-
-| |
-
+     | |
 y ---|NOT| |OR| Output
-
-| |
-
+     | |
 x ---|NOT| |
-
-| |
-
+     | |
 y ---|AND| |
-
-|
-
-z |
-
-\\`\\`\\`
+     |
+z ---|
+\`\`\`
 
 Part III:
 
@@ -3509,3 +3484,7 @@ Both are therefore non-recursive by reduction`
     }
   ]
 };
+
+export function getFullDocumentContent(): string {
+  return bookContent.sections.map(section => section.content).join('\n\n');
+}
