@@ -191,8 +191,8 @@ export default function DocumentContent({
             }
           }
           
-          // Regular paragraph
-          return `<p class="mb-4 leading-relaxed">${paragraph.trim()}</p>`;
+          // Regular paragraph with improved styling
+          return `<p class="mb-4 leading-relaxed text-slate-800 dark:text-slate-200">${paragraph.trim()}</p>`;
         })
         .filter(p => p)
         .join('');
@@ -247,14 +247,14 @@ export default function DocumentContent({
       </div>
       
       <ScrollArea className="h-[calc(100vh-280px)]">
-        <div className="p-8 w-full max-w-5xl mx-auto" data-document-content>
-          <article className="prose prose-xl max-w-none text-foreground w-full leading-relaxed select-text">
+        <div className="p-8 w-full max-w-6xl mx-auto" data-document-content>
+          <article className="prose prose-xl max-w-none text-slate-900 dark:text-slate-100 w-full leading-relaxed select-text">
             {/* Document Title */}
             <header className="text-center mb-12">
-              <h1 className="text-base font-normal text-foreground mb-2">
+              <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
                 {paperContent.title}
               </h1>
-              <p className="text-base font-normal text-muted-foreground text-center">
+              <p className="text-lg font-medium text-slate-700 dark:text-slate-300 text-center">
                 by {paperContent.author}
               </p>
             </header>
@@ -263,7 +263,7 @@ export default function DocumentContent({
             {paperContent.sections.map((section: any, index: number) => (
               <section key={section.id} id={section.id} className="mb-12">
                 <div 
-                  className={`text-muted-foreground leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
+                  className={`text-slate-800 dark:text-slate-200 leading-relaxed prose prose-lg max-w-none ${mathMode ? 'document-math-content' : 'document-text-content'}`}
                   dangerouslySetInnerHTML={{ 
                     __html: processContentForMathMode(section.content) 
                   }}

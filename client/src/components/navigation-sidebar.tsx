@@ -8,32 +8,46 @@ const extractTableOfContents = () => {
   // Get the full content from the first section (which contains all the text)
   const content = paperContent.sections[0]?.content || '';
   
-  // Split content to find where actual content starts (after table of contents)
-  const contentParts = content.split('1.0 The concept of an inference');
+  // Extract major headings and sections from the content
+  const lines = content.split('\n');
+  let counter = 0;
   
-  if (contentParts.length > 1) {
-    // Process only the actual content part (skip table of contents)
-    const actualContent = '1.0 The concept of an inference' + contentParts.slice(1).join('1.0 The concept of an inference');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
     
-    // Regular expressions to match section headings
-    const sectionPattern = /class="document-paragraph mb-6 mt-8 font-normal">([0-9]+\.[0-9]+(?:\.[0-9]+)?\s+[^<]+)/g;
+    // Skip empty lines
+    if (!line) continue;
     
-    let match;
-    let counter = 0;
-    while ((match = sectionPattern.exec(actualContent)) !== null) {
-      const fullTitle = match[1].trim();
-      const sectionNumber = fullTitle.match(/^([0-9]+\.[0-9]+(?:\.[0-9]+)?)/)?.[1] || '';
+    // Check for major section headings
+    if (line.match(/^Week \d+:/i) || 
+        line.match(/^Introduction to/i) ||
+        line.match(/^Basic Concepts/i) ||
+        line.match(/^Material vs\./i) ||
+        line.match(/^Translation Practice/i) ||
+        line.match(/^Practice Exercises/i) ||
+        line.match(/^Truth Tables/i) ||
+        line.match(/^Logic Gates/i) ||
+        line.match(/^Boolean Algebra/i) ||
+        line.match(/^Formal Logic/i) ||
+        line.match(/^Propositional Logic/i) ||
+        line.match(/^Predicate Logic/i) ||
+        line.match(/^Set Theory/i) ||
+        line.match(/^Recursive Definitions/i) ||
+        (line.length < 60 && line.match(/^[A-Z][^.]*[^.]$/))) {
       
-      // Determine level based on section number depth
-      const level = (sectionNumber.match(/\./g) || []).length;
-      
-      // Create unique ID from section number and counter to avoid duplicates
-      const id = `section-${sectionNumber.replace(/\./g, '-')}-${counter}`;
+      // Create ID from the title
+      const id = `toc-${counter}`;
       counter++;
+      
+      // Determine level based on content
+      let level = 1;
+      if (line.match(/^Week \d+:/i)) level = 0;
+      else if (line.match(/^[A-Z][a-z]+ [A-Z]/)) level = 1;
+      else level = 2;
       
       tableOfContents.push({
         id,
-        title: fullTitle,
+        title: line,
         level
       });
     }
@@ -57,22 +71,19 @@ export default function NavigationSidebar() {
   };
 
   return (
-    <aside className="w-full bg-card shadow-sm border-r border-border sticky top-16 h-[calc(100vh-280px)]">
-      <div className="p-1 md:p-4 h-full flex flex-col">
-        <h3 className="font-inter font-semibold text-sm text-foreground mb-3 flex-shrink-0 hidden md:block">
+    <aside className="w-48 bg-card shadow-sm border-r border-border sticky top-16 h-[calc(100vh-280px)]">
+      <div className="p-3 h-full flex flex-col">
+        <h3 className="font-inter font-semibold text-sm text-foreground mb-3 flex-shrink-0">
           Table of Contents
         </h3>
-        <h3 className="font-inter font-semibold text-xs text-foreground mb-1 flex-shrink-0 block md:hidden text-center">
-          TOC
-        </h3>
         <ScrollArea className="flex-1 h-full">
-          <div className="pr-1 md:pr-4">
-            <nav className="space-y-0.5 md:space-y-1">
-              {tableOfContents.slice(Math.floor(tableOfContents.length / 2)).map((entry) => (
+          <div className="pr-2">
+            <nav className="space-y-1">
+              {tableOfContents.map((entry) => (
                 <button
                   key={entry.id}
                   onClick={() => handleNavClick(entry.id)}
-                  className={`block w-full text-left px-1 md:px-3 py-0.5 md:py-2 text-xs md:text-xs text-muted-foreground hover:bg-accent hover:text-primary rounded-sm transition-colors overflow-hidden ${
+                  className={`block w-full text-left px-2 py-1.5 text-xs text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-300 rounded transition-colors ${
                     entry.level === 1 ? 'pl-1 md:pl-3' : 
                     entry.level === 2 ? 'pl-2 md:pl-6' : 
                     'pl-3 md:pl-9'
