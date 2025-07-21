@@ -141,40 +141,61 @@ export default function DocumentContent({
     }
   };
 
-  // Function to convert math content based on mode and add IDs to section headings
+  // Function to convert raw text content to properly formatted HTML
   const processContentForMathMode = (content: string) => {
     try {
       if (!content || typeof content !== 'string') {
         return content || '';
       }
       
-      // Add IDs to section headings for navigation
-      let processedContent = content;
-      let counter = 0;
-      const seenTitles = new Set<string>(); // Track seen titles to avoid duplicates
-      
-      // Split content to find where actual content starts (after table of contents)
-      const contentParts = processedContent.split('1.0 The concept of an inference');
-      
-      if (contentParts.length > 1) {
-        // Skip the table of contents section entirely and show only the actual content
-        const actualContent = '1.0 The concept of an inference' + contentParts.slice(1).join('1.0 The concept of an inference');
+      // Convert plain text to HTML with proper formatting
+      let processedContent = content
+        // First, escape any existing HTML to prevent double processing
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
         
-        const processedActualContent = actualContent.replace(
-          /class="document-paragraph mb-6 mt-8 font-normal">([0-9]+\.[0-9]+(?:\.[0-9]+)?\s+[^<]+)/g,
-          (match, titleText) => {
-            const fullTitle = titleText.trim();
-            const sectionNumber = titleText.match(/^([0-9]+\.[0-9]+(?:\.[0-9]+)?)/)?.[1] || '';
-            const id = `section-${sectionNumber.replace(/\./g, '-')}-${counter}`;
-            counter++;
-            return `class="document-paragraph mb-6 mt-8 font-normal" id="${id}">${titleText}`;
+        // Convert line breaks to proper paragraphs
+        .split('\n\n')
+        .map(paragraph => {
+          if (!paragraph.trim()) return '';
+          
+          // Check if this is a heading (starts with Week, Introduction, etc.)
+          if (paragraph.match(/^(Week \d+:|Introduction|Basic Concepts|Applications|Key Takeaways|Boolean|Truth Tables|Material vs|Strict Implication|Symbolic Logic|Part [IVX]+:|Midterm|Final|Examination)/i)) {
+            return `<h2 class="text-xl font-semibold mb-4 mt-8 text-foreground">${paragraph.trim()}</h2>`;
           }
-        );
-        
-        // Only show the header and actual content, skip the table of contents
-        const headerPart = '<div class="document-content"><p class="document-paragraph mb-4">Introduction to Symbolic Logic</p><p class="document-paragraph mb-4">J.-M. Kuczynski</p>';
-        processedContent = headerPart + processedActualContent;
-      }
+          
+          // Check if this is a subheading (shorter titles)
+          if (paragraph.match(/^[A-Z][^.]{5,50}$/) && !paragraph.includes('|') && !paragraph.includes('=')) {
+            return `<h3 class="text-lg font-medium mb-3 mt-6 text-foreground">${paragraph.trim()}</h3>`;
+          }
+          
+          // Check if this is a code block (contains ASCII art or circuit diagrams)
+          if (paragraph.includes('```') || paragraph.includes('---|') || paragraph.includes('|AND|') || paragraph.includes('|OR|') || paragraph.includes('|NOT|')) {
+            return `<pre class="bg-gray-100 dark:bg-gray-800 p-4 rounded-md my-4 overflow-x-auto text-sm font-mono">${paragraph.trim()}</pre>`;
+          }
+          
+          // Check if this is a table (contains multiple | characters)
+          if (paragraph.split('|').length > 4) {
+            const lines = paragraph.trim().split('\n');
+            const tableRows = lines.map(line => {
+              if (line.includes('|')) {
+                const cells = line.split('|').map(cell => cell.trim()).filter(cell => cell);
+                return `<tr>${cells.map(cell => `<td class="border border-gray-300 px-2 py-1 text-center">${cell}</td>`).join('')}</tr>`;
+              }
+              return '';
+            }).filter(row => row);
+            
+            if (tableRows.length > 0) {
+              return `<table class="border-collapse border border-gray-300 my-4 mx-auto"><tbody>${tableRows.join('')}</tbody></table>`;
+            }
+          }
+          
+          // Regular paragraph
+          return `<p class="mb-4 leading-relaxed">${paragraph.trim()}</p>`;
+        })
+        .filter(p => p)
+        .join('');
       
       if (!mathMode) {
         // Remove LaTeX notation when math mode is off
