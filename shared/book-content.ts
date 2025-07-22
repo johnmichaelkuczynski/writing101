@@ -653,8 +653,6 @@ collapses its higher-order structure.
 
 Proof of Theorem 13
 
-, and any attempt to internalize it within arithmetic
-
 Provability Depends on Premise Sets
 
 Unlike atomic truths, provability judgments depend on what set of truths is taken as background assumptions. Thus ProvableNA is a relation over sets of truths.
