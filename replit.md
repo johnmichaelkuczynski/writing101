@@ -708,6 +708,9 @@ Preferred communication style: Simple, everyday language.
     - Theory and evidence integration modules
   - Updated AI context to focus on academic writing instruction instead of mathematical content
   - AI now correctly identifies document as "Introduction to Academic Writing" course by Zhi Systems
+  - FIXED AI chat prompts to properly reference Writing 101 content instead of outdated document references
+  - Updated passage discussion system to focus on academic writing principles instead of philosophical content
+  - All AI system prompts now properly aligned with Writing 101 curriculum content
   - All API keys activated and working: OpenAI ✅, Anthropic ✅, Perplexity (with fallback) ✅, DeepSeek ✅
   - All existing functionality preserved: chat, rewrite, quiz/study guide generation, passage discussion
 - July 22, 2025: LAYOUT OPTIMIZATION - Maximum space utilization for improved reading experience

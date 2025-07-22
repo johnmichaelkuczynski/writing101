@@ -209,15 +209,15 @@ Provide a brief, enlightening explanation that helps the user understand the wri
 }
 
 export async function generatePassageDiscussionResponse(model: AIModel, userMessage: string, passage: string, conversationHistory: any[] = []): Promise<string> {
-  const systemPrompt = `You are an expert philosophical guide for Wittgenstein's "Tractatus Logico-Philosophicus". 
+  const systemPrompt = `You are an expert writing instructor for the "Introduction to Academic Writing" course by Zhi Systems. 
 
 You are discussing a specific passage with the user. Engage in thoughtful dialogue by:
 1. Responding directly to their questions and thoughts
 2. Building on the conversation history
 3. Referencing the specific passage being discussed
-4. Providing philosophical insights and clarifications
+4. Providing writing insights and clarifications about academic writing principles
 5. Asking engaging follow-up questions when appropriate
-6. Maintaining focus on Wittgenstein's ideas and their implications
+6. Maintaining focus on academic writing concepts, clarity, evidence, and analysis
 
 CRITICAL FORMATTING RULES:
 - Write in plain text format ONLY
@@ -226,7 +226,7 @@ CRITICAL FORMATTING RULES:
 - Write as if for publication in a book or formal document
 - No bullet points, numbered lists, or formatting markup of any kind
 
-Keep responses conversational but intellectually rigorous. Help the user deepen their understanding through dialogue. Do NOT repeat yourself or generate nonsensical text.`;
+Keep responses conversational but intellectually rigorous. Help the user deepen their understanding of academic writing through dialogue. Do NOT repeat yourself or generate nonsensical text.`;
 
   // Build conversation context
   let conversationContext = `We are discussing this passage: "${passage}"\n\n`;
@@ -240,7 +240,7 @@ Keep responses conversational but intellectually rigorous. Help the user deepen 
 
   const prompt = `${conversationContext}User: ${userMessage}
 
-Respond thoughtfully to continue our discussion about this passage from the Tractatus. Use plain text only with no formatting.`;
+Respond thoughtfully to continue our discussion about this passage from the academic writing curriculum. Use plain text only with no formatting.`;
 
   try {
     let result: string;
@@ -294,7 +294,7 @@ export async function generateAIResponse(model: AIModel, prompt: string, isInstr
   }
   
   const systemPrompt = isInstruction 
-    ? `${paperContext}\n\nYou are helping analyze, modify, or explain the Dictionary of Analytic Philosophy content. Follow the user's instructions precisely while staying true to the philosophical concepts and definitions presented. Keep responses concise unless the user specifically asks for elaboration.
+    ? `${paperContext}\n\nYou are helping analyze, modify, or explain the Introduction to Academic Writing content. Follow the user's instructions precisely while staying true to the academic writing principles and concepts presented. Keep responses concise unless the user specifically asks for elaboration.
 
 CRITICAL FORMATTING RULES:
 - Write in plain text format ONLY
@@ -302,7 +302,7 @@ CRITICAL FORMATTING RULES:
 - Use natural paragraph breaks to separate ideas (double line breaks)
 - Write as if for publication in a book or formal document
 - No bullet points, numbered lists, or formatting markup of any kind`
-    : `${paperContext}${conversationContext}\n\nIMPORTANT: This is a conversation about the Dictionary of Analytic Philosophy. Reference our previous discussion when relevant. Provide informative, helpful responses that fully answer questions about philosophical concepts, definitions, and arguments presented in this dictionary. Be clear and thorough while staying focused on the document content.
+    : `${paperContext}${conversationContext}\n\nIMPORTANT: This is a conversation about Introduction to Academic Writing by Zhi Systems. Reference our previous discussion when relevant. Provide informative, helpful responses that fully answer questions about academic writing principles, concepts, and methods presented in this curriculum. Be clear and thorough while staying focused on the document content.
 
 CRITICAL FORMATTING RULES:
 - Write in plain text format ONLY
