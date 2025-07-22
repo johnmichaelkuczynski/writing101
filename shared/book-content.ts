@@ -1,3 +1,15 @@
+export interface BookSection {
+  id: string;
+  title: string;
+  content: string;
+}
+
+export interface BookContent {
+  title: string;
+  author: string;
+  sections: BookSection[];
+}
+
 export const bookContent: BookContent = {
   title: "Converted Document",
   author: "Converted Document",
@@ -131,3 +143,7 @@ Church, A. (1936). An unsolvable problem of elementary number theory. American J
     }
   ]
 };
+
+export function getFullDocumentContent(): string {
+  return bookContent.sections.map(section => section.content).join('\n\n');
+}
