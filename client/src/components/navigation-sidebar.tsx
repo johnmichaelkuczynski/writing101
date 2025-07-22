@@ -83,41 +83,41 @@ export default function NavigationSidebar() {
       const titleMap: { [key: string]: string } = {
         "introduction": "Introduction",
         "table-of-contents": "Table of Contents",
-        "theorem-0": "Theorem 0",
-        "theorem-1": "Theorem 1",
-        "theorem-2": "Theorem 2",
-        "theorem-3": "Theorem 3",
-        "theorem-4": "Theorem 4",
-        "theorem-5": "Theorem 5",
-        "theorem-6": "Theorem 6",
-        "theorem-7": "Theorem 7",
-        "theorem-8": "Theorem 8",
-        "theorem-9": "Theorem 9",
-        "theorem-10": "Theorem 10",
-        "theorem-11": "Theorem 11",
-        "theorem-12": "Theorem 12",
-        "theorem-13": "Theorem 13",
-        "theorem-14": "Theorem 14",
-        "theorem-15": "Theorem 15",
-        "theorem-16": "Theorem 16",
-        "theorem-17": "Theorem 17",
-        "theorem-18": "Theorem 18",
-        "theorem-19": "Theorem 19",
-        "theorem-20": "Theorem 20",
-        "theorem-21": "Theorem 21",
-        "theorem-22": "Theorem 22",
-        "theorem-23": "Theorem 23",
-        "theorem-24": "Theorem 24",
-        "theorem-25": "Theorem 25",
-        "theorem-26": "Theorem 26",
-        "theorem-27": "Theorem 27",
-        "theorem-28": "Theorem 28",
-        "theorem-29": "Theorem 29",
-        "theorem-30": "Theorem 30",
-        "theorem-31": "Theorem 31",
-        "theorem-32": "Theorem 32",
-        "theorem-33": "Theorem 33",
-        "theorem-34": "Theorem 34",
+        "theorem-0": "Statement of Theorem 0",
+        "theorem-1": "Statement of Theorem 1",
+        "theorem-2": "Statement of Theorem 2",
+        "theorem-3": "Statement of Theorem 3",
+        "theorem-4": "Statement of Theorem 4",
+        "theorem-5": "Statement of Theorem 5",
+        "theorem-6": "Statement of Theorem 6",
+        "theorem-7": "Statement of Theorem 7",
+        "theorem-8": "Statement of Theorem 8",
+        "theorem-9": "Statement of Theorem 9",
+        "theorem-10": "Statement of Theorem 10",
+        "theorem-11": "Statement of Theorem 11",
+        "theorem-12": "Statement of Theorem 12",
+        "theorem-13": "Statement of Theorem 13",
+        "theorem-14": "Statement of Theorem 14",
+        "theorem-15": "Statement of Theorem 15",
+        "theorem-16": "Statement of Theorem 16",
+        "theorem-17": "Statement of Theorem 17",
+        "theorem-18": "Statement of Theorem 18",
+        "theorem-19": "Statement of Theorem 19",
+        "theorem-20": "Statement of Theorem 20",
+        "theorem-21": "Statement of Theorem 21",
+        "theorem-22": "Statement of Theorem 22",
+        "theorem-23": "Statement of Theorem 23",
+        "theorem-24": "Statement of Theorem 24",
+        "theorem-25": "Statement of Theorem 25",
+        "theorem-26": "Statement of Theorem 26",
+        "theorem-27": "Statement of Theorem 27",
+        "theorem-28": "Statement of Theorem 28",
+        "theorem-29": "Statement of Theorem 29",
+        "theorem-30": "Statement of Theorem 30",
+        "theorem-31": "Statement of Theorem 31",
+        "theorem-32": "Statement of Theorem 32",
+        "theorem-33": "Statement of Theorem 33",
+        "theorem-34": "Statement of Theorem 34",
         "future-research": "Future Research",
         "applications": "Potential Applications",
         "references": "References"
@@ -130,12 +130,17 @@ export default function NavigationSidebar() {
         // Find all elements containing this text in the document content area
         const contentArea = document.querySelector('[data-document-content]');
         if (contentArea) {
-          const allElements = contentArea.querySelectorAll('h1, h2, h3, p');
+          const allElements = contentArea.querySelectorAll('h1, h2, h3, h4, h5, h6, p');
           for (let i = 0; i < allElements.length; i++) {
             const el = allElements[i];
-            if (el.textContent?.includes(searchText)) {
+            const textContent = el.textContent || '';
+            
+            // Skip table of contents sections - look for actual theorem statements
+            if (textContent.includes(searchText) && 
+                !textContent.includes('Table of Contents') && 
+                !el.closest('.table-of-contents')) {
               element = el as HTMLElement;
-              console.log(`Found element by text search: ${el.tagName}`);
+              console.log(`Found element by text search: ${el.tagName} - ${textContent.substring(0, 50)}...`);
               break;
             }
           }
