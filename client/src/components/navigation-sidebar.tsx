@@ -163,7 +163,7 @@ export default function NavigationSidebar() {
   };
 
   return (
-    <aside className="w-48 bg-card shadow-sm border-r border-border sticky top-16 h-[calc(100vh-280px)]">
+    <aside className="w-48 bg-card shadow-sm border-r border-border sticky top-16 h-[calc(100vh-160px)]">
       <div className="p-3 h-full flex flex-col">
         <h3 className="font-inter font-semibold text-sm text-foreground mb-3 flex-shrink-0">
           Table of Contents
