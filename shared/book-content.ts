@@ -17,11 +17,7 @@ export const bookContent: BookContent = {
     {
       id: "section-1",
       title: "Section 1",
-      content: `On the Cardinality of Arithmetical Proof Spaces
-
-
-
-Table of Contents
+      content: `Table of Contents
 
 Theorem 0: Cardinality of Proof Spaces 
 
