@@ -270,7 +270,7 @@ export default function DocumentContent({
         </Button>
       </div>
       
-      <ScrollArea className="h-[calc(100vh-280px)]">
+      <ScrollArea className="h-[calc(100vh-160px)]">
         <div className="p-8 w-full max-w-6xl mx-auto" data-document-content>
           <article className="prose prose-xl max-w-none text-slate-900 dark:text-slate-100 w-full leading-relaxed select-text">
             {/* Document Title */}
