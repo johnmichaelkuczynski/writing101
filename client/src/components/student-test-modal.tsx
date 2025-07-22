@@ -313,7 +313,7 @@ ${currentStudentTest.testContent}`;
       <body>
         <div class="header">
           <h1 class="title">Student Practice Test</h1>
-          <p class="subtitle">Introduction to Symbolic Logic</p>
+          <p class="subtitle">Cardinality of Proof Spaces</p>
           <p class="meta">Generated: ${timestamp}</p>
           <p class="meta">Model: ${selectedModel}</p>
           <p class="meta">Instructions: ${customInstructions || "Default instructions"}</p>
