@@ -36,21 +36,22 @@ function getModelDisplayName(model: AIModel): string {
 function getPaperContext(): string {
   const fullContent = getFullDocumentContent();
   
-  return `You are an AI assistant for a mathematical learning platform focused on "On the Cardinality of Arithmetical Proof Spaces" by J.-M. Kuczynski.
+  return `You are an AI assistant for an academic learning platform focused on "Introduction to Academic Writing" by Zhi Systems.
 
-This document presents a non-reflexive proof of Gödel's First Incompleteness Theorem using cardinality arguments and set-theoretic methods. The work contains 34 mathematical theorems exploring proof spaces, recursive enumerability, and the structural limits of formal systems.
+This document is a comprehensive academic writing curriculum covering fundamental principles of academic communication. The content includes discussion assignments, essay requirements, source evaluation, argument analysis, and professional writing standards.
 
 CURRENT DOCUMENT CONTENT:
 ${fullContent}
 
 You should help users understand:
-- Mathematical proofs and theorem statements
-- Cardinality arguments and set theory concepts  
-- Gödel's incompleteness theorems and their implications
-- Formal systems and their limitations
-- The relationship between proof spaces and truth spaces
+- Principles of academic writing (clarity, evidence, analysis)
+- Source evaluation and citation methods
+- Argument construction and counterargument strategies
+- Academic vs. popular writing differences
+- Professional writing standards and conventions
+- Essay structure and development techniques
 
-Answer questions about the current mathematical document, provide rigorous analysis, and help users engage with the mathematical content. Focus on mathematical precision, logical clarity, and encouraging deep mathematical understanding.`;
+Answer questions about the academic writing curriculum, provide clear explanations of writing concepts, and help users develop their academic communication skills. Focus on practical application, clear examples, and encouraging strong academic writing practices.`;
 }
 
 // Helper function to clean markdown and improve formatting
@@ -143,14 +144,14 @@ Please rewrite the text according to these instructions:`;
 }
 
 export async function generatePassageExplanation(model: AIModel, passage: string): Promise<string> {
-  const systemPrompt = `You are an expert philosophical guide for Wittgenstein's "Tractatus Logico-Philosophicus". 
+  const systemPrompt = `You are an expert academic writing instructor for "Introduction to Academic Writing" by Zhi Systems. 
 
 When a user highlights a passage, provide a brief, enlightening explanation that:
-1. Clarifies the key philosophical concepts in the passage
-2. Explains Wittgenstein's logical argument or point
-3. Connects it to broader themes in the Tractatus
-4. Engages the user with thought-provoking insights
-5. Uses accessible language while maintaining philosophical depth
+1. Clarifies the key academic writing concepts in the passage
+2. Explains the writing principles or techniques being discussed
+3. Connects it to broader themes in academic communication
+4. Engages the user with practical insights for their own writing
+5. Uses accessible language while maintaining academic rigor
 
 CRITICAL FORMATTING RULES:
 - Write in plain text format ONLY
@@ -159,13 +160,13 @@ CRITICAL FORMATTING RULES:
 - Write as if for publication in a book or formal document
 - No bullet points, numbered lists, or formatting markup of any kind
 
-Keep your explanation concise but insightful (3-4 sentences). Focus on helping the user understand what Wittgenstein means and why it matters.`;
+Keep your explanation concise but insightful (3-4 sentences). Focus on helping the user understand the writing principles and how to apply them effectively.`;
 
-  const prompt = `Explain this passage from the Tractatus:
+  const prompt = `Explain this passage from the academic writing curriculum:
 
 "${passage}"
 
-Provide a brief, enlightening explanation that helps the user understand Wittgenstein's meaning and philosophical significance. Use plain text only with no formatting.`;
+Provide a brief, enlightening explanation that helps the user understand the writing principles and their practical application. Use plain text only with no formatting.`;
 
   try {
     let result: string;

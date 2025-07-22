@@ -1,66 +1,53 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { bookContent as paperContent } from "@shared/book-content";
 
-// Create a table of contents based on the actual mathematical theorems in the document
+// Create a table of contents based on the Writing 101 course content
 const createTableOfContents = () => {
   const tableOfContents: Array<{ id: string; title: string; level: number }> = [
-    // Introduction
-    { id: "introduction", title: "Introduction", level: 0 },
-    { id: "table-of-contents", title: "Table of Contents", level: 1 },
+    // Academic Writing Principles
+    { id: "academic-writing-principles", title: "Academic Writing Principles", level: 0 },
+    { id: "clarity", title: "Clarity", level: 1 },
+    { id: "evidence", title: "Evidence", level: 1 },
+    { id: "analysis", title: "Analysis", level: 1 },
     
-    // Core Theorems - Structural Foundation
-    { id: "theorem-0", title: "Theorem 0: Cardinality Gap and Incompleteness", level: 0 },
-    { id: "theorem-1", title: "Theorem 1: Non-Recursiveness of Arithmetic Provability", level: 1 },
-    { id: "theorem-2", title: "Theorem 2: Non-Recursiveness of Natural Language", level: 1 },
-    { id: "theorem-3", title: "Theorem 3: Semantic Truth Outpaces Syntactic Provability", level: 1 },
-    { id: "theorem-4", title: "Theorem 4: Structural vs Epistemic Gap", level: 1 },
-    { id: "theorem-5", title: "Theorem 5: Diagonalization Reveals, Not Causes", level: 1 },
+    // Discussion Assignment 1
+    { id: "discussion-1", title: "Discussion 1: Understanding Academic Writing", level: 0 },
     
-    // Recursive and Mapping Theorems
-    { id: "theorem-6", title: "Theorem 6: Recursive Flattening", level: 0 },
-    { id: "theorem-7", title: "Theorem 7: Lossy Mapping from Proofs to Truths", level: 1 },
-    { id: "theorem-8", title: "Theorem 8: Power Set Barrier", level: 1 },
-    { id: "theorem-9", title: "Theorem 9: Limits of Meta-Arithmetic", level: 1 },
-    { id: "theorem-10", title: "Theorem 10: Continuity of Incompleteness", level: 1 },
+    // Essay 1
+    { id: "essay-1", title: "Essay 1: Academic vs. Popular Writing", level: 0 },
+    { id: "essay-1-section-1", title: "Section 1: Academic vs. Popular", level: 1 },
+    { id: "essay-1-section-2", title: "Section 2: Translation Exercise", level: 1 },
     
-    // Epistemic and Logical Closure
-    { id: "theorem-11", title: "Theorem 11: Consequence Explosion", level: 0 },
-    { id: "theorem-12", title: "Theorem 12: Recursive vs Meta-Recursive Domains", level: 1 },
-    { id: "theorem-13", title: "Theorem 13: Epistemic Shadows", level: 1 },
-    { id: "theorem-14", title: "Theorem 14: Diagonal-Free Incompleteness", level: 1 },
-    { id: "theorem-15", title: "Theorem 15: Quantifier Collapse", level: 1 },
+    // Source Types and Evidence
+    { id: "discussion-2", title: "Discussion 2: Types of Academic Evidence", level: 0 },
+    { id: "primary-sources", title: "Primary Sources", level: 1 },
+    { id: "secondary-sources", title: "Secondary Sources", level: 1 },
+    { id: "tertiary-sources", title: "Tertiary Sources", level: 1 },
     
-    // Advanced Structural Results
-    { id: "theorem-16", title: "Theorem 16: Encoding Saturation", level: 0 },
-    { id: "theorem-17", title: "Theorem 17: Proof Closure vs Truth Closure", level: 1 },
-    { id: "theorem-18", title: "Theorem 18: No Iterative Extension Can Achieve Completeness", level: 1 },
-    { id: "theorem-19", title: "Theorem 19: Model Independence Requires Transcendence", level: 1 },
-    { id: "theorem-20", title: "Theorem 20: Truth Is Not Inferentially Bootstrappable", level: 1 },
+    // Essay 2
+    { id: "essay-2", title: "Essay 2: Source Evaluation", level: 0 },
+    { id: "essay-2-introduction", title: "Introduction", level: 1 },
+    { id: "essay-2-analysis", title: "Source Analysis", level: 1 },
+    { id: "essay-2-comparison", title: "Comparative Analysis", level: 1 },
     
-    // Meta-Theoretical Analysis
-    { id: "theorem-21", title: "Theorem 21: Inference Cannot Secure Its Own Validity", level: 0 },
-    { id: "theorem-22", title: "Theorem 22: Systems Cannot Generate Semantic Anchors", level: 1 },
-    { id: "theorem-23", title: "Theorem 23: Axiomatic Closure vs Semantic Openness", level: 1 },
-    { id: "theorem-24", title: "Theorem 24: Systems Cannot Anticipate Extensions", level: 1 },
-    { id: "theorem-25", title: "Theorem 25: Semantic Validity Results in Circularity", level: 1 },
+    // Argument Analysis
+    { id: "discussion-3", title: "Discussion 3: Academic Arguments", level: 0 },
+    { id: "premises", title: "Premises", level: 1 },
+    { id: "logical-reasoning", title: "Logical Reasoning", level: 1 },
+    { id: "conclusions", title: "Conclusions", level: 1 },
     
-    // Foundational Dependencies
-    { id: "theorem-26", title: "Theorem 26: Formal Systems Rely on Non-Formal Judgments", level: 0 },
-    { id: "theorem-27", title: "Theorem 27: Expressive Power Limits Self-Validation", level: 1 },
-    { id: "theorem-28", title: "Theorem 28: Recursive Truth Approximation Fails", level: 1 },
+    // Essay 3
+    { id: "essay-3", title: "Essay 3: Argument and Counterargument", level: 0 },
+    { id: "clarity-complexity-dilemma", title: "Clarity-Complexity Dilemma", level: 1 },
+    { id: "resolving-dilemma", title: "Resolving the Dilemma", level: 1 },
     
-    // Final Theorems
-    { id: "theorem-29", title: "Theorem 29: Truth Drift", level: 0 },
-    { id: "theorem-30", title: "Theorem 30: The Compression Barrier", level: 1 },
-    { id: "theorem-31", title: "Theorem 31: Anti-Compression via Meta-Layers", level: 1 },
-    { id: "theorem-32", title: "Theorem 32: Internal Truth Presupposes External Truth", level: 1 },
-    { id: "theorem-33", title: "Theorem 33: Topological Discontinuity", level: 1 },
-    { id: "theorem-34", title: "Theorem 34: Formal Incompleteness", level: 1 },
+    // Theory and Evidence
+    { id: "discussion-4", title: "Discussion 4: Theory and Evidence", level: 0 },
     
-    // Conclusion and References
-    { id: "future-research", title: "Future Research Directions", level: 0 },
-    { id: "applications", title: "Potential Applications", level: 1 },
-    { id: "references", title: "References", level: 0 }
+    // Final Research Paper
+    { id: "final-paper", title: "Final Research Paper", level: 0 },
+    { id: "paper-requirements", title: "Paper Requirements", level: 1 },
+    { id: "works-cited", title: "Works Cited", level: 1 }
   ];
   
   return tableOfContents;
@@ -81,46 +68,33 @@ export default function NavigationSidebar() {
     // If not found, try to find the content by searching text
     if (!element) {
       const titleMap: { [key: string]: string } = {
-        "introduction": "Introduction",
-        "table-of-contents": "Table of Contents",
-        "theorem-0": "Statement of Theorem 0",
-        "theorem-1": "Statement of Theorem 1",
-        "theorem-2": "Statement of Theorem 2",
-        "theorem-3": "Statement of Theorem 3",
-        "theorem-4": "Statement of Theorem 4",
-        "theorem-5": "Statement of Theorem 5",
-        "theorem-6": "Statement of Theorem 6",
-        "theorem-7": "Statement of Theorem 7",
-        "theorem-8": "Statement of Theorem 8",
-        "theorem-9": "Statement of Theorem 9",
-        "theorem-10": "Statement of Theorem 10",
-        "theorem-11": "Statement of Theorem 11",
-        "theorem-12": "Statement of Theorem 12",
-        "theorem-13": "Statement of Theorem 13",
-        "theorem-14": "Statement of Theorem 14",
-        "theorem-15": "Statement of Theorem 15",
-        "theorem-16": "Statement of Theorem 16",
-        "theorem-17": "Statement of Theorem 17",
-        "theorem-18": "Statement of Theorem 18",
-        "theorem-19": "Statement of Theorem 19",
-        "theorem-20": "Statement of Theorem 20",
-        "theorem-21": "Statement of Theorem 21",
-        "theorem-22": "Statement of Theorem 22",
-        "theorem-23": "Statement of Theorem 23",
-        "theorem-24": "Statement of Theorem 24",
-        "theorem-25": "Statement of Theorem 25",
-        "theorem-26": "Statement of Theorem 26",
-        "theorem-27": "Statement of Theorem 27",
-        "theorem-28": "Statement of Theorem 28",
-        "theorem-29": "Statement of Theorem 29",
-        "theorem-30": "Statement of Theorem 30",
-        "theorem-31": "Statement of Theorem 31",
-        "theorem-32": "Statement of Theorem 32",
-        "theorem-33": "Statement of Theorem 33",
-        "theorem-34": "Statement of Theorem 34",
-        "future-research": "Future Research",
-        "applications": "Potential Applications",
-        "references": "References"
+        "academic-writing-principles": "Academic writing is the practice",
+        "clarity": "Clarity - The foundation",
+        "evidence": "Evidence - Academic writing builds",
+        "analysis": "Analysis - Academic writing requires",
+        "discussion-1": "Discussion Assignment 1",
+        "essay-1": "Essay 1 -- Analyzing Academic vs. Popular Writing",
+        "essay-1-section-1": "Section 1 (30 points) Academic vs. Popular Writing",
+        "essay-1-section-2": "Section 2 (20 points) Translation Exercise",
+        "discussion-2": "Discussion 2: Types of Academic Evidence",
+        "primary-sources": "Primary Sources involve:",
+        "secondary-sources": "Secondary Sources involve:",
+        "tertiary-sources": "Tertiary Sources involve:",
+        "essay-2": "Essay 2 -- Source Evaluation and Analysis",
+        "essay-2-introduction": "Section 1 (10 points) Introduction",
+        "essay-2-analysis": "Section 2 (20 points) Source Analysis",
+        "essay-2-comparison": "Section 3 (20 points) Comparative Analysis",
+        "discussion-3": "Discussion 3: Analyzing Academic Arguments",
+        "premises": "Premises (claims supported by evidence)",
+        "logical-reasoning": "Logical reasoning connecting the premises",
+        "conclusions": "A supported conclusion",
+        "essay-3": "Essay 3 -- Argument and Counterargument",
+        "clarity-complexity-dilemma": "Section 1 (30 points) The Argumentative Dilemma",
+        "resolving-dilemma": "Section 2 (20 points) Resolving the Dilemma",
+        "discussion-4": "Discussion 4: Theory and Evidence Integration",
+        "final-paper": "Final Research Paper",
+        "paper-requirements": "Minimum 5 scholarly sources",
+        "works-cited": "Works Cited:"
       };
       
       const searchText = titleMap[id];

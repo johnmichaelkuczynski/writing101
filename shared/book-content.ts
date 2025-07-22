@@ -1,3 +1,15 @@
+export interface BookSection {
+  id: string;
+  title: string;
+  content: string;
+}
+
+export interface BookContent {
+  title: string;
+  author: string;
+  sections: BookSection[];
+}
+
 export const bookContent: BookContent = {
   title: "Introduction to Academic Writing",
   author: "Zhi Systems",
@@ -1151,3 +1163,7 @@ Works Cited:
     }
   ]
 };
+
+export function getFullDocumentContent(): string {
+  return bookContent.sections.map(section => `${section.title}\n\n${section.content}`).join('\n\n');
+}
