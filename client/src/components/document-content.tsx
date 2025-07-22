@@ -11,7 +11,6 @@ import { Copy, Lock } from "lucide-react";
 
 interface DocumentContentProps {
   mathMode?: boolean;
-  onQuestionFromSelection?: (question: string) => void;
   onTextSelectedForChat?: (text: string) => void;
   onRewriteFromSelection?: (text: string) => void;
   onPassageDiscussion?: (text: string) => void;
@@ -21,7 +20,6 @@ interface DocumentContentProps {
 
 export default function DocumentContent({ 
   mathMode = true, 
-  onQuestionFromSelection, 
   onTextSelectedForChat, 
   onRewriteFromSelection, 
   onPassageDiscussion, 

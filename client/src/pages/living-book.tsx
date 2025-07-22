@@ -3,7 +3,7 @@ import { BookOpen, Edit3, FileText, User, LogOut, CreditCard } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import NavigationSidebar from "@/components/navigation-sidebar";
 import DocumentContent from "@/components/document-content";
-import InstructionInterface from "@/components/instruction-interface";
+
 import ChatInterface from "@/components/chat-interface";
 import ModelSelector from "@/components/model-selector";
 import MathToggle from "@/components/math-toggle";
@@ -27,7 +27,7 @@ export default function LivingBook() {
   const { user, logout, isAuthenticated } = useAuth();
   const [selectedModel, setSelectedModel] = useState<AIModel>("openai");
   const [mathMode, setMathMode] = useState<boolean>(true);
-  const [questionFromSelection, setQuestionFromSelection] = useState<string>("");
+
   const [selectedTextForChat, setSelectedTextForChat] = useState<string>("");
   const [rewriteModalOpen, setRewriteModalOpen] = useState(false);
   const [rewriteMode, setRewriteMode] = useState<"selection" | "chunks">("chunks");
@@ -56,9 +56,7 @@ export default function LivingBook() {
     initializeMathRenderer();
   }, []);
 
-  const handleQuestionFromSelection = (question: string) => {
-    setQuestionFromSelection(question);
-  };
+
 
   const handleTextSelectedForChat = (text: string) => {
     setSelectedTextForChat(text);
@@ -68,9 +66,7 @@ export default function LivingBook() {
     setSelectedTextForChat("");
   };
 
-  const handleQuestionProcessed = () => {
-    setQuestionFromSelection("");
-  };
+
 
   const handleRewriteFromSelection = (text: string) => {
     setSelectedTextForRewrite(text);
@@ -317,7 +313,6 @@ export default function LivingBook() {
           {/* Document Content */}
           <DocumentContent 
             mathMode={mathMode}
-            onQuestionFromSelection={handleQuestionFromSelection}
             onTextSelectedForChat={handleTextSelectedForChat}
             onRewriteFromSelection={handleRewriteFromSelection}
             onPassageDiscussion={handlePassageDiscussion}
@@ -337,13 +332,7 @@ export default function LivingBook() {
         </div>
       </div>
 
-      {/* Instruction Interface - Bottom Bar */}
-      <InstructionInterface 
-        selectedModel={selectedModel} 
-        mathMode={mathMode}
-        initialQuestion={questionFromSelection}
-        onQuestionProcessed={handleQuestionProcessed}
-      />
+
 
       {/* Rewrite Modal */}
       <RewriteModal
