@@ -17,7 +17,11 @@ export const bookContent: BookContent = {
     {
       id: "section-1",
       title: "Section 1",
-      content: `Table of Contents
+      content: `On the Cardinality of Arithmetical Proof Spaces
+
+
+
+Table of Contents
 
 Theorem 0: Cardinality of Proof Spaces 
 
@@ -39,17 +43,17 @@ Theorem 8. Power Set Barrier
 
 Theorem 9. Limits of Meta-Arithmetic
 
-Theorem 10. Consequence Explosion
+Theorem 10. Continuity of Incompleteness  
 
-Theorem 11. Epistemic Shadows
+Theorem 11. Consequence Explosion
 
-Theorem 12. Diagonal-Free Incompleteness
+Theorem 12. Recursive vs. Meta-Recursive Domains  
 
-Theorem 13. Quantifier Collapse
+Theorem 13. Epistemic Shadows
 
-Theorem 14. Proof Stack Overflow
+Theorem 14. Diagonal-Free Incompleteness
 
-Theorem 15. Encoding Saturation
+Theorem 15. Quantifier Collapse  
 
 Theorem 16. Encoding Saturation
 
