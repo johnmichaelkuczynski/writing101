@@ -713,6 +713,12 @@ Preferred communication style: Simple, everyday language.
   - All AI system prompts now properly aligned with Writing 101 curriculum content
   - All API keys activated and working: OpenAI ✅, Anthropic ✅, Perplexity (with fallback) ✅, DeepSeek ✅
   - All existing functionality preserved: chat, rewrite, quiz/study guide generation, passage discussion
+- July 23, 2025: FRIENDLY AI CHAT GREETING - Enhanced user experience with welcome message
+  - Added friendly welcome message in AI chat interface that appears when no chat history exists
+  - Welcome message explains interactive features: "This is a fully interactive text. Highlight any text to discuss, rewrite, or generate tests/study guides"
+  - Updated chat header description from "Ask questions about the paper" to "Ask questions about Writing 101"
+  - Greeting message encourages users to ask about academic writing principles, essay assignments, and curriculum content
+  - Message automatically disappears when user starts chatting, maintaining clean interface
 - July 22, 2025: LAYOUT OPTIMIZATION - Maximum space utilization for improved reading experience
   - INCREASED chat interface height from calc(100vh-200px) to calc(100vh-100px) - added 100px
   - INCREASED document content area height from calc(100vh-280px) to calc(100vh-160px) - added 120px

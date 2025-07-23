@@ -272,7 +272,7 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
                 <MessageCircle className="text-primary mr-2 w-4 h-4" />
                 AI Chat Interface
               </h3>
-              <p className="text-xs text-muted-foreground mt-1">Ask questions about the paper</p>
+              <p className="text-xs text-muted-foreground mt-1">Ask questions about Writing 101</p>
             </div>
             <Button
               variant="ghost"
@@ -290,6 +290,24 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
         {/* Chat Messages */}
         <ScrollArea className="flex-1 overflow-y-auto min-h-0">
           <div className="p-4 space-y-4">
+            {/* Welcome Message - shown when no chat history */}
+            {(!chatHistory || !Array.isArray(chatHistory) || chatHistory.length === 0) && (
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                <div className="flex items-start space-x-3">
+                  <Bot className="text-blue-600 dark:text-blue-400 mt-1 w-5 h-5" />
+                  <div className="flex-1">
+                    <div className="text-blue-800 dark:text-blue-200 font-medium mb-2">
+                      Welcome to Writing 101!
+                    </div>
+                    <p className="text-blue-700 dark:text-blue-300 text-sm leading-relaxed">
+                      This is a fully interactive text. Highlight any text to discuss, rewrite, or generate tests/study guides. 
+                      Ask me questions about academic writing principles, essay assignments, or any content in the curriculum!
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             {(chatHistory as ChatMessage[]).map((chat: ChatMessage) => (
                 <div key={chat.id} className="space-y-2">
                   {/* User Message */}
