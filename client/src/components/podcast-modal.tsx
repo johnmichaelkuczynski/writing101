@@ -45,7 +45,7 @@ export function PodcastModal({ isOpen, onClose, selectedText, chunkIndex }: Podc
     mutationFn: async () => {
       const instructions = mode === "custom" ? customInstructions : undefined;
       
-      return await apiRequest("/api/generate-podcast", {
+      const response = await apiRequest("/api/generate-podcast", {
         method: "POST",
         body: JSON.stringify({
           sourceText: selectedText,
@@ -55,6 +55,7 @@ export function PodcastModal({ isOpen, onClose, selectedText, chunkIndex }: Podc
           voice
         }),
       });
+      return await response.json();
     },
     onSuccess: (data) => {
       setCurrentPodcast(data.podcast);

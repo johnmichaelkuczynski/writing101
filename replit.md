@@ -741,3 +741,5 @@ Preferred communication style: Simple, everyday language.
   - Integration with chunking modal completed for large text selections
   - Full end-to-end workflow verified: text selection → script generation → Azure TTS → audio download
   - Admin users get full audio generation, regular users get script previews with registration prompts
+  - CRITICAL FIX: Fixed podcast modal API response parsing error that prevented podcasts from displaying
+  - Modal now properly parses JSON response and shows generated podcast content with audio playback controls
