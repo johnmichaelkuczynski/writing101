@@ -1,4 +1,4 @@
-import { chatMessages, instructions, rewrites, quizzes, studyGuides, studentTests, users, sessions, purchases, testResults, type ChatMessage, type InsertChatMessage, type Instruction, type InsertInstruction, type Rewrite, type InsertRewrite, type Quiz, type InsertQuiz, type StudyGuide, type InsertStudyGuide, type StudentTest, type InsertStudentTest, type User, type InsertUser, type Session, type InsertSession, type Purchase, type InsertPurchase, type TestResult, type InsertTestResult } from "@shared/schema";
+import { chatMessages, instructions, rewrites, quizzes, studyGuides, studentTests, podcasts, users, sessions, purchases, testResults, type ChatMessage, type InsertChatMessage, type Instruction, type InsertInstruction, type Rewrite, type InsertRewrite, type Quiz, type InsertQuiz, type StudyGuide, type InsertStudyGuide, type StudentTest, type InsertStudentTest, type Podcast, type InsertPodcast, type User, type InsertUser, type Session, type InsertSession, type Purchase, type InsertPurchase, type TestResult, type InsertTestResult } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
 
@@ -20,6 +20,9 @@ export interface IStorage {
   createStudentTest(studentTest: InsertStudentTest): Promise<StudentTest>;
   getStudentTests(): Promise<StudentTest[]>;
   getStudentTestById(id: number): Promise<StudentTest | null>;
+  createPodcast(podcast: InsertPodcast): Promise<Podcast>;
+  getPodcasts(): Promise<Podcast[]>;
+  getPodcastById(id: number): Promise<Podcast | null>;
   
   // User management
   createUser(user: InsertUser): Promise<User>;
@@ -54,6 +57,7 @@ export class MemStorage implements IStorage {
   private quizzes: Map<number, Quiz>;
   private studyGuides: Map<number, StudyGuide>;
   private studentTests: Map<number, StudentTest>;
+  private podcasts: Map<number, Podcast>;
   private users: Map<number, User>;
   private usersByUsername: Map<string, User>;
   private sessions: Map<string, Session>;
@@ -64,6 +68,7 @@ export class MemStorage implements IStorage {
   private currentQuizId: number;
   private currentStudyGuideId: number;
   private currentStudentTestId: number;
+  private currentPodcastId: number;
   private currentUserId: number;
   private currentPurchaseId: number;
 
@@ -74,6 +79,7 @@ export class MemStorage implements IStorage {
     this.quizzes = new Map();
     this.studyGuides = new Map();
     this.studentTests = new Map();
+    this.podcasts = new Map();
     this.users = new Map();
     this.usersByUsername = new Map();
     this.sessions = new Map();
@@ -84,6 +90,7 @@ export class MemStorage implements IStorage {
     this.currentQuizId = 1;
     this.currentStudyGuideId = 1;
     this.currentStudentTestId = 1;
+    this.currentPodcastId = 1;
     this.currentUserId = 1;
     this.currentPurchaseId = 1;
   }
@@ -318,6 +325,35 @@ export class MemStorage implements IStorage {
       this.purchases.set(purchaseId, updatedPurchase);
     }
   }
+
+  // Podcast management methods
+  async createPodcast(insertPodcast: InsertPodcast): Promise<Podcast> {
+    const id = this.currentPodcastId++;
+    const podcast: Podcast = {
+      ...insertPodcast,
+      id,
+      timestamp: new Date(),
+      chunkIndex: insertPodcast.chunkIndex ?? null,
+      audioUrl: insertPodcast.audioUrl ?? null,
+      instructions: insertPodcast.instructions ?? null,
+      isCustomInstructions: insertPodcast.isCustomInstructions ?? false,
+      audioPath: insertPodcast.audioPath ?? null,
+      hasAudio: insertPodcast.hasAudio ?? false,
+      voice: insertPodcast.voice ?? "en-US-JennyNeural",
+      customInstructions: insertPodcast.customInstructions ?? null,
+    };
+    this.podcasts.set(id, podcast);
+    return podcast;
+  }
+
+  async getPodcasts(): Promise<Podcast[]> {
+    return Array.from(this.podcasts.values())
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  }
+
+  async getPodcastById(id: number): Promise<Podcast | null> {
+    return this.podcasts.get(id) || null;
+  }
 }
 
 // Database Storage Implementation
@@ -522,6 +558,31 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(testResults)
       .where(eq(testResults.studentTestId, studentTestId))
       .orderBy(desc(testResults.completedAt));
+  }
+
+  // Podcast management methods
+  async createPodcast(insertPodcast: InsertPodcast): Promise<Podcast> {
+    const [podcast] = await db.insert(podcasts).values({
+      ...insertPodcast,
+      chunkIndex: insertPodcast.chunkIndex ?? null,
+      audioUrl: insertPodcast.audioUrl ?? null,
+      instructions: insertPodcast.instructions ?? null,
+      isCustomInstructions: insertPodcast.isCustomInstructions ?? false,
+      audioPath: insertPodcast.audioPath ?? null,
+      hasAudio: insertPodcast.hasAudio ?? false,
+      voice: insertPodcast.voice ?? "en-US-JennyNeural",
+      customInstructions: insertPodcast.customInstructions ?? null,
+    }).returning();
+    return podcast;
+  }
+
+  async getPodcasts(): Promise<Podcast[]> {
+    return await db.select().from(podcasts).orderBy(desc(podcasts.timestamp));
+  }
+
+  async getPodcastById(id: number): Promise<Podcast | null> {
+    const [podcast] = await db.select().from(podcasts).where(eq(podcasts.id, id));
+    return podcast || null;
   }
 
 }

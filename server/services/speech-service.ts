@@ -149,3 +149,47 @@ export async function transcribeAudio(audioBuffer: Buffer): Promise<SpeechToText
     }
   }
 }
+
+// Azure Text-to-Speech Implementation
+export async function synthesizeSpeechWithAzure(text: string, voice: string = "en-US-JennyNeural"): Promise<Buffer> {
+  if (!process.env.AZURE_SPEECH_KEY || !process.env.AZURE_SPEECH_ENDPOINT) {
+    throw new Error("Azure Speech credentials not configured");
+  }
+
+  try {
+    const endpoint = process.env.AZURE_SPEECH_ENDPOINT.replace('/tts/cognitiveservices/v1', '');
+    const url = `${endpoint}/tts/cognitiveservices/v1`;
+    
+    const ssml = `
+      <speak version="1.0" xml:lang="en-US">
+        <voice name="${voice}">
+          <prosody rate="0.9" pitch="medium">
+            ${text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}
+          </prosody>
+        </voice>
+      </speak>
+    `;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Ocp-Apim-Subscription-Key': process.env.AZURE_SPEECH_KEY,
+        'Content-Type': 'application/ssml+xml',
+        'X-Microsoft-OutputFormat': 'audio-16khz-128kbitrate-mono-mp3',
+        'User-Agent': 'YourAppName'
+      },
+      body: ssml
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Azure TTS error: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+
+    const audioBuffer = Buffer.from(await response.arrayBuffer());
+    return audioBuffer;
+  } catch (error) {
+    console.error('Azure TTS error:', error);
+    throw new Error(`Text-to-speech synthesis failed: ${error.message}`);
+  }
+}

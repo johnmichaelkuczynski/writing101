@@ -4,6 +4,11 @@ import { createServer, type Server } from "http";
 import session from "express-session";
 import { storage } from "./storage";
 import { generateAIResponse, generateRewrite, generatePassageExplanation, generatePassageDiscussionResponse, generateQuiz, generateStudyGuide, generateStudentTest } from "./services/ai-models";
+import { generatePodcastScript } from "./services/podcast-service";
+import { synthesizeSpeechWithAzure } from "./services/speech-service";
+import { writeFileSync, existsSync, mkdirSync } from "fs";
+import { join } from "path";
+import { randomUUID } from "crypto";
 
 import { getFullDocumentContent } from "./services/document-processor";
 
@@ -11,7 +16,7 @@ import { generatePDF } from "./services/pdf-generator";
 import { transcribeAudio } from "./services/speech-service";
 import { register, login, createSession, getUserFromSession, canAccessFeature, getPreviewResponse, isAdmin, hashPassword } from "./auth";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalTransaction } from "./safe-paypal";
-import { chatRequestSchema, instructionRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, studentTestRequestSchema, submitTestRequestSchema, registerRequestSchema, loginRequestSchema, purchaseRequestSchema, type AIModel } from "@shared/schema";
+import { chatRequestSchema, instructionRequestSchema, rewriteRequestSchema, quizRequestSchema, studyGuideRequestSchema, studentTestRequestSchema, submitTestRequestSchema, registerRequestSchema, loginRequestSchema, purchaseRequestSchema, podcastRequestSchema, type AIModel } from "@shared/schema";
 import multer from "multer";
 
 declare module 'express-session' {
@@ -648,6 +653,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(studyGuides);
     } catch (error) {
       console.error("Error fetching study guides:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Podcast generation endpoint with authentication
+  app.post("/api/generate-podcast", async (req, res) => {
+    try {
+      const { sourceText, instructions, model, chunkIndex, voice } = podcastRequestSchema.parse(req.body);
+      const user = await getCurrentUser(req);
+      
+      console.log("Generating podcast script...");
+      const script = await generatePodcastScript(model, sourceText, instructions);
+      
+      // Check if user has access to full features
+      let podcastScript = script;
+      let audioUrl = null;
+      let isPreview = false;
+      
+      if (!canAccessFeature(user)) {
+        podcastScript = getPreviewResponse(script, !user);
+        isPreview = true;
+      } else {
+        // Generate audio for full access users
+        if (!isAdmin(user)) {
+          await storage.updateUserCredits(user!.id, user!.credits - 2); // Podcast costs 2 credits
+        }
+        
+        try {
+          console.log("Generating audio with Azure TTS...");
+          const audioBuffer = await synthesizeSpeechWithAzure(script, voice || "en-US-JennyNeural");
+          
+          // Save audio file
+          const audioDir = join(process.cwd(), 'public', 'audio');
+          if (!existsSync(audioDir)) {
+            mkdirSync(audioDir, { recursive: true });
+          }
+          
+          const audioFileName = `podcast_${randomUUID()}.mp3`;
+          const audioPath = join(audioDir, audioFileName);
+          writeFileSync(audioPath, audioBuffer);
+          
+          audioUrl = `/audio/${audioFileName}`;
+          console.log("Audio saved to:", audioUrl);
+        } catch (audioError) {
+          console.error("Audio generation failed:", audioError);
+          // Continue without audio - user still gets the script
+        }
+      }
+      
+      const savedPodcast = await storage.createPodcast({
+        sourceText,
+        script: script,
+        audioUrl: audioUrl,
+        model,
+        chunkIndex,
+        instructions: instructions || null,
+        voice: voice || "en-US-JennyNeural",
+        hasAudio: !!audioUrl,
+        isCustomInstructions: !!instructions,
+        customInstructions: instructions || null,
+        audioPath: audioUrl
+      });
+      
+      res.json({ 
+        podcast: {
+          id: savedPodcast.id,
+          script: podcastScript, // Return preview or full script based on user status
+          audioUrl: isPreview ? null : audioUrl, // Only provide audio URL for full access
+          timestamp: savedPodcast.timestamp,
+          hasAudio: !!audioUrl && !isPreview
+        },
+        isPreview 
+      });
+    } catch (error) {
+      console.error("Podcast generation error:", error);
+      res.status(500).json({ error: error instanceof Error ? error.message : "Failed to generate podcast" });
+    }
+  });
+
+  // Get podcasts endpoint
+  app.get("/api/podcasts", async (req, res) => {
+    try {
+      const podcasts = await storage.getPodcasts();
+      res.json(podcasts);
+    } catch (error) {
+      console.error("Error fetching podcasts:", error);
       res.status(500).json({ error: error.message });
     }
   });

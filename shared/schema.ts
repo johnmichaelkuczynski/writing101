@@ -60,6 +60,22 @@ export const studentTests = pgTable("student_tests", {
   timestamp: timestamp("timestamp").defaultNow().notNull(),
 });
 
+export const podcasts = pgTable("podcasts", {
+  id: serial("id").primaryKey(),
+  sourceText: text("source_text").notNull(),
+  script: text("script").notNull(),
+  audioUrl: text("audio_url"),
+  model: text("model").notNull(),
+  chunkIndex: integer("chunk_index"),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
+  instructions: text("instructions"),
+  isCustomInstructions: boolean("is_custom_instructions").default(false),
+  audioPath: text("audio_path"),
+  hasAudio: boolean("has_audio").default(false),
+  voice: text("voice").default("en-US-JennyNeural"),
+  customInstructions: text("custominstructions"),
+});
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
@@ -150,6 +166,20 @@ export const insertStudentTestSchema = createInsertSchema(studentTests).pick({
   chunkIndex: true,
 });
 
+export const insertPodcastSchema = createInsertSchema(podcasts).pick({
+  sourceText: true,
+  script: true,
+  audioUrl: true,
+  model: true,
+  chunkIndex: true,
+  instructions: true,
+  isCustomInstructions: true,
+  audioPath: true,
+  hasAudio: true,
+  voice: true,
+  customInstructions: true,
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   email: true,
@@ -198,6 +228,8 @@ export type StudyGuide = typeof studyGuides.$inferSelect;
 export type InsertStudyGuide = z.infer<typeof insertStudyGuideSchema>;
 export type StudentTest = typeof studentTests.$inferSelect;
 export type InsertStudentTest = z.infer<typeof insertStudentTestSchema>;
+export type Podcast = typeof podcasts.$inferSelect;
+export type InsertPodcast = z.infer<typeof insertPodcastSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Session = typeof sessions.$inferSelect;
@@ -260,7 +292,13 @@ export const submitTestRequestSchema = z.object({
   questionTypes: z.record(z.enum(["multiple_choice", "short_answer", "long_answer"])).optional(),
 });
 
-
+export const podcastRequestSchema = z.object({
+  sourceText: z.string(),
+  instructions: z.string().optional(),
+  model: z.enum(["deepseek", "openai", "anthropic", "perplexity"]),
+  chunkIndex: z.number().optional(),
+  voice: z.string().optional(),
+});
 
 export const registerRequestSchema = z.object({
   username: z.string().min(3).max(50),
@@ -288,6 +326,7 @@ export type RewriteRequest = z.infer<typeof rewriteRequestSchema>;
 export type QuizRequest = z.infer<typeof quizRequestSchema>;
 export type StudyGuideRequest = z.infer<typeof studyGuideRequestSchema>;
 export type StudentTestRequest = z.infer<typeof studentTestRequestSchema>;
+export type PodcastRequest = z.infer<typeof podcastRequestSchema>;
 
 export type RegisterRequest = z.infer<typeof registerRequestSchema>;
 export type LoginRequest = z.infer<typeof loginRequestSchema>;

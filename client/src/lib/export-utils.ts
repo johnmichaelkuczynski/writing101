@@ -177,6 +177,19 @@ export async function downloadPDF(content: string, filename: string = 'ai-respon
   });
 }
 
+// Download text as file function
+export function downloadAsText(content: string, filename: string): void {
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 // Email functionality removed
 export async function emailContent(content: string, email: string, subject: string): Promise<void> {
   throw new Error("Email functionality disabled");
