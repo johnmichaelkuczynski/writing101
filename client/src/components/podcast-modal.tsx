@@ -43,19 +43,31 @@ export function PodcastModal({ isOpen, onClose, selectedText, chunkIndex }: Podc
 
   const generatePodcastMutation = useMutation({
     mutationFn: async () => {
-      const instructions = mode === "custom" ? customInstructions : undefined;
-      
-      const response = await apiRequest("/api/generate-podcast", {
-        method: "POST",
-        body: JSON.stringify({
-          sourceText: selectedText,
-          instructions,
-          model,
-          chunkIndex,
-          voice
-        }),
-      });
-      return await response.json();
+      try {
+        const instructions = mode === "custom" ? customInstructions : undefined;
+        
+        const response = await apiRequest("/api/generate-podcast", {
+          method: "POST",
+          body: JSON.stringify({
+            sourceText: selectedText,
+            instructions,
+            model,
+            chunkIndex,
+            voice
+          }),
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log("Podcast response:", data);
+        return data;
+      } catch (error) {
+        console.error("Podcast mutation error:", error);
+        throw error;
+      }
     },
     onSuccess: (data) => {
       setCurrentPodcast(data.podcast);
@@ -78,6 +90,7 @@ export function PodcastModal({ isOpen, onClose, selectedText, chunkIndex }: Podc
       queryClient.invalidateQueries({ queryKey: ["/api/podcasts"] });
     },
     onError: (error: any) => {
+      console.error("Podcast generation error:", error);
       toast({
         title: "Generation Failed",
         description: error.message || "Failed to generate podcast",
@@ -328,7 +341,9 @@ export function PodcastModal({ isOpen, onClose, selectedText, chunkIndex }: Podc
                     onTimeUpdate={handleTimeUpdate}
                     onLoadedMetadata={handleLoadedMetadata}
                     onEnded={() => setIsPlaying(false)}
+                    onError={(e) => console.error("Audio playback error:", e)}
                     preload="metadata"
+                    crossOrigin="anonymous"
                   />
                   
                   {/* Playback Controls */}
