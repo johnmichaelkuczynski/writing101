@@ -73,7 +73,8 @@ export const podcasts = pgTable("podcasts", {
   audioPath: text("audio_path"),
   hasAudio: boolean("has_audio").default(false),
   voice: text("voice").default("en-US-JennyNeural"),
-  customInstructions: text("custominstructions"),
+  customInstructions: text("custom_instructions"),
+  duration: integer("duration"),
 });
 
 export const users = pgTable("users", {
