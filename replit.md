@@ -743,3 +743,5 @@ Preferred communication style: Simple, everyday language.
   - Admin users get full audio generation, regular users get script previews with registration prompts
   - CRITICAL FIX: Fixed podcast modal API response parsing error that prevented podcasts from displaying
   - Modal now properly parses JSON response and shows generated podcast content with audio playback controls
+  - MEDIA ERROR FIX: Fixed "media resource not suitable" error by adding proper audio validation and conditional rendering
+  - Enhanced audio player with defensive checks for empty/invalid URLs and proper error handling

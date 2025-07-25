@@ -70,6 +70,8 @@ export function PodcastModal({ isOpen, onClose, selectedText, chunkIndex }: Podc
       }
     },
     onSuccess: (data) => {
+      console.log("Setting current podcast:", data.podcast);
+      console.log("Audio URL:", data.podcast?.audioUrl);
       setCurrentPodcast(data.podcast);
       setIsPreview(data.isPreview || false);
       
@@ -113,12 +115,23 @@ export function PodcastModal({ isOpen, onClose, selectedText, chunkIndex }: Podc
   };
 
   const handlePlayPause = () => {
-    if (!audioRef.current || !currentPodcast?.audioUrl) return;
+    if (!audioRef.current || !currentPodcast?.audioUrl || !currentPodcast.audioUrl.trim()) return;
     
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.play();
+      // Load the audio source if not already loaded
+      if (!audioRef.current.src) {
+        audioRef.current.src = currentPodcast.audioUrl;
+      }
+      audioRef.current.play().catch(error => {
+        console.error("Audio play failed:", error);
+        toast({
+          title: "Audio Error",
+          description: "Failed to play audio. Please try again.",
+          variant: "destructive",
+        });
+      });
     }
     setIsPlaying(!isPlaying);
   };
@@ -140,7 +153,7 @@ export function PodcastModal({ isOpen, onClose, selectedText, chunkIndex }: Podc
   };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current) return;
+    if (!audioRef.current || !currentPodcast?.audioUrl) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const newTime = (clickX / rect.width) * duration;
@@ -326,7 +339,7 @@ export function PodcastModal({ isOpen, onClose, selectedText, chunkIndex }: Podc
         ) : (
           <div className="space-y-6">
             {/* Audio Player */}
-            {currentPodcast.hasAudio && currentPodcast.audioUrl && !isPreview && (
+            {currentPodcast.hasAudio && currentPodcast.audioUrl && !isPreview && currentPodcast.audioUrl.trim() && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-sm flex items-center gap-2">
@@ -337,14 +350,15 @@ export function PodcastModal({ isOpen, onClose, selectedText, chunkIndex }: Podc
                 <CardContent className="space-y-4">
                   <audio
                     ref={audioRef}
-                    src={currentPodcast.audioUrl}
                     onTimeUpdate={handleTimeUpdate}
                     onLoadedMetadata={handleLoadedMetadata}
                     onEnded={() => setIsPlaying(false)}
                     onError={(e) => console.error("Audio playback error:", e)}
-                    preload="metadata"
-                    crossOrigin="anonymous"
-                  />
+                    preload="none"
+                  >
+                    <source src={currentPodcast.audioUrl} type="audio/mpeg" />
+                    Your browser does not support the audio element.
+                  </audio>
                   
                   {/* Playback Controls */}
                   <div className="flex items-center gap-3">
