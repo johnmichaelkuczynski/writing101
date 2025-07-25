@@ -199,7 +199,7 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
       <html>
       <head>
         <meta charset="utf-8">
-        <title>AI Response - Living Book</title>
+        <title>AI Response - NEWWRITINGCOURSE</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
         <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
@@ -216,7 +216,7 @@ export default function ChatInterface({ selectedModel, mathMode = true, selected
       </head>
       <body>
         <div class="header">
-          <h1 class="title">AI Response - Dictionary of Analytic Philosophy</h1>
+          <h1 class="title">AI Response - NEWWRITINGCOURSE</h1>
           <p class="timestamp">Generated: ${timestamp}</p>
         </div>
         <div class="content" id="math-content">${processedContent}</div>

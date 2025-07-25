@@ -294,7 +294,7 @@ ${currentStudentTest.testContent}`;
       <html>
       <head>
         <meta charset="utf-8">
-        <title>Student Practice Test</title>
+        <title>Student Practice Test - NEWWRITINGCOURSE</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
         <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
@@ -313,7 +313,7 @@ ${currentStudentTest.testContent}`;
       <body>
         <div class="header">
           <h1 class="title">Student Practice Test</h1>
-          <p class="subtitle">Cardinality of Proof Spaces</p>
+          <p class="subtitle">NEWWRITINGCOURSE</p>
           <p class="meta">Generated: ${timestamp}</p>
           <p class="meta">Model: ${selectedModel}</p>
           <p class="meta">Instructions: ${customInstructions || "Default instructions"}</p>

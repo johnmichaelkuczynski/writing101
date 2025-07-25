@@ -725,3 +725,10 @@ Preferred communication style: Simple, everyday language.
   - INCREASED navigation sidebar height from calc(100vh-280px) to calc(100vh-160px) - added 120px
   - All three panels (navigation, document, chat) now aligned at same height using maximum available screen space
   - Eliminated dead space at bottom of page for optimal content viewing and scrolling experience
+- July 25, 2025: TITLE AND METADATA UPDATE - Changed from "Symbolic Logic" to "NEWWRITINGCOURSE"
+  - Updated main HTML title from "Living Book: Introduction to Symbolic Logic" to "NEWWRITINGCOURSE"
+  - Added Open Graph and Twitter meta tags for proper social media sharing
+  - Created manifest.json with updated app name and description
+  - Updated all PDF export titles in chat interface, passage discussion, and student test modals
+  - Fixed shared URL preview to display correct title instead of old "Symbolic Logic" reference
+  - All API keys remain activated: OpenAI ✅, Anthropic ✅, Perplexity ✅, DeepSeek ✅, Azure Speech ✅

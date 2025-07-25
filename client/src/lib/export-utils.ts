@@ -62,7 +62,7 @@ export async function downloadPDF(content: string, filename: string = 'ai-respon
         <html>
         <head>
           <meta charset="utf-8">
-          <title>AI Response - Living Book</title>
+          <title>AI Response - NEWWRITINGCOURSE</title>
           <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
           <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
           <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
