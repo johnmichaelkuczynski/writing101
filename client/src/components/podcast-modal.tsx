@@ -353,10 +353,17 @@ export function PodcastModal({ isOpen, onClose, selectedText, chunkIndex }: Podc
                     onTimeUpdate={handleTimeUpdate}
                     onLoadedMetadata={handleLoadedMetadata}
                     onEnded={() => setIsPlaying(false)}
-                    onError={(e) => console.error("Audio playback error:", e)}
-                    preload="none"
+                    onError={(e) => {
+                      console.error("Audio playback error:", e);
+                      console.error("Audio src:", currentPodcast.audioUrl);
+                    }}
+                    onCanPlay={() => console.log("Audio can play")}
+                    onLoadStart={() => console.log("Audio load started")}
+                    preload="metadata"
+                    controls={false}
                   >
                     <source src={currentPodcast.audioUrl} type="audio/mpeg" />
+                    <source src={currentPodcast.audioUrl} type="audio/mp3" />
                     Your browser does not support the audio element.
                   </audio>
                   
