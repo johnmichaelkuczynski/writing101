@@ -17,7 +17,7 @@ export default function ChunkingModal({ isOpen, onClose, text, onChunkAction }: 
   
   // Split text into chunks
   const words = (text || '').split(/\s+/);
-  const chunks = [];
+  const chunks: string[] = [];
   for (let i = 0; i < words.length; i += chunkSize) {
     chunks.push(words.slice(i, i + chunkSize).join(' '));
   }

@@ -16,6 +16,7 @@ interface DocumentContentProps {
   onPassageDiscussion?: (text: string) => void;
   onCreateStudyGuide?: (text: string) => void;
   onTestMe?: (text: string) => void;
+  onPodcast?: (text: string) => void;
 }
 
 export default function DocumentContent({ 
@@ -24,7 +25,8 @@ export default function DocumentContent({
   onRewriteFromSelection, 
   onPassageDiscussion, 
   onCreateStudyGuide,
-  onTestMe
+  onTestMe,
+  onPodcast
 }: DocumentContentProps) {
   const { selection, isSelecting, clearSelection, highlightSelection, removeHighlights } = useTextSelection();
   const [showChunkingModal, setShowChunkingModal] = useState(false);
@@ -96,6 +98,23 @@ export default function DocumentContent({
   const handleTestMe = (text: string) => {
     if (onTestMe) {
       onTestMe(text);
+    }
+    // Don't clear selection - let user choose other actions if needed
+  };
+
+  const handlePodcast = (text: string) => {
+    // Check if text is large and needs chunking
+    const wordCount = text.split(/\s+/).length;
+    
+    if (wordCount > 1000) {
+      // Open chunking modal for large selections
+      setShowChunkingModal(true);
+      setSelectedTextForChunking(text);
+    } else {
+      // For smaller texts, use normal selection
+      if (onPodcast) {
+        onPodcast(text);
+      }
     }
     // Don't clear selection - let user choose other actions if needed
   };
@@ -307,6 +326,7 @@ export default function DocumentContent({
           onRewrite={handleRewrite}
           onCreateStudyGuide={handleCreateStudyGuide}
           onTestMe={handleTestMe}
+          onPodcast={handlePodcast}
           onHighlight={handleHighlight}
           onClear={clearSelection}
         />
@@ -317,11 +337,13 @@ export default function DocumentContent({
         isOpen={showChunkingModal}
         onClose={() => setShowChunkingModal(false)}
         text={selectedTextForChunking}
-        onChunkAction={(chunk: string, chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite' | 'study-guide' | 'student-test') => {
+        onChunkAction={(chunk: string, chunkIndex: number, action: 'quiz' | 'chat' | 'rewrite' | 'study-guide' | 'student-test' | 'podcast') => {
           if (action === 'chat' && onTextSelectedForChat) {
             onTextSelectedForChat(chunk);
           } else if (action === 'rewrite' && onRewriteFromSelection) {
             onRewriteFromSelection(chunk);
+          } else if (action === 'podcast' && onPodcast) {
+            onPodcast(chunk);
           }
         }}
       />

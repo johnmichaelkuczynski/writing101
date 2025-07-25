@@ -9,6 +9,7 @@ interface SelectionToolbarProps {
   onRewrite: (text: string) => void;
   onCreateStudyGuide: (text: string) => void;
   onTestMe: (text: string) => void;
+  onPodcast: (text: string) => void;
   onHighlight: () => void;
   onClear: () => void;
   position?: { x: number; y: number };
@@ -21,6 +22,7 @@ export default function SelectionToolbar({
   onRewrite,
   onCreateStudyGuide,
   onTestMe,
+  onPodcast,
   onHighlight, 
   onClear, 
   position 
@@ -53,6 +55,11 @@ export default function SelectionToolbar({
 
   const handleTestMe = () => {
     onTestMe(selectedText);
+    // Keep toolbar visible so user can try other actions
+  };
+
+  const handlePodcast = () => {
+    onPodcast(selectedText);
     // Keep toolbar visible so user can try other actions
   };
 
@@ -145,7 +152,15 @@ export default function SelectionToolbar({
         <span className="text-xs">Test Me</span>
       </Button>
 
-
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={handlePodcast}
+        className="flex items-center space-x-1 text-pink-600 border-pink-200 hover:bg-pink-50"
+      >
+        🎧
+        <span className="text-xs">Podcast</span>
+      </Button>
       
       <Button
         size="sm"
