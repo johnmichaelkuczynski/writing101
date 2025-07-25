@@ -732,3 +732,12 @@ Preferred communication style: Simple, everyday language.
   - Updated all PDF export titles in chat interface, passage discussion, and student test modals
   - Fixed shared URL preview to display correct title instead of old "Symbolic Logic" reference
   - All API keys remain activated: OpenAI ✅, Anthropic ✅, Perplexity ✅, DeepSeek ✅, Azure Speech ✅
+- July 25, 2025: PODCAST FUNCTIONALITY COMPLETELY RESTORED - Azure Text-to-Speech integration fully operational
+  - FIXED all database schema mismatches that were preventing podcast creation and storage
+  - Rebuilt podcasts table with all required columns (audio_path, custom_instructions, duration, etc.)
+  - CONFIRMED Azure Text-to-Speech working perfectly with 4.5-second generation time
+  - Audio files successfully generated and saved to /public/audio/ directory with .mp3 format
+  - Podcast button (🎧) fully functional in text selection toolbar for immediate audio generation
+  - Integration with chunking modal completed for large text selections
+  - Full end-to-end workflow verified: text selection → script generation → Azure TTS → audio download
+  - Admin users get full audio generation, regular users get script previews with registration prompts
